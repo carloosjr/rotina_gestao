@@ -1476,6 +1476,39 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL)     -->
+  <!-- ============================================================== -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#1c1c1c] border border-red-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative">
+      <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center text-xl shrink-0 border border-red-500/30">
+          <i class="ti ti-trash"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 id="deleteConfirmTitle" class="text-base font-bold text-white">Confirmar Exclusão</h3>
+          <p id="deleteConfirmMessage" class="text-xs text-slate-300 leading-relaxed">
+            Deseja realmente excluir este registro? Esta ação removerá o item permanentemente e não poderá ser desfeita.
+          </p>
+        </div>
+      </div>
+
+      <div id="deleteConfirmDetails" class="p-3 rounded-xl bg-[#141414] border border-[#2a2a2a] text-xs text-slate-300 hidden">
+        <!-- Preview do item a ser excluído -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-[#2a2a2a]">
+        <button type="button" onclick="closeDeleteConfirmModal()" class="px-4 py-2 text-xs font-bold rounded-lg bg-[#252525] hover:bg-[#303030] text-slate-300 transition">
+          Cancelar
+        </button>
+        <button type="button" id="deleteConfirmActionBtn" onclick="confirmDeleteAction()" class="px-4 py-2 text-xs font-bold rounded-lg bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-1.5 active:scale-95 shadow-sm">
+          <i class="ti ti-trash"></i>
+          <span>Confirmar e Excluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- DISCORD WEBHOOK CONFIGURATION MODAL -->
   <div id="discordConfigModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
@@ -5444,17 +5477,107 @@ END \$\$;
       });
     }
 
-    function deleteSensoRecord(recId) {
-      if (!confirm('Deseja excluir este registro de Senso de Dono?')) return;
-      if (dbState.sensoDeDono[selectedDate]) {
-        dbState.sensoDeDono[selectedDate] = dbState.sensoDeDono[selectedDate].filter(r => r.id !== recId);
-        if (supabaseClient) {
-          supabaseClient.from('rotina_operacional_senso_dono').delete().eq('id', recId).then();
+    // --- CONTROLLER DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL) ---
+    let pendingDeleteCallback = null;
+
+    function requestDeleteConfirmation({ title, message, detailsHtml, onConfirm }) {
+      const modal = document.getElementById('deleteConfirmModal');
+      const titleEl = document.getElementById('deleteConfirmTitle');
+      const msgEl = document.getElementById('deleteConfirmMessage');
+      const detailsEl = document.getElementById('deleteConfirmDetails');
+
+      if (titleEl) titleEl.textContent = title || 'Confirmar Exclusão';
+      if (msgEl) msgEl.textContent = message || 'Tem certeza que deseja prosseguir com a exclusão?';
+
+      if (detailsEl) {
+        if (detailsHtml) {
+          detailsEl.innerHTML = detailsHtml;
+          detailsEl.classList.remove('hidden');
+        } else {
+          detailsEl.classList.add('hidden');
         }
-        showToast('Registro de Senso de Dono removido.');
-        renderSensoDeDono();
-        scheduleCloudSync();
       }
+
+      pendingDeleteCallback = onConfirm;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDeleteConfirmModal() {
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.add('hidden');
+      pendingDeleteCallback = null;
+    }
+
+    function confirmDeleteAction() {
+      if (typeof pendingDeleteCallback === 'function') {
+        const action = pendingDeleteCallback;
+        pendingDeleteCallback = null;
+        closeDeleteConfirmModal();
+        action();
+      } else {
+        closeDeleteConfirmModal();
+      }
+    }
+
+    function deleteSensoRecord(recId) {
+      const records = dbState.sensoDeDono[selectedDate] || [];
+      const item = records.find(r => String(r.id) === String(recId));
+
+      const detailsHtml = item ? `
+        <div class="space-y-1.5 text-left">
+          <div class="flex items-center gap-1.5 font-bold text-white">
+            <i class="ti ti-crown text-[#fbbf24]"></i>
+            <span>Apontamento das ${item.time || '--:--'} por <strong>${item.user || 'Gestor'}</strong></span>
+          </div>
+          <p class="text-[11px] text-slate-300 line-clamp-2 italic">
+            "${item.aconteceu || item.acoes || 'Apontamento de liderança do dia'}"
+          </p>
+        </div>
+      ` : null;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Apontamento de Liderança',
+        message: 'Tem certeza que deseja excluir este registro de Senso de Dono? O apontamento será removido permanentemente do histórico e da nuvem.',
+        detailsHtml,
+        onConfirm: () => {
+          executeDeleteSenso(recId);
+        }
+      });
+    }
+
+    function executeDeleteSenso(recId) {
+      if (!dbState.sensoDeDono[selectedDate]) return;
+
+      // 1. Remove do estado local em memória (garantindo comparação como string)
+      dbState.sensoDeDono[selectedDate] = dbState.sensoDeDono[selectedDate].filter(r => String(r.id) !== String(recId));
+
+      // 2. Salva imediatamente no LocalStorage
+      saveLocalState(selectedDate);
+
+      // 3. Marca que o usuário gerenciou exclusões para nunca mais ressuscitar o exemplo seed inicial
+      try {
+        localStorage.setItem('rotina_senso_cleared_' + selectedDate, 'true');
+      } catch(e) {}
+
+      // 4. Remove da tabela dedicada rotina_operacional_senso_dono no Supabase
+      if (supabaseClient) {
+        try {
+          supabaseClient
+            .from('rotina_operacional_senso_dono')
+            .delete()
+            .eq('id', recId)
+            .then(() => {
+              console.log('[Supabase] Registro de Senso de Dono removido:', recId);
+            })
+            .catch(err => {
+              console.warn('[Supabase] Erro ao excluir senso_dono:', err);
+            });
+        } catch(e) {}
+      }
+
+      showToast('Registro de Senso de Dono excluído com sucesso.');
+      renderSensoDeDono();
+      scheduleCloudSync();
     }
 
     function renderSensoDeDono() {
@@ -5693,6 +5816,7 @@ END \$\$;
         closeWhatsAppConfigModal();
         closeAnalyticsModal();
         closeExecutiveReportModal();
+        closeDeleteConfirmModal();
       }
     });
 
@@ -5711,8 +5835,11 @@ END \$\$;
       loadLocalState(selectedDate);
       updateNotificationButtonUI();
 
-      // Seed um exemplo inicial de Senso de Dono se não houver registros
-      if (!dbState.sensoDeDono[selectedDate] || dbState.sensoDeDono[selectedDate].length === 0) {
+      // Seed um exemplo inicial de Senso de Dono se não houver registros e nunca tiver sido excluído pelo usuário
+      const hasUserClearedSenso = localStorage.getItem('rotina_senso_cleared_' + selectedDate);
+      const hasEverSeededSenso = localStorage.getItem('rotina_senso_has_seeded_v1');
+      if (!hasUserClearedSenso && !hasEverSeededSenso && (!dbState.sensoDeDono[selectedDate] || dbState.sensoDeDono[selectedDate].length === 0)) {
+        localStorage.setItem('rotina_senso_has_seeded_v1', 'true');
         dbState.sensoDeDono[selectedDate] = [
           {
             id: 'senso_sample_1',
