@@ -562,11 +562,50 @@
         </div>
       </div>
 
-      <!-- Filter Buttons Row -->
-      <div class="flex items-center space-x-2 border-t border-[#2a2a2a]/80 pt-2 pb-0.5 overflow-x-auto">
+      <!-- Primary Modules Navigation Bar -->
+      <div class="flex items-center justify-between gap-3 border-t border-[#2a2a2a]/80 pt-2.5 pb-2 overflow-x-auto">
+        <div class="flex items-center space-x-2 shrink-0">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1.5 pl-0.5 pr-1">
+            <i class="ti ti-layout-grid text-[#fbbf24]"></i>
+            <span>Módulo:</span>
+          </span>
+
+          <button onclick="switchMainView('routine')" id="moduleTab-routine" class="filter-tab active" title="Trilha diária, rondas WorkDesk, almoços e senso de dono">
+            <i class="ti ti-clock"></i>
+            <span>Trilha &amp; Rotina Diária</span>
+          </button>
+
+          <button onclick="switchMainView('plantao')" id="moduleTab-plantao" class="filter-tab" title="Monitoramento de canais, atendimentos em grupos, filas e ligações da central">
+            <i class="ti ti-moon-stars text-[#fbbf24]"></i>
+            <span>Acompanhamento do Plantão</span>
+            <span id="moduleBadgePlantao" class="text-[10px] px-1.5 py-0.2 rounded-full bg-[#fbbf24]/20 text-[#fbbf24] font-bold border border-[#fbbf24]/30 hidden">0</span>
+          </button>
+
+          <button onclick="switchMainView('agenda')" id="moduleTab-agenda" class="filter-tab" title="Validação de OCs indevidas na agenda dos especialistas">
+            <i class="ti ti-calendar-exclamation text-amber-400"></i>
+            <span>Validação de Agenda</span>
+            <span id="moduleBadgeAgenda" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 hidden">0</span>
+          </button>
+
+          <button onclick="switchMainView('all')" id="moduleTab-all" class="filter-tab" title="Exibir todos os módulos integrados em uma única tela">
+            <i class="ti ti-layers-linked"></i>
+            <span>Visão Integrada (Tudo)</span>
+          </button>
+        </div>
+
+        <div class="hidden xl:flex items-center gap-2 text-xs text-slate-400 shrink-0">
+          <span>Atalhos:</span>
+          <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">1: Rotina</kbd>
+          <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">2: Plantão</kbd>
+          <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">3: Agenda</kbd>
+        </div>
+      </div>
+
+      <!-- Filter Buttons Row (Trilha Diurna/Noturna) -->
+      <div id="timelineFilterButtonsRow" class="flex items-center space-x-2 border-t border-[#2a2a2a]/60 pt-2 pb-0.5 overflow-x-auto">
         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1.5 pl-0.5 pr-1">
           <i class="ti ti-filter text-[#fbbf24]"></i>
-          <span>Filtro:</span>
+          <span>Filtro Trilha:</span>
         </span>
 
         <button onclick="setActiveFilter('all')" id="filterBtn-all" class="filter-tab">
@@ -604,6 +643,11 @@
 
   <!-- Main Container -->
   <main class="max-w-[1800px] w-full mx-auto px-4 sm:px-6 py-6 flex-1 space-y-6">
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 1: TRILHA & ROTINA DIÁRIA (Rondas, HUD, Almoços, Timeline, Senso)  -->
+    <!-- ========================================================================= -->
+    <div id="routineModuleContainer" class="space-y-6">
 
     <!-- HIGH-PRIORITY COMMAND CENTER: WorkDesk 30m Routine Spotlight -->
     <section id="rondaProminentSection" class="system-card relative p-5 sm:p-6 transition-all duration-300 border ronda-glow bg-[#1c1c1c] border-[#2a2a2a] overflow-hidden shadow-2xl">
@@ -1078,7 +1122,311 @@
           <!-- Rendered dynamically by renderSensoDeDono() -->
         </div>
       </div>
-    </section>
+    </div>
+    <!-- /routineModuleContainer -->
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 2: ACOMPANHAMENTO OPERACIONAL DO PLANTÃO                           -->
+    <!-- Canais, Atendimentos em Grupos WhatsApp, Filas e Ligações da Central     -->
+    <!-- ========================================================================= -->
+    <div id="plantaoModuleContainer" class="space-y-6 hidden">
+      <section id="plantaoAcompanhamentoSection" class="system-card p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-6">
+        <!-- Subtle Ambient Glow -->
+        <div class="absolute -right-20 -top-20 w-72 h-72 bg-[#fbbf24]/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-[#4f46e5]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2a2a2a] relative z-10">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#fbbf24]/10 border border-[#fbbf24]/30 flex items-center justify-center text-xl text-[#fbbf24] shrink-0">
+              <i class="ti ti-moon-stars"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">
+                  Acompanhamento Operacional do Plantão
+                </h2>
+                <span id="plantaoHealthScoreBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">
+                  Saúde: 100%
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/30">
+                  Liderança: José Carlos
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Supervisão contínua em tempo real: assunção dos canais, chamados em grupos de WhatsApp, monitoramento de filas e ligações na central
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="copyPlantaoExecutiveSummary()" title="Copiar resumo do acompanhamento do plantão para WhatsApp" class="btn-outline px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5">
+              <i class="ti ti-copy"></i>
+              <span>Copiar Resumo Plantão</span>
+            </button>
+            <button onclick="openPlantaoHandoverModal()" class="btn-accent px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5 shadow-xs">
+              <i class="ti ti-arrows-exchange"></i>
+              <span>Passagem 19h</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. CANAIS OPERACIONAIS -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="ti ti-network text-[#fbbf24]"></i>
+              <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">
+                Canais Operacionais (Assunção & Pontualidade)
+              </h3>
+            </div>
+            <span class="text-[11px] text-slate-400">Horário previsto vs. horário real</span>
+          </div>
+
+          <div id="plantaoCanaisGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- Rendered dynamically by renderPlantaoCanais() -->
+          </div>
+        </div>
+
+        <!-- 2. ATENDIMENTOS EM GRUPOS DE WHATSAPP -->
+        <div class="space-y-3 pt-3 border-t border-[#2a2a2a]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="ti ti-brand-whatsapp text-[#25D366]"></i>
+              <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">
+                Atendimentos em Grupos de WhatsApp
+              </h3>
+            </div>
+            <span id="plantaoGruposCountBadge" class="text-[11px] font-bold text-slate-400">0 atendimentos</span>
+          </div>
+
+          <!-- Form: Início de Atendimento -->
+          <div class="bg-[#181818] p-3.5 rounded-xl border border-[#2a2a2a] flex flex-col md:flex-row md:items-center gap-2.5">
+            <div class="flex-1 min-w-[220px]">
+              <select id="grupoSelectInput" class="w-full system-input px-3 py-2 text-xs text-white">
+                <option value="" disabled selected>Selecione o grupo</option>
+                <option value="Glaçaí">Glaçaí</option>
+                <option value="Maná Comendoria">Maná Comendoria</option>
+                <option value="Eldorado">Eldorado</option>
+                <option value="TRATT">TRATT</option>
+                <option value="Sonho Doce">Sonho Doce</option>
+                <option value="Miss Make">Miss Make</option>
+                <option value="Famiglia Muccini">Famiglia Muccini</option>
+                <option value="Belém Velho Restaurante">Belém Velho Restaurante</option>
+                <option value="Materiais MDW">Materiais MDW</option>
+                <option value="Marterra">Marterra</option>
+                <option value="Panificadora Eldorado">Panificadora Eldorado</option>
+                <option value="Panificadora Prime">Panificadora Prime</option>
+                <option value="Espetinho da Praia">Espetinho da Praia</option>
+                <option value="DLIGHT">DLIGHT</option>
+                <option value="PORTO 60">PORTO 60</option>
+                <option value="JS MOTOS AVELLOZ">JS MOTOS AVELLOZ</option>
+                <option value="Conexfer">Conexfer</option>
+                <option value="Magnum">Magnum</option>
+                <option value="Liderança Motos">Liderança Motos</option>
+                <option value="Personalitte">Personalitte</option>
+                <option value="Farina">Farina</option>
+                <option value="Grao Forneria">Grao Forneria</option>
+                <option value="Hidrauldiesel Truck S">Hidrauldiesel Truck S</option>
+                <option value="Mibra">Mibra</option>
+                <option value="Seu Joao - Bar e Restaurante">Seu Joao - Bar e Restaurante</option>
+              </select>
+            </div>
+
+            <div class="w-full md:w-36">
+              <input type="time" id="grupoInicioInput" aria-label="Horário de início" class="w-full system-input px-3 py-2 text-xs font-mono text-white text-center" />
+            </div>
+
+            <button onclick="adicionarAtendimentoGrupo()" class="btn-accent px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95">
+              <i class="ti ti-player-play text-xs"></i>
+              <span>Registrar início</span>
+            </button>
+          </div>
+
+          <!-- List of Groups Log -->
+          <div id="plantaoGruposList" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 3. FILAS DE ATENDIMENTO -->
+        <div class="space-y-3 pt-3 border-t border-[#2a2a2a]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="ti ti-users text-[#fbbf24]"></i>
+              <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">
+                Filas de Atendimento
+              </h3>
+            </div>
+            <span id="plantaoFilasCountBadge" class="text-[11px] font-bold text-slate-400">0 registros</span>
+          </div>
+
+          <!-- Form: Início de Fila -->
+          <div class="bg-[#181818] p-3.5 rounded-xl border border-[#2a2a2a] flex flex-col md:flex-row md:items-center gap-2.5">
+            <div class="w-full md:w-36">
+              <input type="time" id="filaInicioInput" aria-label="Horário de início da fila" class="w-full system-input px-3 py-2 text-xs font-mono text-white text-center" />
+            </div>
+
+            <div class="flex-1 min-w-[160px]">
+              <input type="number" id="filaQtdInput" placeholder="Tickets em fila" min="1" class="w-full system-input px-3 py-2 text-xs text-white" />
+            </div>
+
+            <button onclick="adicionarFilaPlantao()" class="btn-accent px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95">
+              <i class="ti ti-plus text-xs"></i>
+              <span>Registrar fila</span>
+            </button>
+          </div>
+
+          <!-- List of Queue Log -->
+          <div id="plantaoFilasList" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 4. LIGAÇÕES NA CENTRAL -->
+        <div class="space-y-3 pt-3 border-t border-[#2a2a2a]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="ti ti-phone-incoming text-[#fbbf24]"></i>
+              <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">
+                Ligações na Central
+              </h3>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/30">
+              <i class="ti ti-phone text-xs"></i>
+              <span id="plantaoTotalLigacoesBadge">0 ligações</span>
+            </span>
+          </div>
+
+          <!-- Form: Adicionar Ligações -->
+          <div class="bg-[#181818] p-3.5 rounded-xl border border-[#2a2a2a] flex flex-col md:flex-row md:items-center gap-2.5">
+            <div class="w-full md:w-28">
+              <input type="number" id="ligacaoQtdInput" placeholder="Quantidade" min="1" class="w-full system-input px-3 py-2 text-xs text-white" />
+            </div>
+
+            <div class="w-full md:w-32">
+              <input type="time" id="ligacaoHoraInput" aria-label="Hora da ligação" class="w-full system-input px-3 py-2 text-xs font-mono text-white text-center" />
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+              <input type="url" id="ligacaoEvidenciaInput" placeholder="Evidência (link do print)" class="w-full system-input px-3 py-2 text-xs text-white" />
+            </div>
+
+            <button onclick="adicionarLigacoesPlantao()" class="btn-accent px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95">
+              <i class="ti ti-plus text-xs"></i>
+              <span>Adicionar</span>
+            </button>
+          </div>
+
+          <!-- List of Calls Log -->
+          <div id="plantaoLigacoesList" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- /plantaoModuleContainer -->
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 3: VALIDAÇÃO DE AGENDA                                             -->
+    <!-- OCs que chegaram na agenda de Matheus, Osiel, Bezerra ou Hercílio sem     -->
+    <!-- deveriam estar lá                                                         -->
+    <!-- ========================================================================= -->
+    <div id="agendaModuleContainer" class="space-y-6 hidden">
+      <section id="validacaoAgendaSection" class="system-card p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-6">
+        <!-- Subtle Amber Glow -->
+        <div class="absolute -right-20 -top-20 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2a2a2a] relative z-10">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl text-amber-400 shrink-0">
+              <i class="ti ti-calendar-exclamation"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">
+                  Validação de Agenda
+                </h2>
+                <span id="agendaIndevidaCountBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  0 OCs indevidas registradas
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">
+                OCs que chegaram na agenda de Matheus, Osiel, Bezerra ou Hercílio sem deveriam estar lá
+              </p>
+            </div>
+          </div>
+
+          <button onclick="copyAgendaIndevidaSummary()" title="Copiar lista de OCs indevidas para o WhatsApp" class="btn-outline px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5">
+            <i class="ti ti-copy"></i>
+            <span>Copiar OCs Indevidas</span>
+          </button>
+        </div>
+
+        <!-- Form: Nº Registro + Atendente + OC/chamado + Horário + Evidência + Button -->
+        <div class="bg-[#181818] p-4 rounded-xl border border-[#2a2a2a] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <!-- Nº Registro -->
+          <div class="lg:col-span-2 space-y-1">
+            <label for="agendaRegistroInput" class="text-[11px] font-bold text-slate-300">Nº Registro:</label>
+            <div class="relative flex items-center">
+              <span class="absolute left-3 text-xs font-bold text-[#fbbf24]">Nº</span>
+              <input type="text" inputmode="numeric" id="agendaRegistroInput" placeholder="Registro" class="w-full system-input pl-9 pr-3 py-2 text-xs font-mono text-white" />
+            </div>
+          </div>
+
+          <!-- Atendente -->
+          <div class="lg:col-span-2 space-y-1">
+            <label for="agendaResponsavelInput" class="text-[11px] font-bold text-slate-300">Atendente:</label>
+            <select id="agendaResponsavelInput" class="w-full system-input px-3 py-2 text-xs text-white">
+              <option value="" disabled selected>Atendente</option>
+              <option value="Matheus">Matheus</option>
+              <option value="Osiel">Osiel</option>
+              <option value="Bezerra">Bezerra</option>
+              <option value="Hercílio">Hercílio</option>
+            </select>
+          </div>
+
+          <!-- OC / Chamado -->
+          <div class="lg:col-span-3 space-y-1">
+            <label for="agendaOcInput" class="text-[11px] font-bold text-slate-300">OC / Chamado:</label>
+            <input type="text" id="agendaOcInput" placeholder="OC / chamado" class="w-full system-input px-3 py-2 text-xs text-white" />
+          </div>
+
+          <!-- Horário -->
+          <div class="lg:col-span-2 space-y-1">
+            <label for="agendaHorarioInput" class="text-[11px] font-bold text-slate-300">Horário:</label>
+            <input type="time" id="agendaHorarioInput" class="w-full system-input px-3 py-2 text-xs font-mono text-white text-center" />
+          </div>
+
+          <!-- Evidência -->
+          <div class="lg:col-span-2 space-y-1">
+            <label for="agendaEvidenciaInput" class="text-[11px] font-bold text-slate-300">Evidência (print):</label>
+            <input type="url" id="agendaEvidenciaInput" placeholder="https://..." class="w-full system-input px-3 py-2 text-xs text-white" />
+          </div>
+
+          <!-- Button -->
+          <div class="lg:col-span-1">
+            <button onclick="adicionarAgendaIndevida()" class="w-full btn-accent py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1 active:scale-95">
+              <span>Registrar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- List / Table of Invalid OCs -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 pb-1">
+            <span class="font-bold uppercase tracking-wider">Histórico de OCs Indevidas do Dia</span>
+            <span id="agendaListCountDesc">Mais recentes primeiro</span>
+          </div>
+
+          <div id="agendaIndevidaList" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- /agendaModuleContainer -->
 
   </main>
 
@@ -2311,6 +2659,33 @@
       return `${year}-${month}-${day}`;
     }
 
+    // --- MÓDULOS DE NAVEGAÇÃO & PLANTÃO NOTURNO ---
+    let currentMainView = 'routine'; // 'routine' | 'plantao' | 'agenda' | 'all'
+    try {
+      const savedView = localStorage.getItem('rotina_active_module_view');
+      if (['routine', 'plantao', 'agenda', 'all'].includes(savedView)) {
+        currentMainView = savedView;
+      }
+    } catch(e) {}
+
+    const CANAIS_PLANTAO = [
+      { id: 'grupos', canal: 'Grupos', responsavel: 'Osiel', previsto: '18:00', statusInicial: 'Ativo', statusBadgeClass: 'bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30' },
+      { id: 'linha', canal: 'Linha', responsavel: 'Matheus', previsto: '19:00', statusInicial: 'Aguardando 19h', statusBadgeClass: 'bg-[#252525] text-slate-400 border border-[#2a2a2a]' },
+      { id: 'workdesk', canal: 'Workdesk', responsavel: 'Bezerra', previsto: '19:00', statusInicial: 'Aguardando 19h', statusBadgeClass: 'bg-[#252525] text-slate-400 border border-[#2a2a2a]' },
+      { id: 'chat', canal: 'Chat', responsavel: 'Otávio / Gilseph', previsto: '20:00', statusInicial: 'Ativo até 20h', statusBadgeClass: 'bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30' }
+    ];
+
+    const GRUPOS_WHATSAPP = [
+      'Glaçaí', 'Maná Comendoria', 'Eldorado', 'TRATT', 'Sonho Doce', 'Miss Make',
+      'Famiglia Muccini', 'Belém Velho Restaurante', 'Materiais MDW', 'Marterra',
+      'Panificadora Eldorado', 'Panificadora Prime', 'Espetinho da Praia', 'DLIGHT',
+      'PORTO 60', 'JS MOTOS AVELLOZ', 'Conexfer', 'Magnum', 'Liderança Motos',
+      'Personalitte', 'Farina', 'Grao Forneria', 'Hidrauldiesel Truck S', 'Mibra',
+      'Seu Joao - Bar e Restaurante'
+    ];
+
+    const RESPONSAVEIS_AGENDA = ['Matheus', 'Osiel', 'Bezerra', 'Hercílio'];
+
     function ensureDateState(dateKey) {
       if (!dbState.dates[dateKey]) {
         dbState.dates[dateKey] = {
@@ -2320,13 +2695,35 @@
           lastRoundUser: null,
           absentStaff: [],
           lunchDeviations: {},
-          productivityChecklists: {}
+          productivityChecklists: {},
+          passagemPlantao: {},
+          acompanhamentoPlantao: {
+            canaisReal: {},
+            groupLogs: [],
+            queueLogs: [],
+            ligacoes: [],
+            agendaLogs: []
+          }
         };
       }
-      if (!dbState.dates[dateKey].productivityChecklists) {
-        dbState.dates[dateKey].productivityChecklists = {};
+      const s = dbState.dates[dateKey];
+      if (!s.productivityChecklists) s.productivityChecklists = {};
+      if (!s.passagemPlantao) s.passagemPlantao = {};
+      if (!s.acompanhamentoPlantao) {
+        s.acompanhamentoPlantao = {
+          canaisReal: {},
+          groupLogs: [],
+          queueLogs: [],
+          ligacoes: [],
+          agendaLogs: []
+        };
       }
-      return dbState.dates[dateKey];
+      if (!s.acompanhamentoPlantao.canaisReal) s.acompanhamentoPlantao.canaisReal = {};
+      if (!Array.isArray(s.acompanhamentoPlantao.groupLogs)) s.acompanhamentoPlantao.groupLogs = [];
+      if (!Array.isArray(s.acompanhamentoPlantao.queueLogs)) s.acompanhamentoPlantao.queueLogs = [];
+      if (!Array.isArray(s.acompanhamentoPlantao.ligacoes)) s.acompanhamentoPlantao.ligacoes = [];
+      if (!Array.isArray(s.acompanhamentoPlantao.agendaLogs)) s.acompanhamentoPlantao.agendaLogs = [];
+      return s;
     }
 
     function getCurrentTimeMinutes() {
@@ -2545,6 +2942,68 @@
           }
         } catch (e) {}
 
+        // Buscar dados sincronizados do plantão nas tabelas plantaonoturno_* se existirem
+        try {
+          const { data: turnoRow } = await supabaseClient
+            .from('plantaonoturno_turnos')
+            .select('*')
+            .eq('data', dateStr)
+            .maybeSingle();
+
+          if (turnoRow) {
+            const state = ensureDateState(dateStr);
+            if (turnoRow.canais_real && Object.keys(turnoRow.canais_real).length > 0) {
+              state.acompanhamentoPlantao.canaisReal = { ...state.acompanhamentoPlantao.canaisReal, ...turnoRow.canais_real };
+            }
+
+            const { data: gRows } = await supabaseClient.from('plantaonoturno_atendimentos_grupo').select('*').eq('turno_id', turnoRow.id);
+            if (Array.isArray(gRows) && gRows.length > 0) {
+              state.acompanhamentoPlantao.groupLogs = gRows.map(r => ({
+                id: r.id,
+                nome: r.nome,
+                inicio: r.inicio,
+                fim: r.fim,
+                createdAt: r.created_at
+              }));
+            }
+
+            const { data: fRows } = await supabaseClient.from('plantaonoturno_filas').select('*').eq('turno_id', turnoRow.id);
+            if (Array.isArray(fRows) && fRows.length > 0) {
+              state.acompanhamentoPlantao.queueLogs = fRows.map(r => ({
+                id: r.id,
+                inicio: r.inicio,
+                quantidade: r.quantidade,
+                fim: r.fim,
+                createdAt: r.created_at
+              }));
+            }
+
+            const { data: lRows } = await supabaseClient.from('plantaonoturno_ligacoes').select('*').eq('turno_id', turnoRow.id);
+            if (Array.isArray(lRows) && lRows.length > 0) {
+              state.acompanhamentoPlantao.ligacoes = lRows.map(r => ({
+                id: r.id,
+                quantidade: r.quantidade,
+                horario: r.horario,
+                evidencia: r.evidencia,
+                createdAt: r.created_at
+              }));
+            }
+
+            const { data: aRows } = await supabaseClient.from('plantaonoturno_agenda_indevida').select('*').eq('turno_id', turnoRow.id);
+            if (Array.isArray(aRows) && aRows.length > 0) {
+              state.acompanhamentoPlantao.agendaLogs = aRows.map(r => ({
+                id: r.id,
+                registro: r.registro ? Number(r.registro) : null,
+                responsavel: r.responsavel,
+                oc: r.oc,
+                horario: r.horario,
+                evidencia: r.evidencia,
+                createdAt: r.created_at
+              }));
+            }
+          }
+        } catch (e) {}
+
         lastCloudSyncTime = new Date();
         if (diariaData) {
           applyRemoteData(diariaData, false);
@@ -2565,6 +3024,9 @@
       const totalTasks = masterSchedule.length;
       const completedTasks = masterSchedule.filter(t => state.tasks[t.id]?.completed).length;
       const pct = totalTasks === 0 ? 100 : Math.round((completedTasks / totalTasks) * 100);
+
+      state.passagemPlantao = state.passagemPlantao || {};
+      state.passagemPlantao.acompanhamento = state.acompanhamentoPlantao;
 
       const payload = {
         data: dateStr,
@@ -2752,6 +3214,19 @@
         }
         if (Array.isArray(data.workdesk.absentStaff) && data.workdesk.absentStaff.length > 0) {
           state.absentStaff = data.workdesk.absentStaff;
+        }
+      }
+
+      if (data.passagem_plantao) {
+        state.passagemPlantao = { ...state.passagemPlantao, ...data.passagem_plantao };
+        if (data.passagem_plantao.acompanhamento) {
+          const a = data.passagem_plantao.acompanhamento;
+          state.acompanhamentoPlantao = state.acompanhamentoPlantao || {};
+          if (a.canaisReal) state.acompanhamentoPlantao.canaisReal = { ...state.acompanhamentoPlantao.canaisReal, ...a.canaisReal };
+          if (Array.isArray(a.groupLogs)) state.acompanhamentoPlantao.groupLogs = a.groupLogs;
+          if (Array.isArray(a.queueLogs)) state.acompanhamentoPlantao.queueLogs = a.queueLogs;
+          if (Array.isArray(a.ligacoes)) state.acompanhamentoPlantao.ligacoes = a.ligacoes;
+          if (Array.isArray(a.agendaLogs)) state.acompanhamentoPlantao.agendaLogs = a.agendaLogs;
         }
       }
 
@@ -2992,6 +3467,27 @@ CREATE POLICY "rotina_op_workdesk_all" ON public.rotina_operacional_workdesk FOR
 
 DROP POLICY IF EXISTS "rotina_op_plantao_all" ON public.rotina_operacional_passagem_plantao;
 CREATE POLICY "rotina_op_plantao_all" ON public.rotina_operacional_passagem_plantao FOR ALL USING (true) WITH CHECK (true);
+
+-- Políticas para o Módulo de Acompanhamento do Plantão e Validação de Agenda
+ALTER TABLE IF EXISTS public.plantaonoturno_turnos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_turnos_all" ON public.plantaonoturno_turnos;
+CREATE POLICY "plantaonoturno_turnos_all" ON public.plantaonoturno_turnos FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.plantaonoturno_atendimentos_grupo ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_grupos_all" ON public.plantaonoturno_atendimentos_grupo;
+CREATE POLICY "plantaonoturno_grupos_all" ON public.plantaonoturno_atendimentos_grupo FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.plantaonoturno_filas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_filas_all" ON public.plantaonoturno_filas;
+CREATE POLICY "plantaonoturno_filas_all" ON public.plantaonoturno_filas FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.plantaonoturno_ligacoes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_ligacoes_all" ON public.plantaonoturno_ligacoes;
+CREATE POLICY "plantaonoturno_ligacoes_all" ON public.plantaonoturno_ligacoes FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.plantaonoturno_agenda_indevida ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_agenda_all" ON public.plantaonoturno_agenda_indevida;
+CREATE POLICY "plantaonoturno_agenda_all" ON public.plantaonoturno_agenda_indevida FOR ALL USING (true) WITH CHECK (true);
 
 -- Habilitar leitura pública dos perfis para o Dashboard (ADMIN para o login e TIME para equipe)
 DROP POLICY IF EXISTS "Permitir leitura de admins para todos" ON public.profiles;
@@ -3627,6 +4123,41 @@ END \$\$;
                     ${s.conhecimento ? `<p class="text-slate-400"><strong class="text-indigo-400">Aprendizado:</strong> ${s.conhecimento}</p>` : ''}
                   </div>
                 `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- 4. Acompanhamento Operacional do Plantão Noturno & Validação de Agenda -->
+          ${(state.acompanhamentoPlantao && (Object.keys(state.acompanhamentoPlantao.canaisReal || {}).length > 0 || (state.acompanhamentoPlantao.groupLogs || []).length > 0 || (state.acompanhamentoPlantao.ligacoes || []).length > 0 || (state.acompanhamentoPlantao.agendaLogs || []).length > 0)) ? `
+            <div class="space-y-2">
+              <h4 class="text-xs font-bold uppercase text-slate-300 flex items-center gap-1.5">
+                <i class="ti ti-moon-stars text-[#fbbf24]"></i>
+                <span>4. Monitoramento do Plantão & Validação de Agenda:</span>
+              </h4>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                ${CANAIS_PLANTAO.map(c => {
+                  const val = (state.acompanhamentoPlantao.canaisReal || {})[c.id];
+                  return `
+                    <div class="p-2.5 rounded-lg bg-[#252525] border border-[#2a2a2a] text-xs">
+                      <span class="text-[10px] text-slate-400 font-bold">${c.canal} (${c.responsavel})</span>
+                      <div class="font-mono font-bold ${val ? 'text-[#22c55e]' : 'text-slate-500'} mt-0.5">${val || 'Pendente'}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <div class="p-2.5 rounded-lg bg-[#252525] border border-[#2a2a2a]">
+                  <span class="text-slate-400 text-[10px] uppercase font-bold">Grupos WhatsApp:</span>
+                  <div class="font-bold text-white mt-0.5">${(state.acompanhamentoPlantao.groupLogs || []).length} atendimentos</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#252525] border border-[#2a2a2a]">
+                  <span class="text-slate-400 text-[10px] uppercase font-bold">Ligações na Central:</span>
+                  <div class="font-bold text-white mt-0.5">${(state.acompanhamentoPlantao.ligacoes || []).reduce((acc, l) => acc + (l.quantidade || 0), 0)} chamadas</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#252525] border border-[#2a2a2a]">
+                  <span class="text-slate-400 text-[10px] uppercase font-bold">Validação de Agenda:</span>
+                  <div class="font-bold text-amber-400 mt-0.5">${(state.acompanhamentoPlantao.agendaLogs || []).length} OCs indevidas</div>
+                </div>
               </div>
             </div>
           ` : ''}
@@ -5809,7 +6340,36 @@ END \$\$;
       text += `• [20:30] Saída: Gilseph\n`;
       text += `• [21:00] Saída: David e Fechamento Geral\n`;
 
-      // 5. Senso de Dono
+      // 5. Acompanhamento Operacional do Plantão
+      const plantao = state.acompanhamentoPlantao || {};
+      const canaisReal = plantao.canaisReal || {};
+      text += `\n📡 *STATUS DOS CANAIS OPERACIONAIS:*\n`;
+      for (const c of CANAIS_PLANTAO) {
+        const val = canaisReal[c.id];
+        text += `• ${c.canal} (${c.responsavel}): ${val ? `${val} (Previsto: ${c.previsto})` : `Aguardando (Previsto: ${c.previsto})`}\n`;
+      }
+
+      if ((plantao.groupLogs || []).length > 0) {
+        text += `\n💬 *ATENDIMENTOS EM GRUPOS:* ${plantao.groupLogs.length} registrado(s)\n`;
+        plantao.groupLogs.forEach(g => {
+          text += `• ${g.nome} [${g.inicio} ${g.fim ? `-> ${g.fim}` : '(em andamento)'}]\n`;
+        });
+      }
+
+      const totalCalls = (plantao.ligacoes || []).reduce((acc, l) => acc + (l.quantidade || 0), 0);
+      if (totalCalls > 0) {
+        text += `\n📞 *LIGAÇÕES NA CENTRAL:* ${totalCalls} chamada(s) registrada(s)\n`;
+      }
+
+      const indevidas = (plantao.agendaLogs || []).length;
+      if (indevidas > 0) {
+        text += `\n⚠️ *VALIDAÇÃO DE AGENDA (OCs Indevidas):* ${indevidas} ocorrência(s)\n`;
+        plantao.agendaLogs.forEach(a => {
+          text += `• ${a.registro ? `Nº ${a.registro} - ` : ''}${a.responsavel}: ${a.oc} (às ${a.horario})\n`;
+        });
+      }
+
+      // 6. Senso de Dono
       if (sensoRecords.length > 0) {
         text += `\n👑 *DESTAQUE DO SENSO DE DONO:*\n`;
         sensoRecords.slice(0, 2).forEach(s => {
@@ -6362,7 +6922,777 @@ END \$\$;
       }, 3000);
     }
 
+    // =========================================================================
+    // MÓDULOS DE ACOMPANHAMENTO DO PLANTÃO & VALIDAÇÃO DE AGENDA (INTEGRADOS)
+    // =========================================================================
+
+    function switchMainView(viewName) {
+      if (!['routine', 'plantao', 'agenda', 'all'].includes(viewName)) viewName = 'routine';
+      currentMainView = viewName;
+      try {
+        localStorage.setItem('rotina_active_module_view', viewName);
+      } catch(e) {}
+      updateModuleNavigationUI();
+      renderApp();
+    }
+
+    function updateModuleNavigationUI() {
+      const routineBtn = document.getElementById('moduleTab-routine');
+      const plantaoBtn = document.getElementById('moduleTab-plantao');
+      const agendaBtn = document.getElementById('moduleTab-agenda');
+      const allBtn = document.getElementById('moduleTab-all');
+
+      if (routineBtn) routineBtn.classList.toggle('active', currentMainView === 'routine');
+      if (plantaoBtn) plantaoBtn.classList.toggle('active', currentMainView === 'plantao');
+      if (agendaBtn) agendaBtn.classList.toggle('active', currentMainView === 'agenda');
+      if (allBtn) allBtn.classList.toggle('active', currentMainView === 'all');
+
+      const routineContainer = document.getElementById('routineModuleContainer');
+      const plantaoContainer = document.getElementById('plantaoModuleContainer');
+      const agendaContainer = document.getElementById('agendaModuleContainer');
+      const timelineFilterRow = document.getElementById('timelineFilterButtonsRow');
+
+      if (routineContainer) {
+        routineContainer.classList.toggle('hidden', currentMainView !== 'routine' && currentMainView !== 'all');
+      }
+      if (plantaoContainer) {
+        plantaoContainer.classList.toggle('hidden', currentMainView !== 'plantao' && currentMainView !== 'all');
+      }
+      if (agendaContainer) {
+        agendaContainer.classList.toggle('hidden', currentMainView !== 'agenda' && currentMainView !== 'all');
+      }
+      if (timelineFilterRow) {
+        timelineFilterRow.classList.toggle('hidden', currentMainView === 'plantao' || currentMainView === 'agenda');
+      }
+    }
+
+    function getCurrentHHMM() {
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // --- CÁLCULO DE PONTUALIDADE E SAÚDE DO PLANTÃO ---
+    function calcularSaudePlantao(state) {
+      const acompanhamento = state.acompanhamentoPlantao || {};
+      const canaisReal = acompanhamento.canaisReal || {};
+
+      let totalChannels = CANAIS_PLANTAO.length;
+      let lateChannels = 0;
+      let channelScoreSum = 0;
+
+      for (const canal of CANAIS_PLANTAO) {
+        const real = canaisReal[canal.id];
+        let score = 0;
+        if (real) {
+          const diff = parseTimeToMinutes(real) - parseTimeToMinutes(canal.previsto);
+          if (diff > 0) {
+            lateChannels += 1;
+            score = Math.max(0, 100 - diff * 5);
+          } else {
+            score = 100;
+          }
+        } else {
+          score = 80;
+        }
+        channelScoreSum += score;
+      }
+
+      const score = Math.round(channelScoreSum / totalChannels);
+      return { score, lateChannels, totalChannels };
+    }
+
+    function renderPlantaoAcompanhamento() {
+      const state = ensureDateState(selectedDate);
+      const plantao = state.acompanhamentoPlantao;
+
+      // 1. Health Badge
+      const health = calcularSaudePlantao(state);
+      const healthBadge = document.getElementById('plantaoHealthScoreBadge');
+      if (healthBadge) {
+        healthBadge.textContent = `Saúde Operacional: ${health.score}%`;
+        healthBadge.className = health.score >= 80
+          ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30'
+          : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/30';
+      }
+
+      // 2. Render Sub-blocks
+      renderPlantaoCanais(state);
+      renderPlantaoGrupos(state);
+      renderPlantaoFilas(state);
+      renderPlantaoLigacoes(state);
+
+      // 3. Module Tab Badge
+      const moduleBadge = document.getElementById('moduleBadgePlantao');
+      if (moduleBadge) {
+        const totalItems = (plantao.groupLogs || []).filter(g => !g.fim).length +
+                           (plantao.queueLogs || []).filter(q => !q.fim).length +
+                           (plantao.ligacoes || []).length;
+        if (totalItems > 0) {
+          moduleBadge.textContent = totalItems;
+          moduleBadge.classList.remove('hidden');
+        } else {
+          moduleBadge.classList.add('hidden');
+        }
+      }
+
+      // Pre-fill time inputs with current time if empty
+      const curTime = getCurrentHHMM();
+      const gInput = document.getElementById('grupoInicioInput');
+      if (gInput && !gInput.value) gInput.value = curTime;
+
+      const fInput = document.getElementById('filaInicioInput');
+      if (fInput && !fInput.value) fInput.value = curTime;
+
+      const lInput = document.getElementById('ligacaoHoraInput');
+      if (lInput && !lInput.value) lInput.value = curTime;
+
+      const aInput = document.getElementById('agendaHorarioInput');
+      if (aInput && !aInput.value) aInput.value = curTime;
+    }
+
+    // 1. CANAIS OPERACIONAIS
+    function renderPlantaoCanais(state) {
+      const container = document.getElementById('plantaoCanaisGrid');
+      if (!container) return;
+
+      const canaisReal = state.acompanhamentoPlantao.canaisReal || {};
+      const currentMins = getCurrentTimeMinutes();
+
+      container.innerHTML = CANAIS_PLANTAO.map(canal => {
+        const realVal = canaisReal[canal.id] || '';
+        let diff = null;
+        let resultHtml = '';
+
+        if (realVal) {
+          diff = parseTimeToMinutes(realVal) - parseTimeToMinutes(canal.previsto);
+          if (diff <= 0) {
+            resultHtml = `<div class="text-[11px] text-[#22c55e] font-bold flex items-center justify-end gap-1"><i class="ti ti-check"></i> No horário</div>`;
+          } else {
+            resultHtml = `<div class="text-[11px] text-[#fbbf24] font-bold flex items-center justify-end gap-1"><i class="ti ti-clock-exclamation"></i> ${diff} min de atraso</div>`;
+          }
+        } else {
+          resultHtml = `<div class="text-[11px] text-slate-500 italic text-right">Aguardando registro</div>`;
+        }
+
+        // Status badge dinâmico de acordo com horário
+        let badgeClass = canal.statusBadgeClass;
+        let badgeText = canal.statusInicial;
+
+        if (canal.id === 'chat') {
+          if (currentMins >= 20 * 60) {
+            badgeText = 'Finalizado';
+            badgeClass = 'bg-[#252525] text-slate-400 border border-[#2a2a2a]';
+          }
+        } else if (canal.id === 'linha' || canal.id === 'workdesk') {
+          if (currentMins >= 19 * 60) {
+            badgeText = 'Ativo';
+            badgeClass = 'bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30';
+          }
+        }
+
+        return `
+          <div class="bg-[#181818] border border-[#2a2a2a] hover:border-[#fbbf24]/40 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${canal.canal}</span>
+                <h4 class="text-sm sm:text-base font-bold text-white mt-0.5">${canal.responsavel}</h4>
+              </div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+                ${badgeText}
+              </span>
+            </div>
+
+            <div class="space-y-1.5 pt-2 border-t border-[#2a2a2a]/60">
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span>Previsto:</span>
+                <strong class="font-mono text-slate-200 font-bold">${canal.previsto}</strong>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="text-[11px] font-medium text-slate-400 shrink-0">Real:</label>
+                <input
+                  type="time"
+                  value="${realVal}"
+                  onchange="setCanalHorarioReal('${canal.id}', this.value)"
+                  class="system-input px-2 py-1 text-xs font-mono text-white text-center w-full"
+                  title="Horário em que o especialista assumiu o canal"
+                />
+              </div>
+
+              ${resultHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setCanalHorarioReal(canalId, val) {
+      const state = ensureDateState(selectedDate);
+      state.acompanhamentoPlantao.canaisReal[canalId] = val || null;
+      scheduleCloudSync();
+      renderPlantaoCanais(state);
+      const health = calcularSaudePlantao(state);
+      const healthBadge = document.getElementById('plantaoHealthScoreBadge');
+      if (healthBadge) healthBadge.textContent = `Saúde Operacional: ${health.score}%`;
+      showToast(`Horário de ${canalId} salvo: ${val || '--:--'}`);
+    }
+
+    // 2. ATENDIMENTOS EM GRUPOS
+    function renderPlantaoGrupos(state) {
+      const container = document.getElementById('plantaoGruposList');
+      const badge = document.getElementById('plantaoGruposCountBadge');
+      if (!container) return;
+
+      const items = (state.acompanhamentoPlantao.groupLogs || []).slice().reverse();
+      if (badge) badge.textContent = `${items.length} atendimento(s)`;
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-3 text-center bg-[#181818] rounded-xl border border-[#2a2a2a]">Nenhum atendimento registrado</p>`;
+        return;
+      }
+
+      const curTime = getCurrentHHMM();
+
+      container.innerHTML = items.map(log => {
+        if (!log.fim) {
+          return `
+            <div class="bg-[#181818] border border-[#2a2a2a] hover:border-[#fbbf24]/40 rounded-xl p-3 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] shrink-0">
+                  <i class="ti ti-brand-whatsapp text-base"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-white">${log.nome}</div>
+                  <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                    Início: <strong class="text-slate-200">${log.inicio}</strong> &rarr; <span class="text-amber-400 font-bold">Em andamento</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center flex-wrap">
+                <div class="flex items-center gap-1.5">
+                  <input type="time" id="fimGrupo-${log.id}" value="${curTime}" class="system-input px-2 py-1 text-xs font-mono text-white text-center w-24" />
+                  <button onclick="finalizarAtendimentoGrupo('${log.id}')" class="btn-outline px-2.5 py-1 text-xs font-bold text-[#22c55e] hover:bg-[#22c55e]/10 border-[#22c55e]/30">
+                    Registrar fim
+                  </button>
+                </div>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30 animate-pulse">
+                  Em andamento
+                </span>
+                <button onclick="excluirAtendimentoGrupo('${log.id}')" title="Excluir lançamento" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          const duration = Math.max(0, parseTimeToMinutes(log.fim) - parseTimeToMinutes(log.inicio));
+          return `
+            <div class="bg-[#181818] border border-[#2a2a2a] rounded-xl p-3 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 opacity-90">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#252525] border border-[#2a2a2a] flex items-center justify-center text-slate-400 shrink-0">
+                  <i class="ti ti-brand-whatsapp text-base"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-slate-200">${log.nome}</div>
+                  <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                    ${log.inicio} &rarr; ${log.fim} <span class="text-slate-500">(${duration} min)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">
+                  Concluído
+                </span>
+                <button onclick="excluirAtendimentoGrupo('${log.id}')" title="Excluir lançamento" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    function adicionarAtendimentoGrupo() {
+      const select = document.getElementById('grupoSelectInput');
+      const inicioInput = document.getElementById('grupoInicioInput');
+      if (!select || !inicioInput) return;
+
+      const nome = select.value.trim();
+      const inicio = inicioInput.value.trim();
+
+      if (!nome) {
+        showToast('Selecione um grupo de WhatsApp da lista.');
+        return;
+      }
+      if (!inicio) {
+        showToast('Informe o horário de início do atendimento.');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const newLog = {
+        id: 'grp_' + Date.now(),
+        nome,
+        inicio,
+        fim: null,
+        createdAt: new Date().toISOString()
+      };
+
+      state.acompanhamentoPlantao.groupLogs.push(newLog);
+      scheduleCloudSync();
+      select.value = '';
+      inicioInput.value = getCurrentHHMM();
+      renderPlantaoGrupos(state);
+      playChime(660, 0.1);
+      showToast(`Início registrado no grupo: ${nome}`);
+    }
+
+    function finalizarAtendimentoGrupo(id) {
+      const fimInput = document.getElementById(`fimGrupo-${id}`);
+      if (!fimInput || !fimInput.value) {
+        showToast('Informe o horário de encerramento.');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const log = state.acompanhamentoPlantao.groupLogs.find(g => g.id === id);
+      if (log) {
+        log.fim = fimInput.value;
+        scheduleCloudSync();
+        renderPlantaoGrupos(state);
+        playChime(880, 0.12);
+        showToast(`Atendimento em ${log.nome} finalizado às ${log.fim}!`);
+      }
+    }
+
+    function excluirAtendimentoGrupo(id) {
+      const state = ensureDateState(selectedDate);
+      state.acompanhamentoPlantao.groupLogs = state.acompanhamentoPlantao.groupLogs.filter(g => g.id !== id);
+      scheduleCloudSync();
+      renderPlantaoGrupos(state);
+      showToast('Lançamento de grupo removido.');
+    }
+
+    // 3. FILAS DE ATENDIMENTO
+    function renderPlantaoFilas(state) {
+      const container = document.getElementById('plantaoFilasList');
+      const badge = document.getElementById('plantaoFilasCountBadge');
+      if (!container) return;
+
+      const items = (state.acompanhamentoPlantao.queueLogs || []).slice().reverse();
+      if (badge) badge.textContent = `${items.length} registro(s)`;
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-3 text-center bg-[#181818] rounded-xl border border-[#2a2a2a]">Nenhuma fila registrada</p>`;
+        return;
+      }
+
+      const curTime = getCurrentHHMM();
+
+      container.innerHTML = items.map(log => {
+        if (!log.fim) {
+          return `
+            <div class="bg-[#181818] border border-[#2a2a2a] hover:border-[#ef4444]/40 rounded-xl p-3 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444] shrink-0">
+                  <i class="ti ti-alert-triangle text-base"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-white">${log.quantidade} ticket(s) em fila</div>
+                  <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                    Início: <strong class="text-slate-200">${log.inicio}</strong> &rarr; <span class="text-rose-400 font-bold">Em fila</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center flex-wrap">
+                <div class="flex items-center gap-1.5">
+                  <input type="time" id="fimFila-${log.id}" value="${curTime}" class="system-input px-2 py-1 text-xs font-mono text-white text-center w-24" />
+                  <button onclick="finalizarFilaPlantao('${log.id}')" class="btn-outline px-2.5 py-1 text-xs font-bold text-[#22c55e] hover:bg-[#22c55e]/10 border-[#22c55e]/30">
+                    Fila zerou
+                  </button>
+                </div>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                  Em fila
+                </span>
+                <button onclick="excluirFilaPlantao('${log.id}')" title="Excluir fila" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          const duration = Math.max(0, parseTimeToMinutes(log.fim) - parseTimeToMinutes(log.inicio));
+          return `
+            <div class="bg-[#181818] border border-[#2a2a2a] rounded-xl p-3 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 opacity-90">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#252525] border border-[#2a2a2a] flex items-center justify-center text-slate-400 shrink-0">
+                  <i class="ti ti-circle-check text-base text-[#22c55e]"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-slate-200">${log.quantidade} ticket(s) atendido(s)</div>
+                  <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                    ${log.inicio} &rarr; ${log.fim} <span class="text-slate-500">(${duration} min para zerar)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">
+                  Fila zerada
+                </span>
+                <button onclick="excluirFilaPlantao('${log.id}')" title="Excluir fila" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    function adicionarFilaPlantao() {
+      const inicioInput = document.getElementById('filaInicioInput');
+      const qtdInput = document.getElementById('filaQtdInput');
+      if (!inicioInput || !qtdInput) return;
+
+      const inicio = inicioInput.value.trim();
+      const quantidade = parseInt(qtdInput.value, 10);
+
+      if (!inicio) {
+        showToast('Informe o horário de início da fila.');
+        return;
+      }
+      if (!quantidade || quantidade < 1) {
+        showToast('Informe a quantidade de tickets em fila (mínimo 1).');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const newLog = {
+        id: 'fila_' + Date.now(),
+        inicio,
+        quantidade,
+        fim: null,
+        createdAt: new Date().toISOString()
+      };
+
+      state.acompanhamentoPlantao.queueLogs.push(newLog);
+      scheduleCloudSync();
+      qtdInput.value = '';
+      inicioInput.value = getCurrentHHMM();
+      renderPlantaoFilas(state);
+      playChime(440, 0.1);
+      showToast(`Fila registrada com ${quantidade} ticket(s).`);
+    }
+
+    function finalizarFilaPlantao(id) {
+      const fimInput = document.getElementById(`fimFila-${id}`);
+      if (!fimInput || !fimInput.value) {
+        showToast('Informe o horário em que a fila zerou.');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const log = state.acompanhamentoPlantao.queueLogs.find(q => q.id === id);
+      if (log) {
+        log.fim = fimInput.value;
+        scheduleCloudSync();
+        renderPlantaoFilas(state);
+        playChime(880, 0.12);
+        showToast(`Fila zerada com sucesso às ${log.fim}!`);
+      }
+    }
+
+    function excluirFilaPlantao(id) {
+      const state = ensureDateState(selectedDate);
+      state.acompanhamentoPlantao.queueLogs = state.acompanhamentoPlantao.queueLogs.filter(q => q.id !== id);
+      scheduleCloudSync();
+      renderPlantaoFilas(state);
+      showToast('Registro de fila removido.');
+    }
+
+    // 4. LIGAÇÕES NA CENTRAL
+    function renderPlantaoLigacoes(state) {
+      const container = document.getElementById('plantaoLigacoesList');
+      const totalBadge = document.getElementById('plantaoTotalLigacoesBadge');
+      if (!container) return;
+
+      const items = (state.acompanhamentoPlantao.ligacoes || []).slice().reverse();
+      const total = items.reduce((acc, cur) => acc + (cur.quantidade || 0), 0);
+
+      if (totalBadge) totalBadge.textContent = `${total} ligações`;
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-3 text-center bg-[#181818] rounded-xl border border-[#2a2a2a]">Nenhuma ligação registrada</p>`;
+        return;
+      }
+
+      container.innerHTML = items.map(log => `
+        <div class="bg-[#181818] border border-[#2a2a2a] hover:border-[#fbbf24]/40 rounded-xl p-3 sm:px-4 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-[#fbbf24]/10 border border-[#fbbf24]/30 flex items-center justify-center text-[#fbbf24] shrink-0">
+              <i class="ti ti-phone-call text-base"></i>
+            </div>
+            <div>
+              <div class="font-bold text-xs sm:text-sm text-white">${log.quantidade} ligação(ões) na central</div>
+              <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                Registrado às <strong class="text-slate-200">${log.horario}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            ${log.evidencia ? `
+              <a href="${log.evidencia}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/30 transition flex items-center gap-1">
+                <i class="ti ti-external-link"></i>
+                <span>Evidência</span>
+              </a>
+            ` : ''}
+            <button onclick="excluirLigacaoPlantao('${log.id}')" title="Excluir registro de ligação" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adicionarLigacoesPlantao() {
+      const qtdInput = document.getElementById('ligacaoQtdInput');
+      const horaInput = document.getElementById('ligacaoHoraInput');
+      const evInput = document.getElementById('ligacaoEvidenciaInput');
+      if (!qtdInput || !horaInput || !evInput) return;
+
+      const quantidade = parseInt(qtdInput.value, 10);
+      const horario = horaInput.value.trim() || getCurrentHHMM();
+      const evidencia = evInput.value.trim();
+
+      if (!quantidade || quantidade < 1) {
+        showToast('Informe a quantidade de ligações (mínimo 1).');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const newLog = {
+        id: 'call_' + Date.now(),
+        quantidade,
+        horario,
+        evidencia: evidencia || null,
+        createdAt: new Date().toISOString()
+      };
+
+      state.acompanhamentoPlantao.ligacoes.push(newLog);
+      scheduleCloudSync();
+      qtdInput.value = '';
+      evInput.value = '';
+      horaInput.value = getCurrentHHMM();
+      renderPlantaoLigacoes(state);
+      playChime(660, 0.1);
+      showToast(`${quantidade} ligação(ões) adicionada(s)!`);
+    }
+
+    function excluirLigacaoPlantao(id) {
+      const state = ensureDateState(selectedDate);
+      state.acompanhamentoPlantao.ligacoes = state.acompanhamentoPlantao.ligacoes.filter(l => l.id !== id);
+      scheduleCloudSync();
+      renderPlantaoLigacoes(state);
+      showToast('Registro de ligação removido.');
+    }
+
+    // =========================================================================
+    // MÓDULO 3: VALIDAÇÃO DE AGENDA (OCs INDEVIDAS)
+    // =========================================================================
+
+    function renderValidacaoAgenda() {
+      const state = ensureDateState(selectedDate);
+      const container = document.getElementById('agendaIndevidaList');
+      const badge = document.getElementById('agendaIndevidaCountBadge');
+      const moduleBadge = document.getElementById('moduleBadgeAgenda');
+      const desc = document.getElementById('agendaListCountDesc');
+      if (!container) return;
+
+      const logs = (state.acompanhamentoPlantao.agendaLogs || []).slice().reverse();
+
+      if (badge) {
+        badge.textContent = `${logs.length} OC(s) indevida(s) registrada(s)`;
+      }
+
+      if (moduleBadge) {
+        if (logs.length > 0) {
+          moduleBadge.textContent = logs.length;
+          moduleBadge.classList.remove('hidden');
+        } else {
+          moduleBadge.classList.add('hidden');
+        }
+      }
+
+      if (desc) {
+        desc.textContent = `${logs.length} registro(s) no total`;
+      }
+
+      if (logs.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center bg-[#181818] rounded-xl border border-[#2a2a2a]">Nenhuma OC indevida registrada</p>`;
+        return;
+      }
+
+      container.innerHTML = logs.map(log => `
+        <div class="bg-[#181818] border border-[#2a2a2a] hover:border-amber-500/40 rounded-xl p-3 sm:px-4 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <i class="ti ti-user-exclamation text-base"></i>
+            </div>
+            <div>
+              <div class="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5 flex-wrap">
+                ${log.registro ? `<span class="font-mono text-[#fbbf24] bg-[#fbbf24]/10 px-1.5 py-0.2 rounded border border-[#fbbf24]/20">Nº ${log.registro}</span>` : ''}
+                <span class="text-slate-200 font-semibold">${log.responsavel}</span>
+                <span class="text-slate-500">&mdash;</span>
+                <span class="text-amber-300 font-mono font-bold">${log.oc}</span>
+              </div>
+              <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                Identificado às <strong class="text-slate-200">${log.horario}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            ${log.evidencia ? `
+              <a href="${log.evidencia}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/30 transition flex items-center gap-1">
+                <i class="ti ti-external-link"></i>
+                <span>Evidência</span>
+              </a>
+            ` : ''}
+            <button onclick="excluirAgendaIndevida('${log.id}')" title="Excluir registro de agenda" class="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-[#252525] transition text-sm">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adicionarAgendaIndevida() {
+      const regInput = document.getElementById('agendaRegistroInput');
+      const respInput = document.getElementById('agendaResponsavelInput');
+      const ocInput = document.getElementById('agendaOcInput');
+      const horaInput = document.getElementById('agendaHorarioInput');
+      const evInput = document.getElementById('agendaEvidenciaInput');
+
+      if (!regInput || !respInput || !ocInput || !horaInput || !evInput) return;
+
+      const registro = regInput.value.replace(/\D/g, '');
+      const responsavel = respInput.value;
+      const oc = ocInput.value.trim();
+      const horario = horaInput.value.trim() || getCurrentHHMM();
+      const evidencia = evInput.value.trim();
+
+      if (!responsavel) {
+        showToast('Selecione o atendente (Matheus, Osiel, Bezerra ou Hercílio).');
+        return;
+      }
+      if (!oc) {
+        showToast('Informe a OC ou número do chamado.');
+        return;
+      }
+
+      const state = ensureDateState(selectedDate);
+      const newLog = {
+        id: 'agenda_' + Date.now(),
+        registro: registro ? Number(registro) : null,
+        responsavel,
+        oc,
+        horario,
+        evidencia: evidencia || null,
+        createdAt: new Date().toISOString()
+      };
+
+      state.acompanhamentoPlantao.agendaLogs.push(newLog);
+      scheduleCloudSync();
+
+      regInput.value = '';
+      respInput.value = '';
+      ocInput.value = '';
+      evInput.value = '';
+      horaInput.value = getCurrentHHMM();
+
+      renderValidacaoAgenda();
+      playChime(660, 0.1);
+      showToast(`OC indevida registrada na agenda de ${responsavel}!`);
+    }
+
+    function excluirAgendaIndevida(id) {
+      const state = ensureDateState(selectedDate);
+      state.acompanhamentoPlantao.agendaLogs = state.acompanhamentoPlantao.agendaLogs.filter(a => a.id !== id);
+      scheduleCloudSync();
+      renderValidacaoAgenda();
+      showToast('Registro de OC indevida removido.');
+    }
+
+    // --- CÓPIA E COMPILADOS PARA WHATSAPP ---
+    function copyPlantaoExecutiveSummary() {
+      const state = ensureDateState(selectedDate);
+      const p = state.acompanhamentoPlantao;
+      const canaisReal = p.canaisReal || {};
+
+      let text = `🌙 *ACOMPANHAMENTO OPERACIONAL DO PLANTÃO* (${selectedDate})\n`;
+      text += `Responsável: José Carlos\n\n`;
+
+      text += `📡 *CANAIS OPERACIONAIS:*\n`;
+      for (const canal of CANAIS_PLANTAO) {
+        const real = canaisReal[canal.id];
+        const status = real ? `${real} (Prev: ${canal.previsto})` : `Pendente (Prev: ${canal.previsto})`;
+        text += `• ${canal.canal} (${canal.responsavel}): ${status}\n`;
+      }
+
+      text += `\n💬 *ATENDIMENTOS EM GRUPOS:* ${(p.groupLogs || []).length} registrado(s)\n`;
+      (p.groupLogs || []).forEach(g => {
+        text += `• ${g.nome} [${g.inicio} ${g.fim ? `-> ${g.fim}` : '(em andamento)'}]\n`;
+      });
+
+      text += `\n📊 *FILAS:* ${(p.queueLogs || []).length} registro(s)\n`;
+      (p.queueLogs || []).forEach(q => {
+        text += `• ${q.quantidade} ticket(s) [${q.inicio} ${q.fim ? `-> zerou às ${q.fim}` : '(em fila)'}]\n`;
+      });
+
+      const totalCalls = (p.ligacoes || []).reduce((acc, c) => acc + (c.quantidade || 0), 0);
+      text += `\n📞 *LIGAÇÕES NA CENTRAL:* ${totalCalls} chamada(s)\n`;
+
+      const indevidas = (p.agendaLogs || []).length;
+      text += `\n📑 *VALIDAÇÃO DE AGENDA (OCs Indevidas):* ${indevidas} ocorrência(s)\n`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Resumo do Plantão copiado para a área de transferência!');
+      }).catch(() => {
+        showToast('Resumo gerado.');
+      });
+    }
+
+    function copyAgendaIndevidaSummary() {
+      const state = ensureDateState(selectedDate);
+      const logs = state.acompanhamentoPlantao.agendaLogs || [];
+
+      let text = `📑 *VALIDAÇÃO DE AGENDA - OCs INDEVIDAS* (${selectedDate})\n`;
+      text += `Total de ocorrências: ${logs.length}\n\n`;
+
+      if (logs.length === 0) {
+        text += `Nenhuma OC indevida registrada na agenda dos especialistas hoje.\n`;
+      } else {
+        logs.forEach((log, idx) => {
+          text += `${idx + 1}. ${log.registro ? `Reg: ${log.registro} | ` : ''}${log.responsavel} - ${log.oc} (às ${log.horario})\n`;
+          if (log.evidencia) text += `   Evidência: ${log.evidencia}\n`;
+        });
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Lista de OCs indevidas copiada!');
+      }).catch(() => {
+        showToast('Lista copiada.');
+      });
+    }
+
     function renderApp() {
+      updateModuleNavigationUI();
       updateFilterButtonsUI();
       renderClockAndCoverage();
       renderRondaSection();
@@ -6371,11 +7701,17 @@ END \$\$;
       renderLunchRuler();
       renderTimeline();
       renderSensoDeDono();
+      renderPlantaoAcompanhamento();
+      renderValidacaoAgenda();
     }
 
     // Keyboard shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === '1') switchMainView('routine');
+      if (e.key === '2') switchMainView('plantao');
+      if (e.key === '3') switchMainView('agenda');
+      if (e.key === '4') switchMainView('all');
       if (e.key === 't' || e.key === 'T') toggleTvMode(!tvModeActive);
       if (e.key === 'r' || e.key === 'R') triggerQuickWorkDeskRound();
       if (e.key === 'c' || e.key === 'C') copyShiftSummary();
@@ -6383,7 +7719,7 @@ END \$\$;
       if (e.key === 'e' || e.key === 'E') openExecutiveReportModal();
       if (e.key === 'a' || e.key === 'A') openAnalyticsModal();
       if (e.key === '?') {
-        showToast('⌨️ Atalhos: [R] Ronda WorkDesk | [P] Passagem 19h | [E] Relatório Executivo | [A] SLA & Analytics | [T] Modo TV | [C] Copiar Resumo | [ESC] Fechar');
+        showToast('⌨️ Atalhos: [1] Rotina | [2] Plantão | [3] Agenda | [4] Tudo | [R] Ronda | [P] Passagem 19h | [E] Relatório | [T] TV');
       }
       if (e.key === 'Escape') {
         toggleTvMode(false);
