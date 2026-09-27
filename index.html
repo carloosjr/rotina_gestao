@@ -1602,7 +1602,7 @@
       <div class="p-3.5 rounded-xl bg-[#252525] border border-[#2a2a2a] space-y-2 text-xs">
         <label class="flex items-center gap-2.5 cursor-pointer text-slate-200">
           <input type="checkbox" id="discordAutoCriticalCheck" class="rounded text-[#5865F2] focus:ring-0 cursor-pointer" checked />
-          <span><strong>Disparo automático</strong> no Discord 5 minutos antes de tarefas com status <strong>Crítico</strong></span>
+          <span><strong>Disparo automático para TODAS as tarefas</strong> da rotina (41 tarefas) com 5 minutos de antecedência no Direct do responsável</span>
         </label>
         <label class="flex items-center gap-2.5 cursor-pointer text-slate-200">
           <input type="checkbox" id="discordAutoWorkdeskCheck" class="rounded text-[#5865F2] focus:ring-0 cursor-pointer" checked />
@@ -3289,30 +3289,35 @@ END \$\$;
       if (!isToday) return;
 
       masterSchedule.forEach(task => {
-        if (!task.critical) return;
         const isDone = !!state.tasks[task.id]?.completed;
         if (isDone) return;
 
         const taskMins = parseTimeToMinutes(task.time);
-        // Dispara aviso de 5 minutos antes até 2 minutos após o horário
+        // Dispara aviso de 5 minutos antes até 2 minutos após o horário previsto
         if (currentMins >= taskMins - 5 && currentMins <= taskMins + 2) {
           const alertKey = `${selectedDate}_${task.id}_${taskMins}`;
           if (!alertedCriticalTasks.has(alertKey)) {
             alertedCriticalTasks.add(alertKey);
-            playCriticalChime();
-            speakAlert(`Atenção ${activeOperator}: atividade crítica "${task.title}" prevista para as ${task.time}!`);
+
+            // Som e voz prioritários para tarefas críticas
+            if (task.critical) {
+              playCriticalChime();
+              speakAlert(`Atenção ${activeOperator}: atividade crítica "${task.title}" prevista para as ${task.time}!`);
+            }
             sendDesktopNotification(
-              `🚨 Tarefa Crítica: ${task.time} - ${task.title}`,
+              `${task.critical ? '🚨 Tarefa Crítica' : '⏰ Rotina Operacional'}: ${task.time} - ${task.title}`,
               `Responsável: ${task.resp}. Validar e concluir na trilha de gestão.`
             );
 
-            // Disparo automático no Discord para o responsável da tarefa crítica (5 min de antecedência)
-            if (discordConfig.autoAlertCritical && (discordConfig.mode === 'direct' ? discordConfig.botToken : discordConfig.webhookUrl)) {
+            // Disparo automático no Discord para o responsável da tarefa (5 min de antecedência)
+            // Abrange TODAS as 41 tarefas da rotina operacional
+            if ((discordConfig.autoAlertCritical !== false || discordConfig.autoAlertTasks !== false) && 
+                (discordConfig.mode === 'direct' ? discordConfig.botToken : discordConfig.webhookUrl)) {
               sendDiscordTaskAlert(task.id, true);
             }
 
             // Disparo automático no WhatsApp se configurado
-            if (whatsappConfig.autoAlertCritical && whatsappConfig.apiUrl && whatsappConfig.targetGroup) {
+            if (whatsappConfig.autoAlertCritical && (task.critical || whatsappConfig.autoAlertAll) && whatsappConfig.apiUrl && whatsappConfig.targetGroup) {
               sendWhatsAppTaskAlert(task.id).catch(() => {});
             }
           }
