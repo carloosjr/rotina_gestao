@@ -1870,6 +1870,100 @@
   </div>
 
   <!-- ============================================================== -->
+  <!-- MODAL DE SELEÇÃO DE ATENDENTES DO CANAL (MÚLTIPLA SELEÇÃO)      -->
+  <!-- ============================================================== -->
+  <div id="canalAttendantsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-[#1c1c1c] border border-amber-500/40 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col relative">
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between pb-3 border-b border-[#2a2a2a] shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-xl border border-amber-500/30 shrink-0">
+            <i class="ti ti-users"></i>
+          </div>
+          <div>
+            <h3 id="canalAttendantsModalTitle" class="text-base font-bold text-white flex items-center gap-2">
+              Selecionar Atendentes
+            </h3>
+            <p id="canalAttendantsModalSubtitle" class="text-xs text-slate-400 mt-0.5">
+              Escolha um ou mais atendentes responsáveis por este canal no plantão.
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCanalAttendantsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#252525] text-lg font-bold transition cursor-pointer">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <!-- Search & Quick Actions -->
+      <div class="space-y-2 shrink-0">
+        <div class="relative">
+          <i class="ti ti-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+          <input
+            type="text"
+            id="attendantsModalSearchInput"
+            oninput="filterModalAttendants(this.value)"
+            placeholder="Filtrar atendentes por nome..."
+            class="system-input w-full pl-9 pr-3 py-2 text-xs text-white"
+          />
+        </div>
+
+        <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="selectDefaultCanalAttendants()" class="text-[11px] font-bold text-amber-400 hover:text-amber-300 hover:underline cursor-pointer">
+              Restaurar Padrão
+            </button>
+            <span class="text-slate-600">•</span>
+            <button type="button" onclick="clearCanalAttendantsSelection()" class="text-[11px] font-bold text-slate-400 hover:text-red-400 hover:underline cursor-pointer">
+              Limpar Seleção
+            </button>
+          </div>
+          <span id="canalAttendantsSelectedCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+            0 selecionado(s)
+          </span>
+        </div>
+      </div>
+
+      <!-- Attendants List (Scrollable) -->
+      <div id="canalAttendantsListContainer" class="flex-1 overflow-y-auto space-y-3.5 pr-1 max-h-[380px] min-h-[180px]">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Quick Add New Attendant Field -->
+      <div class="pt-2.5 border-t border-[#2a2a2a] shrink-0">
+        <label class="text-[11px] font-bold text-slate-400 block mb-1">Adicionar outro colaborador à lista:</label>
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            id="quickNewAttendantInput"
+            placeholder="Digite o nome de outro colaborador..."
+            class="system-input flex-1 px-3 py-1.5 text-xs text-white"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();quickAddCustomAttendant();}"
+          />
+          <button
+            type="button"
+            onclick="quickAddCustomAttendant()"
+            class="btn-outline px-3 py-1.5 text-xs font-bold shrink-0 flex items-center gap-1 text-amber-400 border-amber-500/40 hover:bg-amber-500/10 cursor-pointer"
+          >
+            <i class="ti ti-plus"></i>
+            <span>Adicionar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#2a2a2a] shrink-0">
+        <button type="button" onclick="closeCanalAttendantsModal()" class="px-4 py-2 text-xs font-bold rounded-lg bg-[#252525] hover:bg-[#303030] text-slate-300 transition cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" onclick="saveCanalAttendantsModal()" class="btn-accent px-4 py-2 text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer active:scale-95">
+          <i class="ti ti-check"></i>
+          <span>Confirmar Atendentes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
   <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL)     -->
   <!-- ============================================================== -->
   <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
@@ -2788,6 +2882,70 @@
 
     const RESPONSAVEIS_AGENDA = ['Matheus', 'Osiel', 'Bezerra', 'Hercílio'];
 
+    const CANAIS_DEFAULT_RESP = {
+      grupos: ['Osiel'],
+      linha: ['Matheus'],
+      workdesk: ['Bezerra'],
+      chat: ['Otávio', 'Gilseph']
+    };
+
+    function getCanalResponsaveis(canalId, state = null) {
+      if (!state) state = ensureDateState(selectedDate);
+      const custom = state.acompanhamentoPlantao?.canaisResponsaveis?.[canalId];
+      if (Array.isArray(custom) && custom.length > 0) {
+        return custom;
+      }
+      return CANAIS_DEFAULT_RESP[canalId] || [];
+    }
+
+    function getCanalResponsaveisText(canalId, state = null) {
+      const list = getCanalResponsaveis(canalId, state);
+      return list.length > 0 ? list.join(' / ') : 'A definir';
+    }
+
+    function getAllPlantaoAttendants() {
+      const set = new Set();
+      
+      // 1. Especialistas da tela de validação da agenda
+      if (Array.isArray(RESPONSAVEIS_AGENDA)) {
+        RESPONSAVEIS_AGENDA.forEach(n => { if (n && n.trim()) set.add(n.trim()); });
+      }
+
+      // 2. Colaboradores do time / sistema
+      if (Array.isArray(floorStaffList)) {
+        floorStaffList.forEach(n => { if (n && n.trim()) set.add(n.trim()); });
+      }
+
+      // 3. Atendentes da escala diária se carregados
+      const escala = dbState.escalaDiaria?.[selectedDate];
+      if (escala) {
+        ['intDefault', 'intPrime'].forEach(k => {
+          if (escala[k]) {
+            Object.values(escala[k]).forEach(arr => {
+              if (Array.isArray(arr)) {
+                arr.forEach(n => { if (n && n.trim()) set.add(n.trim()); });
+              }
+            });
+          }
+        });
+      }
+
+      // 4. Gestores e Supervisores
+      ['Bruno', 'Maurício', 'José Carlos'].forEach(n => set.add(n));
+
+      // 5. Atendentes já selecionados em canais para que nada se perca
+      const state = ensureDateState(selectedDate);
+      if (state.acompanhamentoPlantao?.canaisResponsaveis) {
+        Object.values(state.acompanhamentoPlantao.canaisResponsaveis).forEach(arr => {
+          if (Array.isArray(arr)) {
+            arr.forEach(n => { if (n && n.trim()) set.add(n.trim()); });
+          }
+        });
+      }
+
+      return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    }
+
     function ensureDateState(dateKey) {
       if (!dbState.dates[dateKey]) {
         dbState.dates[dateKey] = {
@@ -2801,6 +2959,7 @@
           passagemPlantao: {},
           acompanhamentoPlantao: {
             canaisReal: {},
+            canaisResponsaveis: {},
             groupLogs: [],
             queueLogs: [],
             ligacoes: [],
@@ -2814,6 +2973,7 @@
       if (!s.acompanhamentoPlantao) {
         s.acompanhamentoPlantao = {
           canaisReal: {},
+          canaisResponsaveis: {},
           groupLogs: [],
           queueLogs: [],
           ligacoes: [],
@@ -2821,6 +2981,7 @@
         };
       }
       if (!s.acompanhamentoPlantao.canaisReal) s.acompanhamentoPlantao.canaisReal = {};
+      if (!s.acompanhamentoPlantao.canaisResponsaveis) s.acompanhamentoPlantao.canaisResponsaveis = {};
       if (!Array.isArray(s.acompanhamentoPlantao.groupLogs)) s.acompanhamentoPlantao.groupLogs = [];
       if (!Array.isArray(s.acompanhamentoPlantao.queueLogs)) s.acompanhamentoPlantao.queueLogs = [];
       if (!Array.isArray(s.acompanhamentoPlantao.ligacoes)) s.acompanhamentoPlantao.ligacoes = [];
@@ -3337,6 +3498,7 @@
           const a = data.passagem_plantao.acompanhamento;
           state.acompanhamentoPlantao = state.acompanhamentoPlantao || {};
           if (a.canaisReal) state.acompanhamentoPlantao.canaisReal = { ...state.acompanhamentoPlantao.canaisReal, ...a.canaisReal };
+          if (a.canaisResponsaveis) state.acompanhamentoPlantao.canaisResponsaveis = { ...state.acompanhamentoPlantao.canaisResponsaveis, ...a.canaisResponsaveis };
           if (Array.isArray(a.groupLogs)) state.acompanhamentoPlantao.groupLogs = a.groupLogs;
           if (Array.isArray(a.queueLogs)) state.acompanhamentoPlantao.queueLogs = a.queueLogs;
           if (Array.isArray(a.ligacoes)) state.acompanhamentoPlantao.ligacoes = a.ligacoes;
@@ -4256,7 +4418,7 @@ END \$\$;
                   const val = (state.acompanhamentoPlantao.canaisReal || {})[c.id];
                   return `
                     <div class="p-2.5 rounded-lg bg-[#252525] border border-[#2a2a2a] text-xs">
-                      <span class="text-[10px] text-slate-400 font-bold">${c.canal} (${c.responsavel})</span>
+                      <span class="text-[10px] text-slate-400 font-bold">${c.canal} (${getCanalResponsaveisText(c.id, state)})</span>
                       <div class="font-mono font-bold ${val ? 'text-[#22c55e]' : 'text-slate-500'} mt-0.5">${val || 'Pendente'}</div>
                     </div>
                   `;
@@ -6520,7 +6682,8 @@ END \$\$;
       text += `\n📡 *STATUS DOS CANAIS OPERACIONAIS:*\n`;
       for (const c of CANAIS_PLANTAO) {
         const val = canaisReal[c.id];
-        text += `• ${c.canal} (${c.responsavel}): ${val ? `${val} (Previsto: ${c.previsto})` : `Aguardando (Previsto: ${c.previsto})`}\n`;
+        const respText = getCanalResponsaveisText(c.id, state);
+        text += `• ${c.canal} (${respText}): ${val ? `${val} (Previsto: ${c.previsto})` : `Aguardando (Previsto: ${c.previsto})`}\n`;
       }
 
       if ((plantao.groupLogs || []).length > 0) {
@@ -7234,6 +7397,7 @@ END \$\$;
 
       container.innerHTML = CANAIS_PLANTAO.map(canal => {
         const realVal = canaisReal[canal.id] || '';
+        const responsaveis = getCanalResponsaveis(canal.id, state);
         let diff = null;
         let resultHtml = '';
 
@@ -7267,11 +7431,33 @@ END \$\$;
         return `
           <div class="bg-[#181818] border border-[#2a2a2a] hover:border-[#fbbf24]/40 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between space-y-3">
             <div class="flex items-start justify-between gap-2">
-              <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${canal.canal}</span>
-                <h4 class="text-sm sm:text-base font-bold text-white mt-0.5">${canal.responsavel}</h4>
+              <div class="flex-1 min-w-0 pr-1">
+                <div class="flex items-center justify-between gap-1 mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${canal.canal}</span>
+                  <button type="button" onclick="openCanalAttendantsModal('${canal.id}')" title="Alterar atendentes deste canal" class="text-[10px] text-[#fbbf24] hover:text-amber-300 font-bold flex items-center gap-1 hover:underline cursor-pointer">
+                    <i class="ti ti-user-edit"></i> <span>Editar</span>
+                  </button>
+                </div>
+
+                <!-- Atendentes Selecionados (Permite múltiplos) -->
+                <div class="flex flex-wrap gap-1.5 items-center min-h-[30px]">
+                  ${responsaveis.map(name => `
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-bold bg-[#262626] text-white border border-[#333333] shadow-xs group">
+                      <i class="ti ti-user text-[11px] text-[#fbbf24]"></i>
+                      <span class="truncate max-w-[120px]" title="${name}">${name}</span>
+                      <button type="button" onclick="removeCanalAttendant('${canal.id}', '${name}', event)" title="Remover ${name}" class="text-slate-400 hover:text-red-400 ml-0.5 transition cursor-pointer">
+                        <i class="ti ti-x text-[10px]"></i>
+                      </button>
+                    </span>
+                  `).join('')}
+
+                  <button type="button" onclick="openCanalAttendantsModal('${canal.id}')" title="Adicionar / selecionar atendentes" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/30 hover:border-[#fbbf24] transition cursor-pointer">
+                    <i class="ti ti-plus text-[10px]"></i>
+                    <span>${responsaveis.length === 0 ? 'Selecionar Atendente' : '+ Atendente'}</span>
+                  </button>
+                </div>
               </div>
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass} shrink-0">
                 ${badgeText}
               </span>
             </div>
@@ -7309,6 +7495,194 @@ END \$\$;
       const healthBadge = document.getElementById('plantaoHealthScoreBadge');
       if (healthBadge) healthBadge.textContent = `Saúde Operacional: ${health.score}%`;
       showToast(`Horário de ${canalId} salvo: ${val || '--:--'}`);
+    }
+
+    // Modal & Multi-Select Controller para Atendentes dos Canais
+    let activeModalCanalId = null;
+    let modalSelectedAttendants = new Set();
+    let modalAttendantsSearchQuery = '';
+
+    function openCanalAttendantsModal(canalId) {
+      activeModalCanalId = canalId;
+      const canal = CANAIS_PLANTAO.find(c => c.id === canalId);
+      if (!canal) return;
+
+      const modal = document.getElementById('canalAttendantsModal');
+      const titleEl = document.getElementById('canalAttendantsModalTitle');
+      const subEl = document.getElementById('canalAttendantsModalSubtitle');
+      const searchInput = document.getElementById('attendantsModalSearchInput');
+
+      if (titleEl) {
+        titleEl.innerHTML = `Atendentes do Canal: <span class="text-[#fbbf24]">${canal.canal}</span> (Previsto: ${canal.previsto})`;
+      }
+      if (subEl) {
+        subEl.textContent = 'Marque um ou mais atendentes para assumir este canal no plantão.';
+      }
+      if (searchInput) searchInput.value = '';
+      modalAttendantsSearchQuery = '';
+
+      const state = ensureDateState(selectedDate);
+      const currentAssigned = getCanalResponsaveis(canalId, state);
+      modalSelectedAttendants = new Set(currentAssigned);
+
+      renderCanalAttendantsModalList();
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCanalAttendantsModal() {
+      const modal = document.getElementById('canalAttendantsModal');
+      if (modal) modal.classList.add('hidden');
+      activeModalCanalId = null;
+    }
+
+    function filterModalAttendants(query) {
+      modalAttendantsSearchQuery = (query || '').toLowerCase().trim();
+      renderCanalAttendantsModalList();
+    }
+
+    function toggleAttendantSelection(name) {
+      if (!name) return;
+      if (modalSelectedAttendants.has(name)) {
+        modalSelectedAttendants.delete(name);
+      } else {
+        modalSelectedAttendants.add(name);
+      }
+      renderCanalAttendantsModalList();
+    }
+
+    function selectDefaultCanalAttendants() {
+      if (!activeModalCanalId) return;
+      const def = CANAIS_DEFAULT_RESP[activeModalCanalId] || [];
+      modalSelectedAttendants = new Set(def);
+      renderCanalAttendantsModalList();
+    }
+
+    function clearCanalAttendantsSelection() {
+      modalSelectedAttendants.clear();
+      renderCanalAttendantsModalList();
+    }
+
+    function quickAddCustomAttendant() {
+      const input = document.getElementById('quickNewAttendantInput');
+      if (!input) return;
+      const name = input.value.trim();
+      if (!name) return;
+
+      modalSelectedAttendants.add(name);
+      if (!floorStaffList.includes(name) && !RESPONSAVEIS_AGENDA.includes(name)) {
+        floorStaffList.push(name);
+        try {
+          localStorage.setItem('rotina_time_profiles_cache', JSON.stringify(floorStaffList));
+        } catch(e) {}
+      }
+      input.value = '';
+      renderCanalAttendantsModalList();
+      showToast(`Atendente "${name}" adicionado e selecionado!`);
+    }
+
+    function saveCanalAttendantsModal() {
+      if (!activeModalCanalId) return;
+      const state = ensureDateState(selectedDate);
+      if (!state.acompanhamentoPlantao.canaisResponsaveis) {
+        state.acompanhamentoPlantao.canaisResponsaveis = {};
+      }
+
+      const selectedArray = Array.from(modalSelectedAttendants);
+      state.acompanhamentoPlantao.canaisResponsaveis[activeModalCanalId] = selectedArray;
+
+      scheduleCloudSync();
+      renderPlantaoCanais(state);
+      closeCanalAttendantsModal();
+
+      const canal = CANAIS_PLANTAO.find(c => c.id === activeModalCanalId);
+      const canalName = canal ? canal.canal : activeModalCanalId;
+      showToast(`Atendentes de ${canalName} definidos: ${selectedArray.length > 0 ? selectedArray.join(', ') : 'Nenhum'}`);
+    }
+
+    function removeCanalAttendant(canalId, name, event) {
+      if (event) event.stopPropagation();
+      const state = ensureDateState(selectedDate);
+      if (!state.acompanhamentoPlantao.canaisResponsaveis) {
+        state.acompanhamentoPlantao.canaisResponsaveis = {};
+      }
+      const current = getCanalResponsaveis(canalId, state);
+      state.acompanhamentoPlantao.canaisResponsaveis[canalId] = current.filter(n => n !== name);
+      scheduleCloudSync();
+      renderPlantaoCanais(state);
+      showToast(`${name} removido do canal.`);
+    }
+
+    function renderCanalAttendantsModalList() {
+      const container = document.getElementById('canalAttendantsListContainer');
+      const countBadge = document.getElementById('canalAttendantsSelectedCountBadge');
+      if (!container) return;
+
+      if (countBadge) {
+        countBadge.textContent = `${modalSelectedAttendants.size} selecionado(s)`;
+      }
+
+      const all = getAllPlantaoAttendants();
+      let filtered = all;
+      if (modalAttendantsSearchQuery) {
+        filtered = all.filter(n => n.toLowerCase().includes(modalAttendantsSearchQuery));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-500 text-xs italic bg-[#141414] rounded-xl border border-[#2a2a2a]">
+            Nenhum atendente encontrado para "${modalAttendantsSearchQuery}".<br/>
+            Você pode cadastrá-lo abaixo no campo "Adicionar outro colaborador".
+          </div>
+        `;
+        return;
+      }
+
+      const especialistas = filtered.filter(n => RESPONSAVEIS_AGENDA.includes(n));
+      const equipe = filtered.filter(n => !RESPONSAVEIS_AGENDA.includes(n) && !['Bruno', 'Maurício', 'José Carlos'].includes(n));
+      const gestores = filtered.filter(n => ['Bruno', 'Maurício', 'José Carlos'].includes(n));
+
+      function renderGroup(title, icon, items) {
+        if (items.length === 0) return '';
+        return `
+          <div class="space-y-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i class="${icon} text-[#fbbf24]"></i>
+              <span>${title} (${items.length})</span>
+            </span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              ${items.map(name => {
+                const isSelected = modalSelectedAttendants.has(name);
+                return `
+                  <button
+                    type="button"
+                    onclick="toggleAttendantSelection('${name}')"
+                    class="p-2.5 rounded-xl border text-left transition flex items-center justify-between gap-2 cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#fbbf24]/15 border-[#fbbf24] text-white shadow-sm ring-1 ring-[#fbbf24]/40 font-bold'
+                        : 'bg-[#181818] border-[#2a2a2a] text-slate-300 hover:border-[#404040] hover:text-white'
+                    }"
+                  >
+                    <div class="flex items-center gap-2 truncate">
+                      <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${isSelected ? 'bg-[#fbbf24] text-black font-bold' : 'bg-[#252525] text-slate-400'}">
+                        ${isSelected ? '<i class="ti ti-check"></i>' : '<i class="ti ti-user"></i>'}
+                      </div>
+                      <span class="text-xs truncate" title="${name}">${name}</span>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-3">
+          ${renderGroup('Especialistas da Agenda', 'ti ti-star', especialistas)}
+          ${renderGroup('Equipe do Sistema / TIME', 'ti ti-users', equipe)}
+          ${renderGroup('Gestores & Supervisores', 'ti ti-shield', gestores)}
+        </div>
+      `;
     }
 
     // 2. ATENDIMENTOS EM GRUPOS
@@ -7688,6 +8062,28 @@ END \$\$;
       const desc = document.getElementById('agendaListCountDesc');
       if (!container) return;
 
+      // Popula o select de atendentes com todos os disponíveis (especialistas + equipe)
+      const respSelect = document.getElementById('agendaResponsavelInput');
+      if (respSelect) {
+        const curVal = respSelect.value;
+        const allAttendants = getAllPlantaoAttendants();
+        let opts = `<option value="" disabled ${!curVal ? 'selected' : ''}>Atendente</option>`;
+        opts += `<optgroup label="Especialistas da Agenda">`;
+        RESPONSAVEIS_AGENDA.forEach(name => {
+          opts += `<option value="${name}" ${curVal === name ? 'selected' : ''}>${name}</option>`;
+        });
+        opts += `</optgroup>`;
+        const outros = allAttendants.filter(n => !RESPONSAVEIS_AGENDA.includes(n));
+        if (outros.length > 0) {
+          opts += `<optgroup label="Equipe da Operação / Outros">`;
+          outros.forEach(name => {
+            opts += `<option value="${name}" ${curVal === name ? 'selected' : ''}>${name}</option>`;
+          });
+          opts += `</optgroup>`;
+        }
+        respSelect.innerHTML = opts;
+      }
+
       const logs = (state.acompanhamentoPlantao.agendaLogs || []).slice().reverse();
 
       if (badge) {
@@ -7762,7 +8158,7 @@ END \$\$;
       const evidencia = evInput.value.trim();
 
       if (!responsavel) {
-        showToast('Selecione o atendente (Matheus, Osiel, Bezerra ou Hercílio).');
+        showToast('Selecione o atendente responsável.');
         return;
       }
       if (!oc) {
@@ -7815,8 +8211,8 @@ END \$\$;
       text += `📡 *CANAIS OPERACIONAIS:*\n`;
       for (const canal of CANAIS_PLANTAO) {
         const real = canaisReal[canal.id];
-        const status = real ? `${real} (Prev: ${canal.previsto})` : `Pendente (Prev: ${canal.previsto})`;
-        text += `• ${canal.canal} (${canal.responsavel}): ${status}\n`;
+        const respText = getCanalResponsaveisText(canal.id, state);
+        text += `• ${canal.canal} (${respText}): ${status}\n`;
       }
 
       text += `\n💬 *ATENDIMENTOS EM GRUPOS:* ${(p.groupLogs || []).length} registrado(s)\n`;
@@ -7907,6 +8303,7 @@ END \$\$;
         closeAnalyticsModal();
         closeExecutiveReportModal();
         closeDeleteConfirmModal();
+        closeCanalAttendantsModal();
       }
     });
 
