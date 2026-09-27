@@ -2023,6 +2023,17 @@
     // --- ADMIN PROFILES FROM SUPABASE (APENAS USUÁRIOS ADMIN) ---
     let loadedAdminUsers = [];
 
+    function isTestOrExcludedUser(u) {
+      if (!u) return true;
+      const normName = normalizeName(u.nome || u.username || '');
+      const email = (u.email || '').toLowerCase().trim();
+      return normName.includes('teste') ||
+             normName.includes('test') ||
+             email.includes('teste') ||
+             email.includes('test') ||
+             normName === 'plantao';
+    }
+
     async function fetchAndRenderAdminUsers() {
       const container = document.getElementById('adminUserCardsContainer');
       let admins = [];
@@ -2033,9 +2044,11 @@
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            admins = parsed;
-            renderAdminCards(admins, false);
-            updateOperatorDropdown(admins);
+            admins = parsed.filter(u => !isTestOrExcludedUser(u));
+            if (admins.length > 0) {
+              renderAdminCards(admins, false);
+              updateOperatorDropdown(admins);
+            }
           }
         }
       } catch (e) {}
@@ -2064,9 +2077,9 @@
         }
       }
 
-      // 3. Se obteve administradores do Supabase
+      // 3. Se obteve administradores do Supabase (remove usuários de teste e contas excluídas)
       if (admins.length > 0) {
-        admins = admins.filter(u => normalizeName(u.nome || u.username) !== 'plantao');
+        admins = admins.filter(u => !isTestOrExcludedUser(u));
         loadedAdminUsers = admins;
         try {
           localStorage.setItem('rotina_admin_profiles_cache', JSON.stringify(admins));
@@ -2091,10 +2104,12 @@
       const badge = document.getElementById('adminUsersCountBadge');
       if (!container) return;
 
+      const validAdmins = admins.filter(u => !isTestOrExcludedUser(u));
+
       if (badge) {
         badge.innerHTML = isFallback
-          ? `<span class="text-amber-400/90 font-medium">Gestores padrão (${admins.length}) • Execute o SQL para sincronizar da tabela profiles</span>`
-          : `<span class="text-emerald-400 font-semibold flex items-center justify-center gap-1"><i class="ti ti-check"></i> ${admins.length} Administrador(es) carregado(s) da tabela profiles</span>`;
+          ? `<span class="text-amber-400/90 font-medium">Gestores padrão (${validAdmins.length}) • Execute o SQL para sincronizar da tabela profiles</span>`
+          : `<span class="text-emerald-400 font-semibold flex items-center justify-center gap-1"><i class="ti ti-check"></i> ${validAdmins.length} Administrador(es) carregado(s) da tabela profiles</span>`;
       }
 
       const colors = [
@@ -2105,7 +2120,7 @@
         { bg: 'bg-[#ef4444]/20', text: 'text-[#ef4444]', border: 'border-[#ef4444]/40', hoverBg: 'group-hover:bg-[#ef4444]' }
       ];
 
-      container.innerHTML = admins.map((user, idx) => {
+      container.innerHTML = validAdmins.map((user, idx) => {
         const color = colors[idx % colors.length];
         const displayName = user.nome || user.username || user.email?.split('@')[0] || 'Administrador';
         const initials = displayName.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
@@ -2140,7 +2155,7 @@
       if (!select) return;
       const current = activeOperator;
       select.innerHTML = admins
-        .filter(u => normalizeName(u.nome || u.username) !== 'plantao')
+        .filter(u => !isTestOrExcludedUser(u))
         .map(u => {
           const name = u.nome || u.username || u.email?.split('@')[0] || 'Admin';
           return `<option value="${name}" class="bg-[#1c1c1c] text-white" ${name === current ? 'selected' : ''}>${name}</option>`;
