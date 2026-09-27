@@ -12,9 +12,10 @@ serve(async (req) => {
 
   try {
     const { botToken, userId, payload } = await req.json()
+    const token = (botToken || Deno.env.get('DISCORD_BOT_TOKEN') || '').trim()
 
-    if (!botToken || !userId) {
-      return new Response(JSON.stringify({ error: 'botToken e userId são obrigatórios.' }), {
+    if (!token || !userId) {
+      return new Response(JSON.stringify({ error: 'botToken (ou variável de ambiente DISCORD_BOT_TOKEN) e userId são obrigatórios.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -24,7 +25,7 @@ serve(async (req) => {
     const dmRes = await fetch('https://discord.com/api/v10/users/@me/channels', {
       method: 'POST',
       headers: {
-        'Authorization': `Bot ${botToken.trim()}`,
+        'Authorization': `Bot ${token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ recipient_id: userId.trim() })

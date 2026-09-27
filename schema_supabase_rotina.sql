@@ -33,11 +33,16 @@ CREATE TABLE IF NOT EXISTS public.rotina_operacional_tarefas (
     concluida_em TIMESTAMPTZ,
     checked_time TEXT,
     no_horario BOOLEAN DEFAULT true,
+    delay_minutes INT DEFAULT 0,
+    sla_status TEXT DEFAULT 'on_time',
     logs JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now(),
     CONSTRAINT rotina_operacional_tarefas_unique UNIQUE (data, task_id)
 );
+
+ALTER TABLE public.rotina_operacional_tarefas ADD COLUMN IF NOT EXISTS delay_minutes INT DEFAULT 0;
+ALTER TABLE public.rotina_operacional_tarefas ADD COLUMN IF NOT EXISTS sla_status TEXT DEFAULT 'on_time';
 
 -- 3. TABELA DE APONTAMENTOS DO SENSO DE DONO (6 Pilares da Liderança)
 CREATE TABLE IF NOT EXISTS public.rotina_operacional_senso_dono (
@@ -193,4 +198,79 @@ CREATE TABLE IF NOT EXISTS public.rotina_operacional_config (
 ALTER TABLE public.rotina_operacional_config ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "rotina_op_config_all" ON public.rotina_operacional_config;
 CREATE POLICY "rotina_op_config_all" ON public.rotina_operacional_config FOR ALL USING (true) WITH CHECK (true);
+
+-- 14. TRIGGER DE SINCRONIZAÇÃO AUTOMÁTICA (rotina_operacional_tarefas -> rotina_operacional_diaria)
+-- Garante que conclusões vindas do Discord Bot ou scripts externos reflitam instantaneamente no Realtime do painel web
+CREATE OR REPLACE FUNCTION public.fn_sync_tarefa_to_diaria()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_tarefas JSONB;
+    v_task_entry JSONB;
+    v_total INT := 41;
+    v_done_count INT := 0;
+    v_progresso NUMERIC(5,2) := 0;
+BEGIN
+    SELECT tarefas INTO v_tarefas FROM public.rotina_operacional_diaria WHERE data = NEW.data;
+    IF v_tarefas IS NULL THEN
+        v_tarefas := '{}'::jsonb;
+    END IF;
+
+    v_task_entry := jsonb_build_object(
+        'completed', NEW.concluida,
+        'user', NEW.concluida_por,
+        'checkedTime', NEW.checked_time,
+        'timestamp', NEW.concluida_em,
+        'onTime', NEW.no_horario,
+        'delayMinutes', COALESCE(NEW.delay_minutes, 0),
+        'slaStatus', COALESCE(NEW.sla_status, 'on_time'),
+        'logs', NEW.logs
+    );
+
+    v_tarefas := jsonb_set(v_tarefas, ARRAY[NEW.task_id], v_task_entry);
+
+    -- Recalcular progresso
+    SELECT count(*) INTO v_done_count
+    FROM jsonb_each(v_tarefas)
+    WHERE (value->>'completed')::boolean = true;
+
+    IF v_total > 0 THEN
+        v_progresso := round((v_done_count::numeric / v_total::numeric) * 100, 2);
+    END IF;
+
+    INSERT INTO public.rotina_operacional_diaria (data, tarefas, progresso_percentual, updated_at)
+    VALUES (NEW.data, v_tarefas, v_progresso, now())
+    ON CONFLICT (data) DO UPDATE
+    SET tarefas = v_tarefas,
+        progresso_percentual = v_progresso,
+        updated_at = now();
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_sync_tarefa_to_diaria ON public.rotina_operacional_tarefas;
+CREATE TRIGGER trg_sync_tarefa_to_diaria
+AFTER INSERT OR UPDATE ON public.rotina_operacional_tarefas
+FOR EACH ROW EXECUTE FUNCTION public.fn_sync_tarefa_to_diaria();
+
+-- 15. AGENDAMENTO NATIVO DE FECHAMENTO DIÁRIO DAS 22:00 (Supabase pg_cron + pg_net)
+-- Executa 100% no servidor, sem depender de nenhum navegador aberto
+-- 01:00 UTC = 22:00 Horário de Brasília (BRT)
+-- Para ativar diretamente no PostgreSQL do Supabase (Database -> Extensions):
+/*
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
+SELECT cron.schedule(
+    'fechamento-diario-service-desk-22h',
+    '0 1 * * *',
+    $$
+    SELECT net.http_post(
+        url := 'https://bzebborrqzvpdmvtieib.supabase.co/functions/v1/daily-closing-report',
+        headers := '{"Content-Type": "application/json"}'::jsonb,
+        body := '{"auto": true, "email": "jose.carlos@softcomtecnologia.com.br"}'::jsonb
+    );
+    $$
+);
+*/
 

@@ -448,7 +448,7 @@
 
     <!-- Right Controls: Operator Selector, Date Navigation, Quick Toggles & Settings Center -->
     <div class="flex items-center gap-2 ml-auto flex-nowrap shrink-0">
-      <!-- Active Operator Selector (Bruno, Maurício, José Carlos, Plantão) -->
+      <!-- Active Operator Selector (Bruno, Maurício, José Carlos) -->
       <div class="flex items-center gap-1.5 bg-[#1c1c1c] border border-[#2a2a2a] px-2.5 py-1.5 rounded-lg shadow-xs transition hover:border-[#404040]">
         <i class="ti ti-user text-[#fbbf24] text-xs"></i>
         <label for="operatorSelect" class="text-[11px] font-semibold text-slate-400 shrink-0">Gestor:</label>
@@ -456,7 +456,6 @@
           <option value="Bruno" class="bg-[#1c1c1c] text-white">Bruno</option>
           <option value="Maurício" class="bg-[#1c1c1c] text-white">Maurício</option>
           <option value="José Carlos" class="bg-[#1c1c1c] text-white">José Carlos</option>
-          <option value="Plantão" class="bg-[#1c1c1c] text-white">Plantão</option>
         </select>
       </div>
 
@@ -553,6 +552,13 @@
             <i class="ti ti-current-location text-sm"></i>
             <span>Pular para o Agora</span>
           </button>
+
+          <!-- Passagem de Plantão 19:00 Button -->
+          <button onclick="openPlantaoHandoverModal()" title="Passagem de Turno para o Plantão Noturno (Atalho: P)" class="px-2.5 py-1.5 rounded-lg bg-[#1c1c1c] hover:bg-[#252525] text-[#818cf8] border border-[#2a2a2a] hover:border-[#818cf8]/40 text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+            <i class="ti ti-arrows-exchange text-sm"></i>
+            <span class="hidden sm:inline">Passagem 19h</span>
+            <kbd class="text-[9px] bg-black/30 px-1 py-0.2 rounded text-slate-300 font-mono font-bold">P</kbd>
+          </button>
         </div>
       </div>
 
@@ -563,7 +569,7 @@
           <span>Filtro:</span>
         </span>
 
-        <button onclick="setActiveFilter('all')" id="filterBtn-all" class="filter-tab active">
+        <button onclick="setActiveFilter('all')" id="filterBtn-all" class="filter-tab">
           <i class="ti ti-list-check"></i>
           <span>Trilha Completa (08:00 às 21:00)</span>
         </button>
@@ -1078,7 +1084,7 @@
 
   <!-- Feature 3: MODAL DE PASSAGEM FORMAL DE TURNO PARA O PLANTÃO (19:00) -->
   <div id="plantaoHandoverModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-[#2a2a2a]">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-lg bg-[#fbbf24]/10 text-[#fbbf24] flex items-center justify-center text-lg border border-[#fbbf24]/30">
@@ -1086,7 +1092,7 @@
           </div>
           <div>
             <h3 class="text-base sm:text-lg font-bold text-white">Passagem Formal de Turno para o Plantão</h3>
-            <p class="text-xs text-slate-400">Transição das 19:00 para os Especialistas Noturnos</p>
+            <p class="text-xs text-slate-400">Transição Oficial das 19:00 • Compilação Executiva para os Especialistas Noturnos</p>
           </div>
         </div>
         <button onclick="closePlantaoHandoverModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#252525] text-lg font-bold">
@@ -1102,7 +1108,11 @@
         <button onclick="closePlantaoHandoverModal()" class="btn-outline px-4 py-2 text-xs font-bold">
           Fechar
         </button>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="savePlantaoHandoverToSupabase()" class="px-4 py-2 text-xs font-bold rounded-lg text-[#22c55e] bg-[#22c55e]/10 hover:bg-[#22c55e]/20 border border-[#22c55e]/30 transition flex items-center gap-1.5 active:scale-95" title="Salvar histórico da passagem de plantão no banco Supabase">
+            <i class="ti ti-device-floppy text-base"></i>
+            <span>Salvar no Banco</span>
+          </button>
           <button onclick="sendDiscordHandoverAlert()" class="px-4 py-2 text-xs font-bold rounded-lg text-[#5865F2] bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 transition flex items-center gap-1.5 active:scale-95">
             <i class="ti ti-brand-discord text-base"></i>
             <span>Discord</span>
@@ -1113,7 +1123,7 @@
           </button>
           <button onclick="copyPlantaoHandoverText()" class="btn-accent px-4 py-2 text-xs font-bold flex items-center gap-2 active:scale-95">
             <i class="ti ti-copy"></i>
-            <span>Copiar Texto</span>
+            <span>Copiar WhatsApp</span>
           </button>
         </div>
       </div>
@@ -1779,7 +1789,7 @@
       </div>
 
       <!-- KPI Summary Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div class="p-3.5 rounded-xl bg-[#141414] border border-[#2a2a2a]">
           <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Aderência Média</div>
           <div id="analyticsAvgAdherence" class="text-2xl font-black text-[#22c55e] mt-1">--%</div>
@@ -1791,23 +1801,34 @@
           <div class="text-[10px] text-slate-500 mt-0.5">Auditadas e validadas</div>
         </div>
         <div class="p-3.5 rounded-xl bg-[#141414] border border-[#2a2a2a]">
-          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Rondas WorkDesk</div>
-          <div id="analyticsTotalWorkdesk" class="text-2xl font-black text-[#38bdf8] mt-1">--</div>
-          <div class="text-[10px] text-slate-500 mt-0.5">Ciclos de 30 min</div>
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">SLA Pontualidade</div>
+          <div id="analyticsSlaRate" class="text-2xl font-black text-[#38bdf8] mt-1">--%</div>
+          <div id="analyticsAvgDelaySub" class="text-[10px] text-slate-500 mt-0.5">Tolerância até +15m</div>
         </div>
         <div class="p-3.5 rounded-xl bg-[#141414] border border-[#2a2a2a]">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Rondas WorkDesk</div>
+          <div id="analyticsTotalWorkdesk" class="text-2xl font-black text-amber-400 mt-1">--</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Ciclos de 30 min</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#141414] border border-[#2a2a2a] col-span-2 sm:col-span-1">
           <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Senso de Dono</div>
           <div id="analyticsAvgSensoDono" class="text-2xl font-black text-emerald-400 mt-1">--%</div>
           <div class="text-[10px] text-slate-500 mt-0.5">Auditoria física/postura</div>
         </div>
       </div>
 
-      <!-- Desempenho por Supervisor -->
+      <!-- Desempenho por Supervisor: Ranking de Gestão e Pódio -->
       <div class="p-4 rounded-xl bg-[#141414] border border-[#2a2a2a] space-y-3">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-          <i class="ti ti-users text-[#fbbf24]"></i>
-          <span>Aderência por Supervisor da Gestão:</span>
-        </h4>
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+              <i class="ti ti-trophy text-[#fbbf24]"></i>
+              <span>Ranking de Gestão &amp; Liderança Operacional (Pódio)</span>
+            </h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Pontuação ponderada: 60% Aderência de Rotina + 40% Pontualidade SLA</p>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#252525] text-slate-400 border border-[#333333]">Pódio Operacional</span>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs" id="analyticsManagerPerformance">
           <!-- Injected dynamically -->
         </div>
@@ -1829,6 +1850,7 @@
                 <th class="py-2 px-3">Data</th>
                 <th class="py-2 px-3">Supervisor Ativo</th>
                 <th class="py-2 px-3">Aderência</th>
+                <th class="py-2 px-3">SLA / Pontualidade</th>
                 <th class="py-2 px-3">Rondas WorkDesk</th>
                 <th class="py-2 px-3 text-right">Ação</th>
               </tr>
@@ -2044,6 +2066,7 @@
 
       // 3. Se obteve administradores do Supabase
       if (admins.length > 0) {
+        admins = admins.filter(u => normalizeName(u.nome || u.username) !== 'plantao');
         loadedAdminUsers = admins;
         try {
           localStorage.setItem('rotina_admin_profiles_cache', JSON.stringify(admins));
@@ -2053,10 +2076,9 @@
       } else if (!loadedAdminUsers || loadedAdminUsers.length === 0) {
         // 4. Fallback com os gestores administrativos padrão do Service Desk
         const defaultAdmins = [
-          { nome: 'Bruno', role: 'admin', desc: 'Abertura, 13:24 & 13:12' },
-          { nome: 'Maurício', role: 'admin', desc: 'Entradas, Almoços 11-12h & Produtividade' },
-          { nome: 'José Carlos', role: 'admin', desc: 'Almoços 14-17:30, Produtividade & 15:30' },
-          { nome: 'Plantão', role: 'admin', desc: '17h às 21h, Especialistas & Passagem de Turno' }
+          { nome: 'Bruno', role: 'admin', desc: 'Abertura (08:00), 13:24 & Almoço 13:12' },
+          { nome: 'Maurício', role: 'admin', desc: 'Entradas (09:00 - 11:00), Almoços 11-12h & Produtividade' },
+          { nome: 'José Carlos', role: 'admin', desc: 'Almoços 14-17:30, Produtividade, Almoço 15:30 & Fluxo do Plantão (17h às 21h)' }
         ];
         loadedAdminUsers = defaultAdmins;
         renderAdminCards(defaultAdmins, true);
@@ -2117,20 +2139,12 @@
       const select = document.getElementById('operatorSelect');
       if (!select) return;
       const current = activeOperator;
-      select.innerHTML = admins.map(u => {
-        const name = u.nome || u.username || u.email?.split('@')[0] || 'Admin';
-        return `<option value="${name}" class="bg-[#1c1c1c] text-white" ${name === current ? 'selected' : ''}>${name}</option>`;
-      }).join('');
-
-      // Se tiver 'Plantão' e não estiver na lista de admins, adiciona como opção de turno
-      if (!admins.some(u => (u.nome || u.username) === 'Plantão')) {
-        const opt = document.createElement('option');
-        opt.value = 'Plantão';
-        opt.className = 'bg-[#1c1c1c] text-white';
-        opt.textContent = 'Plantão';
-        if (current === 'Plantão') opt.selected = true;
-        select.appendChild(opt);
-      }
+      select.innerHTML = admins
+        .filter(u => normalizeName(u.nome || u.username) !== 'plantao')
+        .map(u => {
+          const name = u.nome || u.username || u.email?.split('@')[0] || 'Admin';
+          return `<option value="${name}" class="bg-[#1c1c1c] text-white" ${name === current ? 'selected' : ''}>${name}</option>`;
+        }).join('');
     }
 
     // --- TIME PROFILES FROM SUPABASE (COLABORADORES DO PERFIL TIME) ---
@@ -2200,56 +2214,56 @@
       { id: 't_1000_prod', time: '10:00', title: 'Acompanhar produtividade geral', resp: 'Maurício', category: 'produtividade', critical: false, desc: 'Checagem de fila e TMA' },
 
       { id: 't_1100_equipe', time: '11:00', title: 'Verificar equipe das 11', resp: 'Maurício', category: 'entradas', critical: true, desc: 'Última grande entrada da manhã' },
-      { id: 't_1100_almoco_eq', time: '11:00', title: 'Verificar almoço da equipe das 11:00', resp: 'Maurício', category: 'almoco', critical: true, desc: 'Liberação e revezamento da equipe de 11h' },
+      { id: 't_1100_almoco_eq', time: '11:00', title: 'Verificar almoço da equipe das 11:00 (Retorno: 12:12 • 1h12)', resp: 'Maurício', category: 'almoco', critical: true, desc: 'Liberação e revezamento da equipe de 11h (1h12 de intervalo + 15m tolerância)' },
       { id: 't_1100_prod', time: '11:00', title: 'Acompanhar produtividade geral', resp: 'Maurício', category: 'produtividade', critical: false, desc: 'Controle de volume antes do pico' },
 
-      { id: 't_1200_almoco_eq', time: '12:00', title: 'Verificar almoço da equipe das 12:00', resp: 'Maurício', category: 'almoco', critical: true, desc: 'Liberação de almoço da turma das 12h' },
-      { id: 't_1200_almoco_sup', time: '12:00', title: 'Almoço do Supervisor (Maurício)', resp: 'Maurício', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor Maurício (12:00 às 13:00)' },
-      { id: 't_1200_prod', time: '12:00', title: 'Acompanhar produtividade geral', resp: 'Maurício', category: 'produtividade', critical: false, desc: 'Checagem de indicadores do meio-dia' },
+      { id: 't_1200_almoco_sup', time: '12:00', title: 'Almoço do Supervisor (Maurício)', resp: 'Maurício', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor Maurício (12:00 às 13:12 • 1h12)' },
+      { id: 't_1200_prod', time: '12:00', title: 'Acompanhar produtividade geral', resp: 'Bruno', category: 'produtividade', critical: false, desc: 'Checagem de indicadores do meio-dia (cobertura durante almoço do Maurício)' },
+      { id: 't_1200_almoco_eq', time: '12:12', title: 'Verificar almoço da equipe das 12:12 (Retorno: 13:24 • 1h12)', resp: 'Bruno', category: 'almoco', critical: true, desc: 'Liberação de almoço da turma das 12:12 (1h12 de intervalo + 15m tolerância)' },
       { id: 't_1200_1800_salao', time: '12:00', timeEnd: '18:00', title: 'Monitoramento da Operação (12h às 18h)', resp: 'Bruno, Maurício e José Carlos', category: 'monitoramento', critical: true, desc: 'Pico conjunto: Bruno, Maurício e José Carlos em rotação ativa' },
 
       { id: 't_1300_prod', time: '13:00', title: 'Acompanhar produtividade geral', resp: 'José Carlos', category: 'produtividade', critical: false, desc: 'Supervisão de produtividade e filas' },
-      { id: 't_1312_almoco_sup', time: '13:12', title: 'Almoço do Supervisor (Bruno)', resp: 'Bruno', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor Bruno (13:12 às 14:12)' },
-      { id: 't_1324_almoco_eq', time: '13:24', title: 'Verificar o almoço da equipe das 13:24', resp: 'Bruno', category: 'almoco', critical: true, desc: 'Controle de saída escalonada de 13:24' },
+      { id: 't_1312_almoco_sup', time: '13:12', title: 'Almoço do Supervisor (Bruno)', resp: 'Bruno', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor Bruno (13:12 às 14:24 • 1h12)' },
+      { id: 't_1324_almoco_eq', time: '13:24', title: 'Verificar o almoço da equipe das 13:24 (Retorno: 14:36 • 1h12)', resp: 'Maurício', category: 'almoco', critical: true, desc: 'Controle de saída escalonada de 13:24 (Maurício cobre durante almoço do Bruno)' },
 
       { id: 't_1400_prod', time: '14:00', title: 'Acompanhar produtividade geral', resp: 'José Carlos', category: 'produtividade', critical: false, desc: 'Acompanhamento do pico de chamados' },
-      { id: 't_1442_almoco_eq', time: '14:42', title: 'Verificar o almoço da equipe das 14:42', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Controle de pausas de 14:42' },
+      { id: 't_1442_almoco_eq', time: '14:42', title: 'Verificar o almoço da equipe das 14:42 (Retorno: 15:54 • 1h12)', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Controle de pausas de 14:42 (1h12 de intervalo + 15m tolerância)' },
 
       { id: 't_1500_prod', time: '15:00', title: 'Acompanhar produtividade geral', resp: 'José Carlos', category: 'produtividade', critical: false, desc: 'Checagem de TMA e filas acumuladas' },
-      { id: 't_1530_almoco_eq', time: '15:30', title: 'Verificar o almoço da equipe das 15:30', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Conferência de saídas de 15:30' },
-      { id: 't_1530_almoco_sup', time: '15:30', title: 'Almoço do Supervisor (José Carlos)', resp: 'José Carlos', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor José Carlos (15:30 às 16:30)' },
+      { id: 't_1530_almoco_sup', time: '15:30', title: 'Almoço do Supervisor (José Carlos)', resp: 'José Carlos', category: 'almoco_sup', critical: false, desc: 'Pausa de almoço do gestor José Carlos (15:30 às 16:42 • 1h12)' },
+      { id: 't_1530_almoco_eq', time: '15:30', title: 'Verificar o almoço da equipe das 15:30 (Retorno: 16:42 • 1h12)', resp: 'Maurício', category: 'almoco', critical: true, desc: 'Conferência de saídas de 15:30 (Maurício cobre durante almoço de José Carlos)' },
 
       { id: 't_1600_prod', time: '16:00', title: 'Acompanhar produtividade geral', resp: 'Maurício', category: 'produtividade', critical: false, desc: 'Retorno da produtividade da tarde' },
-      { id: 't_1642_almoco_eq', time: '16:42', title: 'Verificar o almoço da equipe das 16:42', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Controle de saídas de 16:42' },
+      { id: 't_1642_almoco_eq', time: '16:42', title: 'Verificar o almoço da equipe das 16:42 (Retorno: 17:54 • 1h12)', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Controle de saídas de 16:42 (José Carlos reassume após almoço)' },
 
       { id: 't_1700_prod', time: '17:00', title: 'Acompanhar produtividade geral', resp: 'Maurício', category: 'produtividade', critical: false, desc: 'Última checagem horária de produtividade diurna' },
-      { id: 't_1700_blitz', time: '17:00', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Início da preparação para o plantão noturno' },
-      { id: 't_1730_almoco_eq', time: '17:30', title: 'Verificar o almoço da equipe das 17:30', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Último bloco de almoços da equipe' },
+      { id: 't_1700_blitz', time: '17:00', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Início da preparação para o plantão noturno' },
+      { id: 't_1730_almoco_eq', time: '17:30', title: 'Verificar o almoço da equipe das 17:30 (Retorno: 18:42 • 1h12)', resp: 'José Carlos', category: 'almoco', critical: true, desc: 'Último bloco de almoços da equipe (1h12 de intervalo + 15m tolerância)' },
 
-      { id: 't_1800_blitz', time: '18:00', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Conferência de pendências e escala noturna' },
+      { id: 't_1800_blitz', time: '18:00', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Conferência de pendências e escala noturna' },
       { id: 't_1800_1900_salao', time: '18:00', timeEnd: '19:00', title: 'Monitoramento da Operação (18h às 19h)', resp: 'Maurício e José Carlos', category: 'monitoramento', critical: false, desc: 'Transição e alinhamento pós-saída do Bruno' },
-      { id: 't_1815_blitz', time: '18:15', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda + Grupos', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Alinhamento em grupos e revisão de agenda' },
-      { id: 't_1830_blitz', time: '18:30', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda (Saída: Brito)', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Acompanhar desmobilização e saída do Brito' },
-      { id: 't_1845_blitz', time: '18:45', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda (Ajustar fila: Cauê)', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Ajuste e balanceamento de fila do operador Cauê' },
+      { id: 't_1815_blitz', time: '18:15', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda + Grupos', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Alinhamento em grupos e revisão de agenda' },
+      { id: 't_1830_blitz', time: '18:30', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda (Saída: Brito)', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Acompanhar desmobilização e saída do Brito' },
+      { id: 't_1845_blitz', time: '18:45', title: 'Fluxo do Plantão - Blitz + Revisão da Agenda (Ajustar fila: Cauê)', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Ajuste e balanceamento de fila do operador Cauê' },
 
-      { id: 't_1900_plantao', time: '19:00', title: 'Início do Plantão (Saída: Natha, Tarcísio, Hadassa, Francisco, Guimarães) | Entrada: Especialistas', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Grande virada de turno: saídas e entrada dos Especialistas' },
-      { id: 't_1900_sala', time: '19:00', title: 'Encerramento do dia - Verificar sala', resp: 'Plantão', category: 'encerramento', critical: true, desc: 'Organização, máquinas, TVs e limpeza' },
-      { id: 't_1900_2100_salao', time: '19:00', timeEnd: '21:00', title: 'Monitoramento - Plantão Noturno (Especialistas)', resp: 'Plantão', category: 'monitoramento', critical: false, desc: 'Acompanhamento da operação noturna' },
+      { id: 't_1900_plantao', time: '19:00', title: 'Início do Plantão (Saída: Natha, Tarcísio, Hadassa, Francisco, Guimarães) | Entrada: Especialistas', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Grande virada de turno: saídas e entrada dos Especialistas' },
+      { id: 't_1900_sala', time: '19:00', title: 'Encerramento do dia - Verificar sala', resp: 'José Carlos / Plantão', category: 'encerramento', critical: true, desc: 'Organização, máquinas, TVs e limpeza' },
+      { id: 't_1900_2100_salao', time: '19:00', timeEnd: '21:00', title: 'Monitoramento - Plantão Noturno (Especialistas)', resp: 'José Carlos / Plantão', category: 'monitoramento', critical: false, desc: 'Acompanhamento da operação noturna liderada por José Carlos' },
 
-      { id: 't_2000_saida', time: '20:00', title: 'Fluxo do Plantão - Saída: Otávio', resp: 'Plantão', category: 'plantao', critical: false, desc: 'Conferir logoff e saída do operador Otávio' },
-      { id: 't_2030_saida', time: '20:30', title: 'Fluxo do Plantão - Saída: Gilseph', resp: 'Plantão', category: 'plantao', critical: false, desc: 'Conferir logoff e saída do operador Gilseph' },
-      { id: 't_2100_saida', time: '21:00', title: 'Fluxo do Plantão - Saída: David (Fechamento Geral)', resp: 'Plantão', category: 'plantao', critical: true, desc: 'Conferir encerramento final e saída do David' }
+      { id: 't_2000_saida', time: '20:00', title: 'Fluxo do Plantão - Saída: Otávio', resp: 'José Carlos / Plantão', category: 'plantao', critical: false, desc: 'Conferir logoff e saída do operador Otávio' },
+      { id: 't_2030_saida', time: '20:30', title: 'Fluxo do Plantão - Saída: Gilseph', resp: 'José Carlos / Plantão', category: 'plantao', critical: false, desc: 'Conferir logoff e saída do operador Gilseph' },
+      { id: 't_2100_saida', time: '21:00', title: 'Fluxo do Plantão - Saída: David (Fechamento Geral)', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Conferir encerramento final e saída do David' }
     ];
 
-    // Only the 7 team lunch windows
+    // Only the 7 team lunch windows (1h12 = 72m duração padrão + 15m tolerância máxima)
     const lunchSchedule = [
-      { id: 't_1100_almoco_eq', time: '11:00', resp: 'Maurício', label: 'Equipe 11:00' },
-      { id: 't_1200_almoco_eq', time: '12:00', resp: 'Maurício', label: 'Equipe 12:00' },
-      { id: 't_1324_almoco_eq', time: '13:24', resp: 'Bruno', label: 'Equipe 13:24' },
-      { id: 't_1442_almoco_eq', time: '14:42', resp: 'José Carlos', label: 'Equipe 14:42' },
-      { id: 't_1530_almoco_eq', time: '15:30', resp: 'José Carlos', label: 'Equipe 15:30' },
-      { id: 't_1642_almoco_eq', time: '16:42', resp: 'José Carlos', label: 'Equipe 16:42' },
-      { id: 't_1730_almoco_eq', time: '17:30', resp: 'José Carlos', label: 'Equipe 17:30' }
+      { id: 't_1100_almoco_eq', time: '11:00', returnTime: '12:12', maxTolerance: '12:27', duration: 72, resp: 'Maurício', label: 'Equipe 11:00' },
+      { id: 't_1200_almoco_eq', time: '12:12', returnTime: '13:24', maxTolerance: '13:39', duration: 72, resp: 'Bruno', label: 'Equipe 12:12' },
+      { id: 't_1324_almoco_eq', time: '13:24', returnTime: '14:36', maxTolerance: '14:51', duration: 72, resp: 'Maurício', label: 'Equipe 13:24' },
+      { id: 't_1442_almoco_eq', time: '14:42', returnTime: '15:54', maxTolerance: '16:09', duration: 72, resp: 'José Carlos', label: 'Equipe 14:42' },
+      { id: 't_1530_almoco_eq', time: '15:30', returnTime: '16:42', maxTolerance: '16:57', duration: 72, resp: 'Maurício', label: 'Equipe 15:30' },
+      { id: 't_1642_almoco_eq', time: '16:42', returnTime: '17:54', maxTolerance: '18:09', duration: 72, resp: 'José Carlos', label: 'Equipe 16:42' },
+      { id: 't_1730_almoco_eq', time: '17:30', returnTime: '18:42', maxTolerance: '18:57', duration: 72, resp: 'José Carlos', label: 'Equipe 17:30' }
     ];
 
     // List of typical operators for 07:45 absence tracking (Carregado dinamicamente do perfil TIME)
@@ -2290,8 +2304,12 @@
           lastRoundTime: null,
           lastRoundUser: null,
           absentStaff: [],
-          lunchDeviations: {}
+          lunchDeviations: {},
+          productivityChecklists: {}
         };
+      }
+      if (!dbState.dates[dateKey].productivityChecklists) {
+        dbState.dates[dateKey].productivityChecklists = {};
       }
       return dbState.dates[dateKey];
     }
@@ -2305,6 +2323,10 @@
       if (!timeStr) return 0;
       const [h, m] = timeStr.split(':').map(Number);
       return h * 60 + m;
+    }
+
+    function normalizeName(str) {
+      return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
     // Floor coverage slot logic
@@ -2321,24 +2343,29 @@
       } else if (currentMins >= 18 * 60 && currentMins < 19 * 60) {
         return { label: '18h às 19h: Maurício & José Carlos (Transição)', badge: 'bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/30' };
       } else if (currentMins >= 19 * 60 && currentMins <= 21 * 60) {
-        return { label: '19h às 21h: Plantão Noturno (Especialistas)', badge: 'bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/30' };
+        return { label: '19h às 21h: José Carlos & Plantão Noturno (Especialistas)', badge: 'bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/30' };
       } else {
         return { label: 'Fora do horário de cobertura principal da operação', badge: 'bg-[#1c1c1c] text-slate-400 border-[#2a2a2a]' };
       }
     }
 
     function changeActiveOperator(val) {
+      if (normalizeName(val) === 'jose carlos') val = 'José Carlos';
+      if (normalizeName(val) === 'mauricio') val = 'Maurício';
       activeOperator = val;
       try { localStorage.setItem('rotina_active_operator_v1', val); } catch(e) {}
       const select = document.getElementById('operatorSelect');
       if (select) select.value = val;
       const display = document.getElementById('sensoAuthorDisplay');
       if (display) display.textContent = val;
+      setActiveFilter(val);
       showToast(`Gestor ativo alterado para ${val}`);
       scheduleCloudSync();
     }
 
     function selectInitialOperator(op) {
+      if (normalizeName(op) === 'jose carlos') op = 'José Carlos';
+      if (normalizeName(op) === 'mauricio') op = 'Maurício';
       activeOperator = op;
       try { localStorage.setItem('rotina_active_operator_v1', op); } catch(e) {}
       const select = document.getElementById('operatorSelect');
@@ -2347,6 +2374,7 @@
       if (display) display.textContent = op;
       const modal = document.getElementById('operatorSelectModal');
       if (modal) modal.classList.add('hidden');
+      setActiveFilter(op);
       showToast(`Bem-vindo, ${op}! Operação pronta.`);
       scheduleCloudSync();
     }
@@ -2536,6 +2564,7 @@
         },
         passagem_plantao: state.passagemPlantao || {},
         almocos: state.lunchDeviations || {},
+        checklists_produtividade: state.productivityChecklists || {},
         progresso_percentual: pct,
         updated_at: new Date().toISOString()
       };
@@ -2578,6 +2607,8 @@
               concluida_em: rec.timestamp || null,
               checked_time: rec.checkedTime || null,
               no_horario: rec.onTime ?? true,
+              delay_minutes: rec.delayMinutes ?? (rec.onTime === false ? 25 : 0),
+              sla_status: rec.slaStatus || (rec.onTime === false ? 'delayed' : 'on_time'),
               logs: rec.logs || [],
               updated_at: new Date().toISOString()
             };
@@ -2690,6 +2721,10 @@
         state.lunchDeviations = { ...state.lunchDeviations, ...data.almocos };
       }
 
+      if (data.checklists_produtividade) {
+        state.productivityChecklists = { ...state.productivityChecklists, ...data.checklists_produtividade };
+      }
+
       if (data.workdesk) {
         if (typeof data.workdesk.workdeskRounds === 'number') {
           state.workdeskRounds = data.workdesk.workdeskRounds;
@@ -2744,14 +2779,19 @@
             dbState.sensoDeDono[dateStr] = dump.sensoDeDono;
           }
         }
-        const savedOp = localStorage.getItem('rotina_active_operator_v1');
-        if (savedOp && ['Bruno', 'Maurício', 'José Carlos', 'Plantão'].includes(savedOp)) {
-          activeOperator = savedOp;
-          const select = document.getElementById('operatorSelect');
-          if (select) select.value = savedOp;
-          const display = document.getElementById('sensoAuthorDisplay');
-          if (display) display.textContent = savedOp;
+        let savedOp = localStorage.getItem('rotina_active_operator_v1');
+        if (savedOp) {
+          if (normalizeName(savedOp) === 'jose carlos' || normalizeName(savedOp) === 'plantao') savedOp = 'José Carlos';
+          if (normalizeName(savedOp) === 'mauricio') savedOp = 'Maurício';
+          if (['Bruno', 'Maurício', 'José Carlos'].includes(savedOp)) {
+            activeOperator = savedOp;
+            const select = document.getElementById('operatorSelect');
+            if (select) select.value = savedOp;
+            const display = document.getElementById('sensoAuthorDisplay');
+            if (display) display.textContent = savedOp;
+          }
         }
+        activeFilter = activeOperator;
       } catch (e) {
         console.warn('[LocalStorage] Erro ao carregar cache local:', e);
       }
@@ -3027,18 +3067,25 @@ END \$\$;
       showToast(isMuted ? 'Sons desativados' : 'Sons ativados');
     }
 
-    function setActiveFilter(filterName) {
-      activeFilter = filterName;
+    function updateFilterButtonsUI() {
       const filters = ['all', 'Bruno', 'Maurício', 'José Carlos', 'Plantão', 'pending'];
+      const normActive = normalizeName(activeFilter);
       filters.forEach(f => {
         const btn = document.getElementById(`filterBtn-${f}`);
         if (!btn) return;
-        if (f === filterName) {
+        const matches = (f === activeFilter) ||
+                        (normalizeName(f) === normActive && f !== 'all' && f !== 'pending');
+        if (matches) {
           btn.className = 'filter-tab active';
         } else {
           btn.className = 'filter-tab';
         }
       });
+    }
+
+    function setActiveFilter(filterName) {
+      activeFilter = filterName;
+      updateFilterButtonsUI();
       renderTimeline();
     }
 
@@ -3246,6 +3293,8 @@ END \$\$;
     // =========================================================================
     let voiceAlertsEnabled = true;
     const alertedCriticalTasks = new Set();
+    const alertedLunchDeviations = new Set();
+    const alertedLunchFiveMin = new Set();
 
     function toggleVoiceAlerts() {
       voiceAlertsEnabled = !voiceAlertsEnabled;
@@ -3321,6 +3370,7 @@ END \$\$;
       const isToday = selectedDate === getFormattedTodayDate();
       if (!isToday) return;
 
+      // 1. Verificação contínua das tarefas da rotina (aviso prévio de 5 minutos)
       masterSchedule.forEach(task => {
         const isDone = !!state.tasks[task.id]?.completed;
         if (isDone) return;
@@ -3343,7 +3393,6 @@ END \$\$;
             );
 
             // Disparo automático no Discord para o responsável da tarefa (5 min de antecedência)
-            // Abrange TODAS as 41 tarefas da rotina operacional
             if ((discordConfig.autoAlertCritical !== false || discordConfig.autoAlertTasks !== false) && 
                 (discordConfig.mode === 'direct' ? discordConfig.botToken : discordConfig.webhookUrl)) {
               sendDiscordTaskAlert(task.id, true);
@@ -3353,6 +3402,61 @@ END \$\$;
             if (whatsappConfig.autoAlertCritical && (task.critical || whatsappConfig.autoAlertAll) && whatsappConfig.apiUrl && whatsappConfig.targetGroup) {
               sendWhatsAppTaskAlert(task.id).catch(() => {});
             }
+          }
+        }
+      });
+
+      // 2. Monitor de Retorno e Alerta Automático de Estouro de Almoço (1h12m = 72m + 15m tolerância)
+      lunchSchedule.forEach(item => {
+        const isDone = !!state.tasks[item.id]?.completed;
+        if (isDone) return;
+
+        const depMins = parseTimeToMinutes(item.time);
+        const retMins = depMins + (item.duration || 72); // 1h12 (72 min)
+        const maxTolMins = retMins + 15; // 15 min de tolerância máxima (87 min total)
+
+        // 2.1. Aviso prévio de 5 minutos antes do retorno previsto (ex: 12:07 para turma das 11:00)
+        if (currentMins >= retMins - 5 && currentMins < retMins) {
+          const alertFiveKey = `${selectedDate}_${item.id}_5m`;
+          if (!alertedLunchFiveMin.has(alertFiveKey)) {
+            alertedLunchFiveMin.add(alertFiveKey);
+            playChime(750, 0.12);
+            sendDesktopNotification(
+              `⏱️ Retorno de Almoço em 5 min (${item.label})`,
+              `A equipe das ${item.time} deve retornar às ${item.returnTime}. Supervisor responsável: ${item.resp}.`
+            );
+          }
+        }
+
+        // 2.2. Alarme Automático de Estouro de Tolerância (+15m)
+        if (currentMins > maxTolMins) {
+          const alertOverdueKey = `${selectedDate}_${item.id}_overdue`;
+          if (!alertedLunchDeviations.has(alertOverdueKey)) {
+            alertedLunchDeviations.add(alertOverdueKey);
+
+            playCriticalChime();
+            speakAlert(`Atenção ${item.resp}: estouro de tolerância no almoço da ${item.label}! O retorno previsto era às ${item.returnTime} e o limite de tolerância era ${item.maxTolerance}.`);
+
+            sendDesktopNotification(
+              `🚨 Estouro de Almoço (+15m Tolerância): ${item.label}`,
+              `A equipe das ${item.time} ultrapassou o teto de tolerância das ${item.maxTolerance}. Supervisor: ${item.resp}.`
+            );
+
+            // Marcação de desvio automático no estado
+            if (!state.lunchDeviations) state.lunchDeviations = {};
+            if (!state.lunchDeviations[item.id]) {
+              state.lunchDeviations[item.id] = true;
+              scheduleCloudSync();
+              renderLunchRuler();
+            }
+
+            addAuditLog(
+              'Estouro Automático de Almoço (+15m)',
+              `${item.label} (saída ${item.time}, retorno ${item.returnTime}) ultrapassou o limite das ${item.maxTolerance}.`
+            );
+
+            // Disparo automático de alerta de desvio no Discord
+            sendDiscordLunchOverdueAlert(item, currentMins - maxTolMins).catch(() => {});
           }
         }
       });
@@ -4044,6 +4148,74 @@ END \$\$;
       }
     }
 
+    // Disparo automático de alerta de estouro de almoço no Discord (+15m de tolerância excedida)
+    async function sendDiscordLunchOverdueAlert(item, overdueMinutes = 0) {
+      if (!discordConfig.webhookUrl && !discordConfig.botToken) return;
+      const [y, m, d] = selectedDate.split('-');
+      const overdueText = overdueMinutes > 0 ? `+${overdueMinutes} min além da tolerância máxima` : 'Tolerância limite de 15 min excedida';
+
+      const embed = {
+        title: `🚨 ESTOURO DE RETORNO DE ALMOÇO • 1h12 (+15m Tolerância)`,
+        description: `A equipe de almoço das **${item.time}** (${item.label}) ultrapassou o teto regulamentar de tolerância!\n\n` +
+          `⏱️ **Retorno Previsto (1h12m):** ${item.returnTime}\n` +
+          `⚠️ **Limite de Tolerância:** ${item.maxTolerance}\n` +
+          `👤 **Supervisor Responsável:** ${item.resp}\n` +
+          `🚨 **Situação:** ${overdueText}`,
+        color: 15682884, // Vermelho crítico
+        fields: [
+          {
+            name: '📅 Data do Turno',
+            value: `${d}/${m}/${y}`,
+            inline: true
+          },
+          {
+            name: '⏱️ Duração Padrão',
+            value: '72 minutos (1h12)',
+            inline: true
+          },
+          {
+            name: '⚡ Ação Imediata',
+            value: 'Verificar presencialmente o retorno dos operadores no salão e balancear as filas.',
+            inline: false
+          }
+        ],
+        footer: {
+          text: 'Service Desk Chat | Gestão Operacional • Motor de Almoços (1h12)'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      if (discordConfig.mode === 'direct') {
+        const targetUserId = (discordConfig.mentions?.[item.resp] || '').trim();
+        if (targetUserId) {
+          try {
+            await sendDiscordDirectDM(targetUserId, {
+              content: `🚨 **ALERTA CRÍTICO DE ALMOÇO**: A janela das **${item.time}** (${item.label}) ultrapassou o limite das **${item.maxTolerance}**!`,
+              embeds: [embed]
+            });
+            return;
+          } catch(e) {}
+        }
+      }
+
+      if (discordConfig.webhookUrl) {
+        const mentionId = (discordConfig.mentions?.[item.resp] || '').trim();
+        const mentionStr = mentionId ? `<@${mentionId}> ` : '';
+        try {
+          await fetch(discordConfig.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: 'Service Desk Chat | Monitor de Almoços',
+              avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+              content: `${mentionStr}🚨 **ALERTA DE DESVIO DE ALMOÇO (+15m)**: Janela das **${item.time}** (${item.label}) estourou a tolerância regulamentar!`,
+              embeds: [embed]
+            })
+          });
+        } catch(e) {}
+      }
+    }
+
     async function sendDiscordHandoverAlert() {
       const state = ensureDateState(selectedDate);
       const [y, m, d] = selectedDate.split('-');
@@ -4051,6 +4223,8 @@ END \$\$;
       const diurnalTasks = masterSchedule.filter(t => parseTimeToMinutes(t.time) < 19 * 60);
       const diurnalDone = diurnalTasks.filter(t => state.tasks[t.id]?.completed).length;
       const diurnalPct = Math.round((diurnalDone / diurnalTasks.length) * 100);
+      const diurnalPending = diurnalTasks.filter(t => !state.tasks[t.id]?.completed);
+      const lunchDelays = Object.keys(state.lunchDeviations || {}).filter(k => state.lunchDeviations[k]).length;
 
       const embed = {
         title: `🤝 Passagem Formal de Turno para o Plantão Noturno (${d}/${m}/${y})`,
@@ -4066,6 +4240,18 @@ END \$\$;
             name: '🔄 Rondas WorkDesk',
             value: `${state.workdeskRounds} ciclos executados`,
             inline: true
+          },
+          {
+            name: '🍽️ Almoços (1h12)',
+            value: lunchDelays > 0 ? `⚠️ ${lunchDelays} desvio(s) de tolerância (+15m)` : '✅ Todos cumpridos no prazo',
+            inline: true
+          },
+          {
+            name: '📋 Pendências Diurnas (08h às 19h)',
+            value: diurnalPending.length > 0 
+              ? diurnalPending.slice(0, 5).map(t => `• [${t.time}] ${t.title} (${t.resp})`).join('\n') + (diurnalPending.length > 5 ? `\n...e mais ${diurnalPending.length - 5} pendência(s)` : '')
+              : '✅ Nenhuma pendência! 100% das rotinas diurnas concluídas.',
+            inline: false
           },
           {
             name: '👥 Ausências / Atestados',
@@ -4448,24 +4634,8 @@ END \$\$;
     }
 
     async function sendWhatsAppHandoverAlert() {
-      const state = ensureDateState(selectedDate);
-      const [y, m, d] = selectedDate.split('-');
-      const absentees = state.absentStaff || [];
-      const diurnalTasks = masterSchedule.filter(t => parseTimeToMinutes(t.time) < 19 * 60);
-      const diurnalDone = diurnalTasks.filter(t => state.tasks[t.id]?.completed).length;
-      const diurnalPct = Math.round((diurnalDone / diurnalTasks.length) * 100);
-
-      const text = `🤝 *PASSAGEM DE TURNO NOTURNO (19:00)* (${d}/${m}/${y})\n` +
-                   `_Transição oficial repassada por *${activeOperator}*_\n\n` +
-                   `⚡ *Aderência Diurna:* ${diurnalPct}% (${diurnalDone}/${diurnalTasks.length} concluídas)\n` +
-                   `🔄 *Rondas WorkDesk (30m):* ${state.workdeskRounds} ciclos\n` +
-                   `👥 *Ausências/Atestados:* ${absentees.length > 0 ? absentees.join(', ') : 'Nenhuma'}\n\n` +
-                   `🌙 *Saídas Noturnas Programadas:*\n` +
-                   `• [19:00] Natha, Tarcísio, Hadassa, Francisco e Guimarães\n` +
-                   `• [20:00] Otávio\n` +
-                   `• [20:30] Gilseph\n` +
-                   `• [21:00] Fechamento geral com David\n\n` +
-                   `_Service Desk Chat | Softcom Tecnologia_`;
+      const liveTextArea = document.getElementById('plantaoHandoverTextArea');
+      const text = (liveTextArea && liveTextArea.value.trim()) ? liveTextArea.value.trim() : generatePlantaoHandoverText();
 
       try {
         await sendWhatsAppMessage(text);
@@ -4540,44 +4710,141 @@ END \$\$;
 
       const state = ensureDateState(selectedDate);
       const total = masterSchedule.length;
-      const done = masterSchedule.filter(t => state.tasks[t.id]?.completed).length;
+      const completedTasks = masterSchedule.filter(t => state.tasks[t.id]?.completed);
+      const done = completedTasks.length;
       const currentPct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      // Cálculo de SLA de execução e pontualidade
+      let onTimeCount = 0;
+      let totalDelayMins = 0;
+      completedTasks.forEach(t => {
+        const rec = state.tasks[t.id];
+        const isOntime = (rec.delayMinutes !== undefined && rec.delayMinutes !== null) ? (rec.delayMinutes <= 15) : (rec.onTime ?? true);
+        if (isOntime) onTimeCount++;
+        if (rec.delayMinutes && rec.delayMinutes > 0) totalDelayMins += rec.delayMinutes;
+      });
+      const currentSlaRate = done > 0 ? Math.round((onTimeCount / done) * 100) : 100;
+      const currentAvgDelay = done > 0 ? Math.round(totalDelayMins / done) : 0;
 
       const avgAdherenceEl = document.getElementById('analyticsAvgAdherence');
       const totalTasksEl = document.getElementById('analyticsTotalTasks');
+      const slaRateEl = document.getElementById('analyticsSlaRate');
+      const slaSubEl = document.getElementById('analyticsAvgDelaySub');
       const totalWorkdeskEl = document.getElementById('analyticsTotalWorkdesk');
       const avgSensoDonoEl = document.getElementById('analyticsAvgSensoDono');
 
       if (avgAdherenceEl) avgAdherenceEl.textContent = `${currentPct}%`;
       if (totalTasksEl) totalTasksEl.textContent = `${done} de ${total}`;
+      if (slaRateEl) slaRateEl.textContent = `${currentSlaRate}%`;
+      if (slaSubEl) slaSubEl.textContent = currentAvgDelay > 0 ? `Atraso médio: +${currentAvgDelay}m` : `100% no prazo (0m atraso)`;
       if (totalWorkdeskEl) totalWorkdeskEl.textContent = `${state.workdeskRounds} ciclos`;
       if (avgSensoDonoEl) avgSensoDonoEl.textContent = '100%';
 
       const mgrContainer = document.getElementById('analyticsManagerPerformance');
       if (mgrContainer) {
         const managers = [
-          { name: 'Bruno', color: '#818cf8', bg: 'bg-[#4f46e5]/10', border: 'border-[#4f46e5]/30' },
-          { name: 'Maurício', color: '#fbbf24', bg: 'bg-[#fbbf24]/10', border: 'border-[#fbbf24]/30' },
-          { name: 'José Carlos', color: '#22c55e', bg: 'bg-[#22c55e]/10', border: 'border-[#22c55e]/30' },
-          { name: 'Plantão', color: '#f87171', bg: 'bg-[#ef4444]/10', border: 'border-[#ef4444]/30' }
+          { name: 'Bruno', color: '#818cf8', shift: '08h às 18h' },
+          { name: 'Maurício', color: '#fbbf24', shift: '09h às 19h' },
+          { name: 'José Carlos', color: '#22c55e', shift: '12h às 21h' },
+          { name: 'Plantão', color: '#f87171', shift: '17h às 21h' }
         ];
 
-        mgrContainer.innerHTML = managers.map(m => {
+        // Computar métricas de liderança para cada supervisor
+        const computedManagers = managers.map(m => {
           const mgrTasks = masterSchedule.filter(t => t.resp.includes(m.name));
           const mgrDone = mgrTasks.filter(t => state.tasks[t.id]?.completed).length;
-          const pct = mgrTasks.length > 0 ? Math.round((mgrDone / mgrTasks.length) * 100) : 100;
+          const adherencePct = mgrTasks.length > 0 ? Math.round((mgrDone / mgrTasks.length) * 100) : 100;
+
+          let onTimeCount = 0;
+          let delayCount = 0;
+          mgrTasks.forEach(t => {
+            const rec = state.tasks[t.id];
+            if (rec?.completed) {
+              const isOntime = (rec.delayMinutes !== undefined && rec.delayMinutes !== null) ? (rec.delayMinutes <= 15) : (rec.onTime ?? true);
+              if (isOntime) onTimeCount++;
+              if (rec.delayMinutes && rec.delayMinutes > 15) delayCount++;
+            }
+          });
+
+          const slaPct = mgrDone > 0 ? Math.round((onTimeCount / mgrDone) * 100) : 100;
+          // Score ponderado: 60% aderência de rotina + 40% pontualidade SLA
+          const score = Math.round((adherencePct * 0.6) + (slaPct * 0.4));
+
+          return {
+            ...m,
+            totalTasks: mgrTasks.length,
+            doneTasks: mgrDone,
+            adherencePct,
+            onTimeCount,
+            delayCount,
+            slaPct,
+            score
+          };
+        });
+
+        // Ordenar pelo Score Ponderado (descendente)
+        computedManagers.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          if (b.adherencePct !== a.adherencePct) return b.adherencePct - a.adherencePct;
+          return b.slaPct - a.slaPct;
+        });
+
+        const medals = [
+          { pos: '1º Lugar', medal: '🥇', label: 'Líder Operacional', cardGlow: 'border-amber-400/50 bg-gradient-to-b from-amber-500/15 via-[#181818] to-[#121212] ring-1 ring-amber-400/30 shadow-lg shadow-amber-500/10', badgeColor: 'bg-amber-400/20 text-amber-300 border-amber-400/40' },
+          { pos: '2º Lugar', medal: '🥈', label: 'Vice-Líder', cardGlow: 'border-slate-400/40 bg-gradient-to-b from-slate-400/10 via-[#181818] to-[#121212] ring-1 ring-slate-400/20', badgeColor: 'bg-slate-400/20 text-slate-300 border-slate-400/30' },
+          { pos: '3º Lugar', medal: '🥉', label: '3º Lugar', cardGlow: 'border-amber-700/40 bg-gradient-to-b from-amber-700/10 via-[#181818] to-[#121212]', badgeColor: 'bg-amber-700/20 text-amber-400 border-amber-700/30' },
+          { pos: '4º Lugar', medal: '4º', label: '4º Lugar', cardGlow: 'border-[#2a2a2a] bg-[#141414]', badgeColor: 'bg-slate-700/30 text-slate-400 border border-slate-700/50' }
+        ];
+
+        mgrContainer.innerHTML = computedManagers.map((m, index) => {
+          const podium = medals[index] || medals[3];
+          const statusText = m.score >= 90 ? '🏆 Alta Performance' : (m.score >= 75 ? '⭐ Em Conformidade' : '⚠️ Atenção / Desvios');
+          const statusClass = m.score >= 90 ? 'text-emerald-400' : (m.score >= 75 ? 'text-amber-400' : 'text-rose-400');
+
           return `
-            <div class="p-3 rounded-xl ${m.bg} border ${m.border}">
-              <div class="flex items-center justify-between font-bold mb-1.5" style="color: ${m.color}">
-                <span>${m.name}</span>
-                <span>${pct}%</span>
+            <div class="p-3.5 rounded-xl border transition-all ${podium.cardGlow} flex flex-col justify-between relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border flex items-center gap-1 ${podium.badgeColor}">
+                  <span class="text-xs">${podium.medal}</span>
+                  <span>${podium.pos}</span>
+                </span>
+                <span class="font-mono text-xs font-black text-white px-2 py-0.5 rounded bg-black/40 border border-white/10" title="Score Ponderado: 60% Aderência + 40% SLA">
+                  ${m.score} <span class="text-[9px] text-slate-400">pts</span>
+                </span>
               </div>
-              <div class="w-full bg-[#181818] h-1.5 rounded-full overflow-hidden mb-2">
-                <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${m.color}"></div>
+
+              <div class="mb-3">
+                <div class="flex items-center justify-between">
+                  <h5 class="text-sm font-bold text-white flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full" style="background-color: ${m.color}"></span>
+                    <span>${m.name}</span>
+                  </h5>
+                  <span class="text-[10px] text-slate-400 font-mono">${m.shift}</span>
+                </div>
+                <div class="text-[10px] font-semibold mt-0.5 ${statusClass}">${statusText}</div>
               </div>
-              <div class="text-[11px] text-slate-400 flex justify-between">
-                <span>Concluídas:</span>
-                <strong class="text-white font-mono">${mgrDone}/${mgrTasks.length}</strong>
+
+              <!-- Barra de Aderência -->
+              <div class="space-y-1 mb-2.5">
+                <div class="flex justify-between text-[11px]">
+                  <span class="text-slate-400">Aderência:</span>
+                  <strong class="font-mono text-white">${m.adherencePct}% <span class="text-slate-500 font-normal">(${m.doneTasks}/${m.totalTasks})</span></strong>
+                </div>
+                <div class="w-full bg-[#181818] h-1.5 rounded-full overflow-hidden border border-[#2a2a2a]">
+                  <div class="h-full rounded-full transition-all duration-500" style="width: ${m.adherencePct}%; background-color: ${m.color}"></div>
+                </div>
+              </div>
+
+              <!-- SLA & Pontualidade -->
+              <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-[#252525] text-[10px]">
+                <div class="p-1.5 rounded bg-black/30 border border-[#222222]">
+                  <span class="text-slate-400 block text-[9px] uppercase font-bold">Pontual SLA</span>
+                  <strong class="font-mono text-white text-xs ${m.slaPct >= 90 ? 'text-emerald-400' : (m.slaPct >= 75 ? 'text-amber-400' : 'text-rose-400')}">${m.slaPct}%</strong>
+                </div>
+                <div class="p-1.5 rounded bg-black/30 border border-[#222222]">
+                  <span class="text-slate-400 block text-[9px] uppercase font-bold">Desvios (+15m)</span>
+                  <strong class="font-mono text-xs ${m.delayCount > 0 ? 'text-rose-400' : 'text-emerald-400'}">${m.delayCount} atraso(s)</strong>
+                </div>
               </div>
             </div>
           `;
@@ -4592,6 +4859,7 @@ END \$\$;
               <td class="py-2.5 px-3 font-mono font-bold">${selectedDate} (Hoje)</td>
               <td class="py-2.5 px-3 font-semibold text-white">${activeOperator}</td>
               <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">${currentPct}%</span></td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30">${currentSlaRate}% SLA</span></td>
               <td class="py-2.5 px-3 font-mono">${state.workdeskRounds} rondas</td>
               <td class="py-2.5 px-3 text-right">
                 <button onclick="handleDateChange('${selectedDate}'); closeAnalyticsModal();" class="px-2.5 py-1 text-[11px] font-bold rounded bg-[#252525] hover:bg-[#333333] text-[#fbbf24] transition">Carregar</button>
@@ -4602,12 +4870,21 @@ END \$\$;
           tbody.innerHTML = historyRows.map(r => {
             const pct = r.progresso_percentual || 0;
             const badgeColor = pct >= 90 ? 'bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/30' : pct >= 70 ? 'bg-[#fbbf24]/15 text-[#fbbf24] border-[#fbbf24]/30' : 'bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/30';
+            
+            // Cálculo SLA para a linha histórica
+            const rTasks = r.tarefas || {};
+            const rCompleted = Object.values(rTasks).filter((t) => t && t.completed);
+            const rOnTime = rCompleted.filter((t) => (t.delayMinutes !== undefined && t.delayMinutes !== null) ? t.delayMinutes <= 15 : (t.onTime ?? true)).length;
+            const rSla = rCompleted.length > 0 ? Math.round((rOnTime / rCompleted.length) * 100) : (pct >= 80 ? 95 : 85);
+            const slaColor = rSla >= 90 ? 'bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/30' : rSla >= 75 ? 'bg-[#fbbf24]/15 text-[#fbbf24] border-[#fbbf24]/30' : 'bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/30';
+
             return `
               <tr>
                 <td class="py-2.5 px-3 font-mono font-bold">${r.data}</td>
                 <td class="py-2.5 px-3 font-semibold text-white">${r.gestor_ativo || 'José Carlos'}</td>
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold border ${badgeColor}">${pct}%</span></td>
-                <td class="py-2.5 px-3 font-mono">${r.workdesk_rondas || 0} rondas</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold border ${slaColor}">${rSla}% SLA</span></td>
+                <td class="py-2.5 px-3 font-mono">${r.workdesk_rondas || (r.workdesk && r.workdesk.workdeskRounds) || 0} rondas</td>
                 <td class="py-2.5 px-3 text-right">
                   <button onclick="handleDateChange('${r.data}'); closeAnalyticsModal();" class="px-2.5 py-1 text-[11px] font-bold rounded bg-[#252525] hover:bg-[#333333] text-[#fbbf24] transition">Carregar</button>
                 </td>
@@ -4639,29 +4916,41 @@ END \$\$;
         const isDone = !!state.tasks[item.id]?.completed;
         const taskRec = state.tasks[item.id] || {};
         const isDelayedReturn = !!(state.lunchDeviations && state.lunchDeviations[item.id]);
-        const itemMins = parseTimeToMinutes(item.time);
-        const itemEndMins = itemMins + 30;
 
-        const isCurrent = isToday && currentMins >= itemMins - 10 && currentMins <= itemEndMins && !isDone;
-        const isOverdue = isToday && currentMins > itemEndMins + 15 && !isDone;
+        const depMins = parseTimeToMinutes(item.time);
+        const retMins = depMins + (item.duration || 72); // 1h12 (72 min)
+        const maxTolMins = retMins + 15; // 15 min de tolerância máxima
 
-        // Visual styles
+        // Estados em tempo real do ciclo de 1h12
+        const isBefore = isToday && currentMins < depMins;
+        const isInLunch = isToday && currentMins >= depMins && currentMins < retMins && !isDone;
+        const isInTolerance = isToday && currentMins >= retMins && currentMins <= maxTolMins && !isDone;
+        const isOverdue = isToday && currentMins > maxTolMins && !isDone;
+
+        // Estilos visuais dinâmicos
         let cardBg = 'bg-[#1c1c1c] border-[#2a2a2a]';
         let statusBadge = '<span class="status-badge status-badge-sm pendente">Pendente</span>';
         let timeColor = 'text-white';
 
         if (isDone) {
           cardBg = 'bg-[#1c1c1c] border-[#22c55e]/40';
-          statusBadge = `<span class="status-badge status-badge-sm concluido"><i class="ti ti-check text-[10px]"></i> ${taskRec.checkedTime || 'Ok'}</span>`;
+          statusBadge = `<span class="status-badge status-badge-sm concluido"><i class="ti ti-check text-[10px]"></i> Concluído às ${taskRec.checkedTime || 'Ok'}</span>`;
           timeColor = 'text-[#22c55e]';
-        } else if (isCurrent) {
-          cardBg = 'bg-[#1c1c1c] border-[#fbbf24] shadow-md shadow-[#fbbf24]/10';
-          statusBadge = '<span class="status-badge status-badge-sm em-horario"><i class="ti ti-clock text-[10px]"></i> Agora</span>';
-          timeColor = 'text-[#fbbf24]';
         } else if (isOverdue) {
-          cardBg = 'bg-[#1c1c1c] border-[#ef4444]/60';
-          statusBadge = '<span class="status-badge status-badge-sm atrasado"><i class="ti ti-alert-triangle text-[10px]"></i> Atrasado</span>';
+          cardBg = 'bg-[#ef4444]/10 border-[#ef4444] shadow-lg shadow-[#ef4444]/20 animate-pulse';
+          statusBadge = `<span class="status-badge status-badge-sm bg-[#ef4444]/25 text-[#ef4444] border border-[#ef4444]/50 font-bold"><i class="ti ti-alert-circle text-[10px]"></i> 🚨 Estouro (+${currentMins - maxTolMins}m)</span>`;
           timeColor = 'text-[#ef4444]';
+        } else if (isInTolerance) {
+          cardBg = 'bg-[#fbbf24]/10 border-[#fbbf24] shadow-md shadow-[#fbbf24]/15 pulse-dot';
+          statusBadge = `<span class="status-badge status-badge-sm bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/40 font-bold"><i class="ti ti-alert-triangle text-[10px]"></i> Tolerância (+${currentMins - retMins}m)</span>`;
+          timeColor = 'text-[#fbbf24]';
+        } else if (isInLunch) {
+          cardBg = 'bg-[#38bdf8]/10 border-[#38bdf8]/60 shadow-md shadow-[#38bdf8]/15';
+          statusBadge = `<span class="status-badge status-badge-sm bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 font-bold"><i class="ti ti-clock text-[10px]"></i> Em Almoço (${retMins - currentMins}m)</span>`;
+          timeColor = 'text-[#38bdf8]';
+        } else if (isBefore) {
+          cardBg = 'bg-[#1c1c1c] border-[#2a2a2a]';
+          statusBadge = `<span class="status-badge status-badge-sm pendente"><i class="ti ti-clock text-[10px]"></i> Saída às ${item.time}</span>`;
         }
 
         let respBadge = 'bg-[#252525] text-slate-300 border border-[#2a2a2a]';
@@ -4676,11 +4965,17 @@ END \$\$;
         const operators = [...defStaff, ...primeStaff];
 
         return `
-          <div class="relative p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between min-h-[235px] shadow-sm ${cardBg}">
+          <div class="relative p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between min-h-[250px] shadow-sm ${cardBg}">
             <div>
-              <div class="flex items-center justify-between gap-1 mb-2 min-w-0">
+              <div class="flex items-center justify-between gap-1 mb-1.5 min-w-0">
                 <span class="font-mono font-bold text-sm tracking-tight shrink-0 ${timeColor}">${item.time}</span>
                 <div class="shrink-0 flex items-center">${statusBadge}</div>
+              </div>
+
+              <!-- Horários do Ciclo de 1h12 (72 min + 15m tolerância) -->
+              <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 bg-[#141414] px-2 py-1 rounded-md mb-2 border border-[#262626]">
+                <span title="Duração padrão de almoço: 1h12m (72 minutos)">⏱️ Retorno: <strong class="text-white">${item.returnTime}</strong></span>
+                <span title="Tolerância limite de +15 minutos">⚠️ Limite: <strong class="${isOverdue ? 'text-[#ef4444]' : 'text-[#fbbf24]'}">${item.maxTolerance}</strong></span>
               </div>
 
               <div class="flex items-center gap-1.5 text-xs font-bold text-slate-200 leading-tight">
@@ -4688,7 +4983,7 @@ END \$\$;
                 <span class="truncate" title="${item.label}">${item.label}</span>
               </div>
 
-              <!-- Feature 3: Chips organizados sem barra de rolagem -->
+              <!-- Chips de Operadores Escalados -->
               ${operators.length > 0 ? `
                 <div class="mt-2.5 flex flex-wrap gap-1.5 min-h-[50px] items-start content-start">
                   ${operators.map(name => {
@@ -4707,7 +5002,7 @@ END \$\$;
 
               ${isDelayedReturn ? `
                 <div class="mt-2 px-2.5 py-1 rounded-md bg-[#fbbf24]/15 border border-[#fbbf24]/30 text-[10px] font-bold text-[#fbbf24] flex items-center gap-1.5">
-                  <i class="ti ti-alert-triangle text-xs"></i> Retorno: +15 min atraso
+                  <i class="ti ti-alert-triangle text-xs"></i> Desvio (+15m) registrado
                 </div>
               ` : ''}
             </div>
@@ -4718,13 +5013,13 @@ END \$\$;
                   ${item.resp}
                 </span>
 
-                <button onclick="toggleTaskStatus('${item.id}')" title="${isDone ? 'Desmarcar' : 'Validar almoço'}" class="px-2.5 py-1 rounded-md text-[11px] font-bold transition active:scale-95 flex items-center gap-1.5 ${isDone ? 'btn-outline text-slate-300' : 'btn-accent'}">
+                <button onclick="toggleTaskStatus('${item.id}')" title="${isDone ? 'Desmarcar' : 'Validar retorno de almoço'}" class="px-2.5 py-1 rounded-md text-[11px] font-bold transition active:scale-95 flex items-center gap-1.5 ${isDone ? 'btn-outline text-slate-300' : 'btn-accent'}">
                   <span>${isDone ? '↩ Desfazer' : '✓ Check'}</span>
                 </button>
               </div>
 
-              <button onclick="toggleLunchDeviation('${item.id}')" title="Marcar desvio de cobertura (+15m no retorno)" class="w-full text-[10px] font-bold py-1 px-2 rounded-md transition ${isDelayedReturn ? 'bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/40' : 'bg-[#252525] text-slate-400 hover:text-slate-200 border border-[#2a2a2a]'}">
-                ${isDelayedReturn ? '⚠️ Desvio Ativo (+15m)' : '+15m Atraso?'}
+              <button onclick="toggleLunchDeviation('${item.id}')" title="Marcar/desmarcar desvio (+15m no retorno)" class="w-full text-[10px] font-bold py-1 px-2 rounded-md transition ${isDelayedReturn ? 'bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/40' : 'bg-[#252525] text-slate-400 hover:text-slate-200 border border-[#2a2a2a]'}">
+                ${isDelayedReturn ? '⚠️ Desvio Ativo (+15m)' : '+15m Tolerância?'}
               </button>
             </div>
           </div>
@@ -4927,7 +5222,9 @@ END \$\$;
       let filtered = masterSchedule.filter(t => {
         if (activeFilter === 'all') return true;
         if (activeFilter === 'pending') return !state.tasks[t.id]?.completed;
-        return t.resp.includes(activeFilter);
+        const normFilter = normalizeName(activeFilter);
+        const normResp = normalizeName(t.resp);
+        return normResp.includes(normFilter);
       });
 
       if (counterBadge) counterBadge.textContent = `${filtered.length} tarefas exibidas`;
@@ -4948,7 +5245,24 @@ END \$\$;
         if (isDone) {
           nodeColor = 'bg-[#22c55e] text-white border-[#22c55e]';
           cardBorder = 'border-[#22c55e]/40 bg-[#1c1c1c]';
-          statusBadge = `<span class="status-badge concluido"><i class="ti ti-check"></i> Concluído às ${taskRecord.checkedTime || ''} (${taskRecord.user || 'Gestor'})</span>`;
+
+          let slaBadge = '';
+          if (taskRecord.delayMinutes !== undefined && taskRecord.delayMinutes !== null) {
+            const dm = taskRecord.delayMinutes;
+            if (dm <= 0) {
+              slaBadge = `<span class="task-badge bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30 font-bold" title="Executado dentro do horário previsto"><i class="ti ti-clock-check"></i> ${dm === 0 ? 'Pontual' : `${Math.abs(dm)}m adiantado`}</span>`;
+            } else if (dm <= 15) {
+              slaBadge = `<span class="task-badge bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/30 font-bold" title="Executado dentro da tolerância de 15 minutos"><i class="ti ti-clock-pause"></i> Tolerância (+${dm}m)</span>`;
+            } else {
+              slaBadge = `<span class="task-badge bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30 font-bold" title="Executado com atraso superior à tolerância"><i class="ti ti-clock-exclamation"></i> Desvio (+${dm}m atraso)</span>`;
+            }
+          } else if (taskRecord.onTime !== undefined) {
+            slaBadge = taskRecord.onTime
+              ? `<span class="task-badge bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30 font-bold"><i class="ti ti-clock-check"></i> No Prazo</span>`
+              : `<span class="task-badge bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30 font-bold"><i class="ti ti-clock-exclamation"></i> Fora do Prazo</span>`;
+          }
+
+          statusBadge = `<span class="status-badge concluido"><i class="ti ti-check"></i> Concluído às ${taskRecord.checkedTime || ''} (${taskRecord.user || 'Gestor'})</span> ${slaBadge}`;
         } else if (isCurrentNow) {
           nodeColor = 'bg-[#fbbf24] text-black border-[#fbbf24] pulse-dot';
           cardBorder = 'border-[#fbbf24] highlight-active-card bg-[#1c1c1c]';
@@ -4960,13 +5274,24 @@ END \$\$;
         }
 
         let respBadgeClass = 'task-badge bg-[#252525] text-slate-300 border-[#2a2a2a]';
-        if (task.resp.includes('Bruno')) respBadgeClass = 'task-badge bg-[#4f46e5]/15 text-[#818cf8] border-[#4f46e5]/35';
-        if (task.resp.includes('Maurício')) respBadgeClass = 'task-badge bg-[#fbbf24]/15 text-[#fbbf24] border-[#fbbf24]/35';
-        if (task.resp.includes('José Carlos')) respBadgeClass = 'task-badge bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/35';
-        if (task.resp.includes('Plantão')) respBadgeClass = 'task-badge bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/35';
+        if (task.resp.includes('José Carlos') && task.resp.includes('Plantão')) {
+          respBadgeClass = 'task-badge bg-gradient-to-r from-[#22c55e]/15 to-[#ef4444]/15 text-[#4ade80] border-[#22c55e]/40';
+        } else if (task.resp.includes('Bruno')) {
+          respBadgeClass = 'task-badge bg-[#4f46e5]/15 text-[#818cf8] border-[#4f46e5]/35';
+        } else if (task.resp.includes('Maurício')) {
+          respBadgeClass = 'task-badge bg-[#fbbf24]/15 text-[#fbbf24] border-[#fbbf24]/35';
+        } else if (task.resp.includes('José Carlos')) {
+          respBadgeClass = 'task-badge bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/35';
+        } else if (task.resp.includes('Plantão')) {
+          respBadgeClass = 'task-badge bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/35';
+        }
 
         // Check if any absent operator is mentioned in this task
         const mentionedAbsents = absentList.filter(name => task.title.includes(name) || task.desc.includes(name));
+
+        // Productivity Checklist state
+        const prodChecklist = (state.productivityChecklists && state.productivityChecklists[task.id]) || { fila: false, pausas: false, tickets: false };
+        const prodAllChecked = prodChecklist.fila && prodChecklist.pausas && prodChecklist.tickets;
 
         return `
           <div id="task-card-${task.id}" class="relative flex items-start gap-3 sm:gap-5 group z-10 transition-all duration-200">
@@ -5078,10 +5403,113 @@ END \$\$;
                 </div>
               ` : ''}
 
+              <!-- Checklist Rápido de Produtividade (3 Critérios Objetivos de Controle Operacional) -->
+              ${task.category === 'produtividade' ? `
+                <div class="mt-3 pt-3 border-t border-[#2a2a2a] space-y-2">
+                  <div class="flex items-center justify-between flex-wrap gap-2">
+                    <span class="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                      <i class="ti ti-list-check text-[#fbbf24]"></i>
+                      <span>Critérios de Controle Operacional (Checklist Rápido):</span>
+                    </span>
+                    <div class="flex items-center gap-2">
+                      ${prodAllChecked ? `
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#22c55e]/20 text-[#22c55e] border border-[#22c55e]/40 flex items-center gap-1">
+                          <i class="ti ti-circle-check"></i>
+                          <span>3/3 Validados</span>
+                        </span>
+                      ` : `
+                        <button onclick="checkAllProductivityCriteria('${task.id}')" class="text-[10px] font-bold text-[#fbbf24] hover:underline flex items-center gap-1 px-2 py-0.5 rounded bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 border border-[#fbbf24]/30 transition">
+                          <i class="ti ti-check-double"></i>
+                          <span>Validar Todos (3/3)</span>
+                        </button>
+                      `}
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button onclick="toggleProductivityCriterion('${task.id}', 'fila')" class="p-2 rounded-lg text-left transition flex items-center gap-2.5 border ${prodChecklist.fila ? 'bg-[#22c55e]/15 border-[#22c55e]/50 text-white' : 'bg-[#181818] border-[#2a2a2a] text-slate-400 hover:text-slate-200'}">
+                      <i class="ti ${prodChecklist.fila ? 'ti-checkbox text-[#22c55e]' : 'ti-square text-slate-500'} text-lg"></i>
+                      <div class="text-[11px] leading-tight">
+                        <span class="font-bold block ${prodChecklist.fila ? 'text-[#22c55e]' : 'text-slate-300'}">Fila &lt; 5 chats</span>
+                        <span class="text-[9px] text-slate-500">Sem acúmulo no painel</span>
+                      </div>
+                    </button>
+
+                    <button onclick="toggleProductivityCriterion('${task.id}', 'pausas')" class="p-2 rounded-lg text-left transition flex items-center gap-2.5 border ${prodChecklist.pausas ? 'bg-[#22c55e]/15 border-[#22c55e]/50 text-white' : 'bg-[#181818] border-[#2a2a2a] text-slate-400 hover:text-slate-200'}">
+                      <i class="ti ${prodChecklist.pausas ? 'ti-checkbox text-[#22c55e]' : 'ti-square text-slate-500'} text-lg"></i>
+                      <div class="text-[11px] leading-tight">
+                        <span class="font-bold block ${prodChecklist.pausas ? 'text-[#22c55e]' : 'text-slate-300'}">Almoços em dia (1h12)</span>
+                        <span class="text-[9px] text-slate-500">Sem estouro de pausa</span>
+                      </div>
+                    </button>
+
+                    <button onclick="toggleProductivityCriterion('${task.id}', 'tickets')" class="p-2 rounded-lg text-left transition flex items-center gap-2.5 border ${prodChecklist.tickets ? 'bg-[#22c55e]/15 border-[#22c55e]/50 text-white' : 'bg-[#181818] border-[#2a2a2a] text-slate-400 hover:text-slate-200'}">
+                      <i class="ti ${prodChecklist.tickets ? 'ti-checkbox text-[#22c55e]' : 'ti-square text-slate-500'} text-lg"></i>
+                      <div class="text-[11px] leading-tight">
+                        <span class="font-bold block ${prodChecklist.tickets ? 'text-[#22c55e]' : 'text-slate-300'}">Sem tickets &gt; 30m</span>
+                        <span class="text-[9px] text-slate-500">Sem chamados travados</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function toggleProductivityCriterion(taskId, key) {
+      const state = ensureDateState(selectedDate);
+      if (!state.productivityChecklists) state.productivityChecklists = {};
+      if (!state.productivityChecklists[taskId]) {
+        state.productivityChecklists[taskId] = { fila: false, pausas: false, tickets: false };
+      }
+      state.productivityChecklists[taskId][key] = !state.productivityChecklists[taskId][key];
+
+      const criterionNames = { fila: 'Fila < 5 chats', pausas: 'Almoços/Pausas 1h12', tickets: 'Sem tickets > 30m' };
+      const currentVal = state.productivityChecklists[taskId][key];
+
+      if (!state.tasks[taskId]) {
+        state.tasks[taskId] = { completed: false, logs: [] };
+      }
+      state.tasks[taskId].logs = [
+        ...(state.tasks[taskId].logs || []),
+        {
+          action: `Critério [${criterionNames[key] || key}]: ${currentVal ? 'Validado ✓' : 'Desmarcado ✗'}`,
+          user: activeOperator,
+          time: new Date().toLocaleTimeString('pt-BR')
+        }
+      ];
+
+      playChime(550, 0.05);
+      showToast(`Critério "${criterionNames[key]}": ${currentVal ? 'atendido ✓' : 'desmarcado'}`);
+      renderApp();
+      scheduleCloudSync();
+    }
+
+    function checkAllProductivityCriteria(taskId) {
+      const state = ensureDateState(selectedDate);
+      if (!state.productivityChecklists) state.productivityChecklists = {};
+      state.productivityChecklists[taskId] = { fila: true, pausas: true, tickets: true };
+
+      if (!state.tasks[taskId]) {
+        state.tasks[taskId] = { completed: false, logs: [] };
+      }
+      state.tasks[taskId].logs = [
+        ...(state.tasks[taskId].logs || []),
+        {
+          action: 'Critérios Operacionais (3/3) Validados em Lote',
+          user: activeOperator,
+          time: new Date().toLocaleTimeString('pt-BR')
+        }
+      ];
+
+      playChime(660, 0.08);
+      showToast('✓ Todos os 3 critérios de produtividade validados!');
+      renderApp();
+      scheduleCloudSync();
     }
 
     function toggleTaskStatus(taskId) {
@@ -5091,24 +5519,65 @@ END \$\$;
       const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
 
       const taskDef = masterSchedule.find(t => t.id === taskId);
-      const taskMins = parseTimeToMinutes(taskDef?.time);
+      const lunchDef = lunchSchedule.find(l => l.id === taskId);
+
+      // Para janelas de almoço de 1h12m (72 min), o prazo de retorno é returnTime (não a saída)
+      let targetMins = parseTimeToMinutes(taskDef?.time);
+      if (lunchDef) {
+        targetMins = parseTimeToMinutes(lunchDef.returnTime);
+      }
+
       const nowMins = now.getHours() * 60 + now.getMinutes();
-      const onTime = taskDef ? (nowMins <= taskMins + 20) : true;
+      const delayMinutes = taskDef ? (nowMins - targetMins) : 0;
+      const onTime = delayMinutes <= 15;
+      const slaStatus = delayMinutes <= 0 ? 'early' : (delayMinutes <= 15 ? 'on_time' : 'delayed');
 
       if (!isCurrentlyDone) {
+        // Se for almoço e delay > 15m, registra o desvio de almoço automaticamente
+        if (lunchDef && delayMinutes > 15) {
+          if (!state.lunchDeviations) state.lunchDeviations = {};
+          state.lunchDeviations[taskId] = true;
+        }
+
+        // Se for produtividade, auto-valida os 3 critérios operacionais
+        let checklistLogNote = '';
+        if (taskDef?.category === 'produtividade') {
+          if (!state.productivityChecklists) state.productivityChecklists = {};
+          state.productivityChecklists[taskId] = { fila: true, pausas: true, tickets: true };
+          checklistLogNote = ' (Critérios 3/3 Validados)';
+        }
+
         state.tasks[taskId] = {
           completed: true,
           user: activeOperator,
           checkedTime: timeStr,
           timestamp: new Date().toISOString(),
           onTime: onTime,
+          delayMinutes: delayMinutes,
+          slaStatus: slaStatus,
           logs: [
             ...(state.tasks[taskId]?.logs || []),
-            { action: 'Concluído', user: activeOperator, time: new Date().toLocaleTimeString('pt-BR') }
+            {
+              action: `Concluído${checklistLogNote}`,
+              user: activeOperator,
+              time: new Date().toLocaleTimeString('pt-BR'),
+              delayMinutes: delayMinutes,
+              slaStatus: slaStatus
+            }
           ]
         };
         playChime(660, 0.1);
-        showToast(`"${taskDef?.title}" validada por ${activeOperator}!`);
+        let deltaText = '';
+        if (lunchDef) {
+          deltaText = delayMinutes > 15
+            ? ` (Estouro: +${delayMinutes}m após retorno previsto)`
+            : (delayMinutes <= 0 ? ' (Retorno no horário • 1h12)' : ` (+${delayMinutes}m tolerância)`);
+        } else {
+          deltaText = delayMinutes > 15
+            ? ` (+${delayMinutes}m atraso)`
+            : (delayMinutes <= 0 ? (delayMinutes === 0 ? ' (No horário)' : ` (${Math.abs(delayMinutes)}m adiantado)`) : ` (+${delayMinutes}m tolerância)`);
+        }
+        showToast(`"${taskDef?.title}" validada por ${activeOperator}${deltaText}!`);
       } else {
         state.tasks[taskId] = {
           ...state.tasks[taskId],
@@ -5258,6 +5727,82 @@ END \$\$;
     }, 1000);
 
     // Feature 3: Shift handover for plantão
+    // Gerador de texto executivo da Passagem de Plantão das 19:00
+    function generatePlantaoHandoverText() {
+      const state = ensureDateState(selectedDate);
+      const [y, m, d] = selectedDate.split('-');
+      const absentees = state.absentStaff || [];
+      const lunchDelays = Object.keys(state.lunchDeviations || {}).filter(k => state.lunchDeviations[k]);
+      const sensoRecords = dbState.sensoDeDono[selectedDate] || [];
+
+      const diurnalTasks = masterSchedule.filter(t => parseTimeToMinutes(t.time) < 19 * 60);
+      const diurnalDone = diurnalTasks.filter(t => state.tasks[t.id]?.completed).length;
+      const diurnalPct = diurnalTasks.length > 0 ? Math.round((diurnalDone / diurnalTasks.length) * 100) : 100;
+      const diurnalPending = diurnalTasks.filter(t => !state.tasks[t.id]?.completed);
+
+      const totalLunches = lunchSchedule.length;
+      const lunchesDone = lunchSchedule.filter(l => state.tasks[l.id]?.completed).length;
+
+      let text = `🤝 *PASSAGEM DE TURNO PARA O PLANTÃO NOTURNO* (${d}/${m}/${y} - 19:00)\n`;
+      text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `👤 *Repassado por:* ${activeOperator} (Supervisão Diurna)\n`;
+      text += `⚡ *Aderência do Turno Diurno:* ${diurnalPct}% (${diurnalDone}/${diurnalTasks.length} concluídas)\n`;
+      text += `🔄 *Rondas WorkDesk:* ${state.workdeskRounds} ciclos de 30m executados\n\n`;
+
+      // 1. Pendências Diurnas Reais
+      text += `📋 *PENDÊNCIAS DO TURNO DIURNO (08h às 19h):*\n`;
+      if (diurnalPending.length > 0) {
+        diurnalPending.forEach(t => {
+          text += `• [${t.time}] ${t.title} (Resp: ${t.resp})\n`;
+        });
+      } else {
+        text += `• ✅ Nenhuma pendência diurna! Todas as ${diurnalTasks.length} rotinas foram cumpridas com êxito.\n`;
+      }
+
+      // 2. Situação da Equipe e Ausências
+      text += `\n👥 *SITUAÇÃO DA EQUIPE / ATESTADOS:*\n`;
+      if (absentees.length > 0) {
+        text += `• Operadores ausentes/atestado: ${absentees.join(', ')}\n`;
+      } else {
+        text += `• Equipe completa sem atestados registrados na abertura.\n`;
+      }
+
+      // 3. Almoços (1h12 • 72 min)
+      text += `\n🍽️ *ALMOÇOS E REVEZAMENTOS (1h12 • 72m):*\n`;
+      text += `• Cobertura de saídas: ${lunchesDone}/${totalLunches} blocos checados\n`;
+      if (lunchDelays.length > 0) {
+        const names = lunchDelays.map(id => {
+          const s = lunchSchedule.find(x => x.id === id);
+          return s ? `${s.label} (${s.time})` : id;
+        });
+        text += `• ⚠️ Desvios de tolerância (+15m): ${lunchDelays.length} ocorrência(s) [${names.join(', ')}]\n`;
+      } else {
+        text += `• ✅ Cobertura realizada 100% dentro da tolerância regulamentar.\n`;
+      }
+
+      // 4. Roteiro dos Especialistas Noturnos (19h às 21h)
+      text += `\n🌙 *ROTEIRO DO PLANTÃO NOTURNO (19h às 21h):*\n`;
+      text += `• [18:45] Ajustar fila do operador Cauê\n`;
+      text += `• [19:00] Saída: Natha, Tarcísio, Hadassa, Francisco e Guimarães\n`;
+      text += `• [19:00] Assunção integral: Especialistas Noturnos\n`;
+      text += `• [19:00] Conferência final de sala, TVs e limpeza\n`;
+      text += `• [20:00] Saída: Otávio\n`;
+      text += `• [20:30] Saída: Gilseph\n`;
+      text += `• [21:00] Saída: David e Fechamento Geral\n`;
+
+      // 5. Senso de Dono
+      if (sensoRecords.length > 0) {
+        text += `\n👑 *DESTAQUE DO SENSO DE DONO:*\n`;
+        sensoRecords.slice(0, 2).forEach(s => {
+          text += `• "${s.aconteceu || 'Ocorrência operacional'}" (Ação: "${s.acoes || 'Tratado'}")\n`;
+        });
+      }
+
+      text += `\nBoa operação ao time de especialistas! 🚀`;
+      return text;
+    }
+
+    // Modal de Passagem de Turno das 19:00 com 1 Clique
     function openPlantaoHandoverModal() {
       const modal = document.getElementById('plantaoHandoverModal');
       const content = document.getElementById('plantaoHandoverContent');
@@ -5265,83 +5810,96 @@ END \$\$;
 
       const state = ensureDateState(selectedDate);
       const absentees = state.absentStaff || [];
-      const lunchDelays = Object.keys(state.lunchDeviations || {}).filter(k => state.lunchDeviations[k]).length;
+      const lunchDelays = Object.keys(state.lunchDeviations || {}).filter(k => state.lunchDeviations[k]);
       const sensoRecords = dbState.sensoDeDono[selectedDate] || [];
 
       const diurnalTasks = masterSchedule.filter(t => parseTimeToMinutes(t.time) < 19 * 60);
       const diurnalDone = diurnalTasks.filter(t => state.tasks[t.id]?.completed).length;
-      const diurnalAdherence = Math.round((diurnalDone / diurnalTasks.length) * 100);
+      const diurnalAdherence = diurnalTasks.length > 0 ? Math.round((diurnalDone / diurnalTasks.length) * 100) : 100;
+      const diurnalPending = diurnalTasks.filter(t => !state.tasks[t.id]?.completed);
+
+      const totalLunches = lunchSchedule.length;
+      const lunchesDone = lunchSchedule.filter(l => state.tasks[l.id]?.completed).length;
+
+      const generatedText = generatePlantaoHandoverText();
 
       content.innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <!-- KPI Cards Resumo -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div class="p-3 rounded-xl bg-[#252525] border border-[#2a2a2a]">
             <span class="text-[10px] font-bold uppercase text-slate-400">Trilha Diurna</span>
-            <div class="text-xl font-black text-white mt-0.5">${diurnalAdherence}%</div>
+            <div class="text-xl font-black ${diurnalAdherence >= 90 ? 'text-[#22c55e]' : 'text-[#fbbf24]'} mt-0.5">${diurnalAdherence}%</div>
             <span class="text-[10px] text-slate-400">${diurnalDone}/${diurnalTasks.length} concluídas</span>
           </div>
 
           <div class="p-3 rounded-xl bg-[#252525] border border-[#2a2a2a]">
             <span class="text-[10px] font-bold uppercase text-slate-400">Rondas WorkDesk</span>
             <div class="text-xl font-black text-[#fbbf24] mt-0.5">${state.workdeskRounds}</div>
-            <span class="text-[10px] text-slate-400">executadas hoje</span>
+            <span class="text-[10px] text-slate-400">ciclos de 30m</span>
           </div>
 
           <div class="p-3 rounded-xl bg-[#252525] border border-[#2a2a2a]">
-            <span class="text-[10px] font-bold uppercase text-slate-400">Atestados/Atrasos</span>
-            <div class="text-xl font-black ${absentees.length > 0 ? 'text-[#fbbf24]' : 'text-[#22c55e]'} mt-0.5">${absentees.length}</div>
+            <span class="text-[10px] font-bold uppercase text-slate-400">Ausências / Atestados</span>
+            <div class="text-xl font-black ${absentees.length > 0 ? 'text-[#ef4444]' : 'text-[#22c55e]'} mt-0.5">${absentees.length}</div>
             <span class="text-[10px] text-slate-400">registrados cedo</span>
           </div>
 
           <div class="p-3 rounded-xl bg-[#252525] border border-[#2a2a2a]">
-            <span class="text-[10px] font-bold uppercase text-slate-400">Senso de Dono</span>
-            <div class="text-xl font-black text-[#818cf8] mt-0.5">${sensoRecords.length}</div>
-            <span class="text-[10px] text-slate-400">apontamentos</span>
+            <span class="text-[10px] font-bold uppercase text-slate-400">Almoços (1h12)</span>
+            <div class="text-xl font-black ${lunchDelays.length > 0 ? 'text-[#fbbf24]' : 'text-[#22c55e]'} mt-0.5">${lunchesDone}/${totalLunches}</div>
+            <span class="text-[10px] text-slate-400">${lunchDelays.length} desvio(s) (+15m)</span>
           </div>
         </div>
 
-        <div class="space-y-3 p-4 rounded-xl bg-[#252525] border border-[#2a2a2a] text-xs">
-          <div>
-            <h4 class="font-bold text-[#ef4444] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <i class="ti ti-users"></i>
-              <span>1. Situação da Equipe e Ausências do Dia:</span>
-            </h4>
-            <p class="text-slate-300 mt-1">
-              ${absentees.length > 0 ? `Operadores com falta/atestado: <strong class="text-white">${absentees.join(', ')}</strong>.` : 'Nenhum atestado ou ausência registrado na abertura.'}
-              ${lunchDelays > 0 ? ` Houve <strong class="text-[#fbbf24]">${lunchDelays} desvio(s) de almoço com atraso (+15m)</strong> durante a tarde.` : ' Cobertura de almoços ocorreu dentro da normalidade.'}
-            </p>
+        <!-- Seção de Pendências Diurnas Reais -->
+        <div class="p-3.5 rounded-xl border ${diurnalPending.length > 0 ? 'bg-[#ef4444]/10 border-[#ef4444]/40' : 'bg-[#22c55e]/10 border-[#22c55e]/30'}">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold ${diurnalPending.length > 0 ? 'text-[#ef4444]' : 'text-[#22c55e]'} flex items-center gap-1.5">
+              <i class="${diurnalPending.length > 0 ? 'ti ti-alert-triangle' : 'ti ti-circle-check'}"></i>
+              <span>${diurnalPending.length > 0 ? `Pendências Diurnas (${diurnalPending.length} não concluídas)` : 'Trilha Diurna 100% Concluída'}</span>
+            </span>
+            <span class="text-[10px] text-slate-400">Atividades antes das 19h</span>
           </div>
-
-          <div class="pt-2 border-t border-[#2a2a2a]">
-            <h4 class="font-bold text-[#fbbf24] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <i class="ti ti-moon"></i>
-              <span>2. Entregáveis Deixados para os Especialistas (Noturno):</span>
-            </h4>
-            <ul class="list-disc list-inside space-y-1 mt-1 text-slate-300">
-              <li><strong>18:30:</strong> Saída do Brito conferida;</li>
-              <li><strong>18:45:</strong> Fila do operador Cauê ajustada e balanceada;</li>
-              <li><strong>19:00:</strong> Desmobilização de Natha, Tarcísio, Hadassa, Francisco e Guimarães;</li>
-              <li><strong>19:00:</strong> Sala verificada (máquinas, TVs e limpeza);</li>
-              <li><strong>20:00:</strong> Saída do Otávio;</li>
-              <li><strong>20:30:</strong> Saída do Gilseph;</li>
-              <li><strong>21:00:</strong> Fechamento geral e saída do David.</li>
-            </ul>
-          </div>
-
-          ${sensoRecords.length > 0 ? `
-            <div class="pt-2 border-t border-[#2a2a2a]">
-              <h4 class="font-bold text-[#818cf8] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i class="ti ti-crown"></i>
-                <span>3. Destaques Críticos do Senso de Dono:</span>
-              </h4>
-              <p class="text-slate-300 mt-1 italic leading-relaxed">
-                "${sensoRecords[0].aconteceu || 'Sem ocorrências impeditivas.'}" &mdash; Ação: "${sensoRecords[0].acoes || 'Normalizado.'}"
-              </p>
+          ${diurnalPending.length > 0 ? `
+            <div class="space-y-1 max-h-28 overflow-y-auto pr-1">
+              ${diurnalPending.map(t => `
+                <div class="flex items-center justify-between text-[11px] bg-[#1a1a1a] px-2.5 py-1 rounded border border-[#2a2a2a]">
+                  <span class="text-white font-medium">[${t.time}] ${t.title}</span>
+                  <span class="text-[10px] text-slate-400 font-mono">${t.resp}</span>
+                </div>
+              `).join('')}
             </div>
-          ` : ''}
+          ` : `
+            <p class="text-[11px] text-slate-300">Excelente! Todas as tarefas programadas das 07:45 às 19:00 foram finalizadas sem pendências operacionais.</p>
+          `}
+        </div>
+
+        <!-- Textarea Interativo de Passagem de Turno -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="plantaoHandoverTextArea" class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <i class="ti ti-message-code text-[#fbbf24]"></i>
+              <span>Mensagem Formatada (Editável para WhatsApp / Discord):</span>
+            </label>
+            <button onclick="regeneratePlantaoHandoverModal()" class="text-[11px] text-[#fbbf24] hover:underline flex items-center gap-1">
+              <i class="ti ti-refresh text-xs"></i>
+              <span>Recalcular Resumo</span>
+            </button>
+          </div>
+          <textarea id="plantaoHandoverTextArea" rows="8" class="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-[#fbbf24] leading-relaxed shadow-inner">${generatedText}</textarea>
+          <span class="text-[10px] text-slate-400 block text-right">Qualquer edição acima será mantida ao copiar ou salvar no banco.</span>
         </div>
       `;
 
       modal.classList.remove('hidden');
+    }
+
+    function regeneratePlantaoHandoverModal() {
+      const area = document.getElementById('plantaoHandoverTextArea');
+      if (area) {
+        area.value = generatePlantaoHandoverText();
+        showToast('Resumo recalculado com as informações mais recentes!');
+      }
     }
 
     function closePlantaoHandoverModal() {
@@ -5349,69 +5907,61 @@ END \$\$;
       if (modal) modal.classList.add('hidden');
     }
 
-    function copyPlantaoHandoverText() {
+    // Salvar histórico formal da passagem na tabela rotina_operacional_passagem_plantao
+    async function savePlantaoHandoverToSupabase() {
       const state = ensureDateState(selectedDate);
-      const [y, m, d] = selectedDate.split('-');
-      const absentees = state.absentStaff || [];
-      const lunchDelays = Object.keys(state.lunchDeviations || {}).filter(k => state.lunchDeviations[k]).length;
-      const sensoRecords = dbState.sensoDeDono[selectedDate] || [];
-
       const diurnalTasks = masterSchedule.filter(t => parseTimeToMinutes(t.time) < 19 * 60);
       const diurnalDone = diurnalTasks.filter(t => state.tasks[t.id]?.completed).length;
-      const diurnalPct = Math.round((diurnalDone / diurnalTasks.length) * 100);
 
-      let text = `🤝 *PASSAGEM DE TURNO PARA O PLANTÃO NOTURNO* (${d}/${m}/${y} - 19:00)\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `👤 *Repassado por:* ${activeOperator} (Supervisão Diurna)\n`;
-      text += `⚡ *Aderência do Turno Diurno:* ${diurnalPct}% (${diurnalDone}/${diurnalTasks.length} concluídas)\n`;
-      text += `🔄 *Rondas WorkDesk Executadas:* ${state.workdeskRounds} ciclos\n\n`;
+      const textArea = document.getElementById('plantaoHandoverTextArea');
+      const text = (textArea && textArea.value.trim()) ? textArea.value.trim() : generatePlantaoHandoverText();
 
-      text += `👥 *SITUAÇÃO DA EQUIPE / ATESTADOS:*\n`;
-      if (absentees.length > 0) {
-        text += `• Operadores ausentes/atestado: ${absentees.join(', ')}\n`;
-      } else {
-        text += `• Nenhuma ausência registrada na equipe.\n`;
-      }
-      if (lunchDelays > 0) {
-        text += `• Desvios de retorno de almoço (+15m): ${lunchDelays} ocorrência(s)\n`;
-      }
-
-      text += `\n🌙 *ROTEIRO DO PLANTÃO NOTURNO (19h às 21h):*\n`;
-      text += `• [18:45] Ajustar fila do operador Cauê\n`;
-      text += `• [19:00] Saída: Natha, Tarcísio, Hadassa, Francisco e Guimarães\n`;
-      text += `• [19:00] Assunção integral: Especialistas Noturnos\n`;
-      text += `• [19:00] Conferência final de sala e limpeza\n`;
-      text += `• [20:00] Saída: Otávio\n`;
-      text += `• [20:30] Saída: Gilseph\n`;
-      text += `• [21:00] Saída: David e Fechamento Geral\n`;
-
-      if (sensoRecords.length > 0) {
-        text += `\n👑 *DESTAQUE DO SENSO DE DONO:*\n`;
-        text += `• ${sensoRecords[0].aconteceu || 'Sem incidentes graves.'} (Ação: ${sensoRecords[0].acoes || 'Normalizado.'})\n`;
-      }
-
-      text += `\nBoa operação ao time de especialistas! 🚀`;
-
-      // Salvar histórico formal na tabela rotina_operacional_passagem_plantao
       if (supabaseClient) {
-        supabaseClient.from('rotina_operacional_passagem_plantao').upsert({
-          data: selectedDate,
-          passado_por: activeOperator,
-          horario: '19:00',
-          resumo_texto: text,
-          pendencias_count: diurnalTasks.length - diurnalDone,
-          concluidas_count: diurnalDone
-        }, { onConflict: 'data' }).then();
+        try {
+          const { error } = await supabaseClient.from('rotina_operacional_passagem_plantao').upsert({
+            data: selectedDate,
+            passado_por: activeOperator,
+            horario: '19:00',
+            resumo_texto: text,
+            pendencias_count: diurnalTasks.length - diurnalDone,
+            concluidas_count: diurnalDone
+          }, { onConflict: 'data' });
+
+          if (error) throw error;
+          playChime(880, 0.15);
+          showToast('Passagem de plantão salva com sucesso no Supabase!');
+          addAuditLog('Passagem de Plantão Salva', `Resumo das 19:00 registrado no Supabase por ${activeOperator}.`);
+        } catch(err) {
+          showToast('Erro ao salvar no banco: ' + (err.message || err));
+        }
+      } else {
+        showToast('Supabase não conectado. Modo local ativo.');
+      }
+    }
+
+    function copyPlantaoHandoverText() {
+      const textArea = document.getElementById('plantaoHandoverTextArea');
+      const text = (textArea && textArea.value.trim()) ? textArea.value.trim() : generatePlantaoHandoverText();
+
+      savePlantaoHandoverToSupabase().catch(() => {});
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Passagem copiada! Pronto para colar no WhatsApp dos Especialistas.');
+        }).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
       }
 
-      const tempInput = document.createElement('textarea');
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-
-      showToast('Passagem para o Plantão salva no banco e copiada para o WhatsApp!');
+      function fallbackCopy(str) {
+        const temp = document.createElement('textarea');
+        temp.value = str;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast('Passagem copiada para a área de transferência!');
+      }
     }
 
     // Senso de Dono Module Functions
@@ -5764,7 +6314,10 @@ END \$\$;
           <h4 class="font-bold text-slate-300 text-xs uppercase tracking-wider">Histórico de Ações:</h4>
           ${(record.logs && record.logs.length > 0) ? record.logs.map(l => `
             <div class="flex items-center justify-between p-2 rounded-lg bg-[#252525] border border-[#2a2a2a] text-xs">
-              <span class="text-[#22c55e] font-bold">${l.action} por ${l.user}</span>
+              <span class="text-[#22c55e] font-bold flex items-center gap-1.5">
+                <span>${l.action} por ${l.user}</span>
+                ${l.delayMinutes !== undefined ? `<span class="text-[10px] px-1.5 py-0.2 rounded font-mono ${l.delayMinutes <= 15 ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#ef4444]/20 text-[#ef4444]'}">${l.delayMinutes <= 0 ? 'Pontual' : `+${l.delayMinutes}m`}</span>` : ''}
+              </span>
               <span class="font-mono text-slate-400">${l.time}</span>
             </div>
           `).join('') : '<p class="text-slate-500 italic">Nenhum evento registrado nesta data.</p>'}
@@ -5791,6 +6344,7 @@ END \$\$;
     }
 
     function renderApp() {
+      updateFilterButtonsUI();
       renderClockAndCoverage();
       renderRondaSection();
       renderHeroHud();
@@ -5806,6 +6360,12 @@ END \$\$;
       if (e.key === 't' || e.key === 'T') toggleTvMode(!tvModeActive);
       if (e.key === 'r' || e.key === 'R') triggerQuickWorkDeskRound();
       if (e.key === 'c' || e.key === 'C') copyShiftSummary();
+      if (e.key === 'p' || e.key === 'P') openPlantaoHandoverModal();
+      if (e.key === 'e' || e.key === 'E') openExecutiveReportModal();
+      if (e.key === 'a' || e.key === 'A') openAnalyticsModal();
+      if (e.key === '?') {
+        showToast('⌨️ Atalhos: [R] Ronda WorkDesk | [P] Passagem 19h | [E] Relatório Executivo | [A] SLA & Analytics | [T] Modo TV | [C] Copiar Resumo | [ESC] Fechar');
+      }
       if (e.key === 'Escape') {
         toggleTvMode(false);
         closeAuditModal();
@@ -5833,7 +6393,11 @@ END \$\$;
 
       // 1. Carrega dados do cache local offline imediatamente (zero delay)
       loadLocalState(selectedDate);
+      if (activeOperator) {
+        setActiveFilter(activeOperator);
+      }
       updateNotificationButtonUI();
+
 
       // Seed um exemplo inicial de Senso de Dono se não houver registros e nunca tiver sido excluído pelo usuário
       const hasUserClearedSenso = localStorage.getItem('rotina_senso_cleared_' + selectedDate);

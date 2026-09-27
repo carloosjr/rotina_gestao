@@ -1,0 +1,46 @@
+name: Fechamento Diário 22h - Service Desk
+
+on:
+  schedule:
+    # 01:00 UTC = 22:00 Horário de Brasília (BRT) todos os dias
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    inputs:
+      targetDate:
+        description: 'Data do relatório (AAAA-MM-DD) - Opcional'
+        required: false
+        default: ''
+
+jobs:
+  daily-closing:
+    name: Executar Fechamento Diário
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar Fechamento na Supabase Edge Function
+        run: |
+          TARGET_DATE="${{ github.event.inputs.targetDate }}"
+          PAYLOAD='{"email":"jose.carlos@softcomtecnologia.com.br"}'
+          
+          if [ -n "$TARGET_DATE" ]; then
+            PAYLOAD="{\"email\":\"jose.carlos@softcomtecnologia.com.br\",\"data\":\"$TARGET_DATE\"}"
+          fi
+          
+          echo "Disparando fechamento com payload: $PAYLOAD"
+          
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            "https://bzebborrqzvpdmvtieib.supabase.co/functions/v1/daily-closing-report" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+          
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d':' -f2)
+          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS:")
+          
+          echo "Resposta do servidor:"
+          echo "$BODY"
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Erro ao processar fechamento diário. Código HTTP: $HTTP_STATUS"
+            exit 1
+          fi
+          
+          echo "Fechamento diário processado com sucesso!"

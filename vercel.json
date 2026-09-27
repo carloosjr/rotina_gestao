@@ -3,6 +3,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/dashboard_de_rotina_da_gest_o_operacional.html", "destination": "/index.html" },
+    { "source": "/dashboard_de_rotina_da_gest_o_operacional_v2.html", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/$1" },
     { "source": "/", "destination": "/index.html" }
   ]

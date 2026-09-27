@@ -154,7 +154,80 @@ serve(async (req) => {
       </html>
     `
 
-    // 4. Se houver integração com Discord Webhook configurada, dispara resumo no Discord também
+    // 4. Disparo do E-mail Real via Resend (se RESEND_API_KEY estiver configurada nos Secrets)
+    const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
+    const resendFrom = Deno.env.get('RESEND_FROM_EMAIL') || 'Service Desk Gestão <onboarding@resend.dev>'
+    let emailDispatched = false
+    let emailMessageId = null
+    let emailError = null
+
+    if (resendApiKey) {
+      try {
+        const resendRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendApiKey.trim()}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: resendFrom,
+            to: [recipientEmail],
+            subject: `📊 Fechamento Diário • Service Desk Chat (${dataFormatada})`,
+            html: emailHtml
+          })
+        })
+
+        const resendData = await resendRes.json()
+        if (resendRes.ok) {
+          emailDispatched = true
+          emailMessageId = resendData.id
+          console.log(`[Resend] E-mail enviado com sucesso para ${recipientEmail}, id: ${resendData.id}`)
+        } else {
+          emailError = resendData
+          console.warn('[Resend] Erro retornado pela API do Resend:', resendData)
+
+          // Modo Sandbox do Resend: se o domínio corporativo ainda não foi verificado,
+          // entrega para o e-mail do titular da conta para garantir o recebimento imediato!
+          const match = resendData.message?.match(/\(([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\)/)
+          const fallbackEmail = match ? match[1] : null
+
+          if (fallbackEmail && fallbackEmail !== recipientEmail) {
+            console.log(`[Resend Sandbox Fallback] Redirecionando entrega para: ${fallbackEmail}`)
+            const fallbackRes = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${resendApiKey.trim()}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: resendFrom,
+                to: [fallbackEmail],
+                subject: `📊 [Resend Sandbox] Fechamento Diário • Service Desk Chat (${dataFormatada})`,
+                html: `
+                  <div style="background: #fbbf24; color: #111; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-family: Segoe UI, sans-serif; font-size: 13px; font-weight: bold; border-left: 4px solid #b45309;">
+                    ⚠️ <strong>Modo Sandbox Ativo no Resend:</strong> Este fechamento foi entregue em <em>${fallbackEmail}</em> porque o domínio corporativo <em>softcomtecnologia.com.br</em> ainda não foi validado em <a href="https://resend.com/domains" style="color: #000; text-decoration: underline;">resend.com/domains</a>. Assim que validado, chegará diretamente em <em>${recipientEmail}</em>.
+                  </div>
+                ` + emailHtml
+              })
+            })
+            const fbData = await fallbackRes.json()
+            if (fallbackRes.ok) {
+              emailDispatched = true
+              emailMessageId = fbData.id
+              recipientEmail = `${fallbackEmail} (Sandbox de ${recipientEmail})`
+              console.log(`[Resend Fallback] E-mail entregue com sucesso em ${fallbackEmail}, id: ${fbData.id}`)
+            }
+          }
+        }
+      } catch (rErr: any) {
+        emailError = rErr.message
+        console.error('[Resend] Falha de conexão ao enviar e-mail:', rErr)
+      }
+    } else {
+      console.log('[Resend] Variável RESEND_API_KEY não configurada nos Secrets do Supabase.')
+    }
+
+    // 5. Se houver integração com Discord Webhook configurada, dispara resumo no Discord também
     if (discordCfg.webhookUrl && discordCfg.webhookUrl.startsWith('https://discord')) {
       try {
         await fetch(discordCfg.webhookUrl, {
@@ -163,7 +236,7 @@ serve(async (req) => {
           body: JSON.stringify({
             username: 'Service Desk Chat | Fechamento Diário',
             avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-            content: `🌙 **FECHAMENTO DIÁRIO DA GESTÃO OPERACIONAL** (${dataFormatada})\nRelatório consolidado das 22:00 enviado por e-mail para **${recipientEmail}**.`,
+            content: `🌙 **FECHAMENTO DIÁRIO DA GESTÃO OPERACIONAL** (${dataFormatada})\nRelatório consolidado das 22:00 ${emailDispatched ? 'enviado com sucesso por e-mail' : 'processado'} para **${recipientEmail}**.`,
             embeds: [
               {
                 title: `📊 Balanço Geral do Turno (${dataFormatada})`,
@@ -175,7 +248,7 @@ serve(async (req) => {
                   { name: '⭐ Senso de Dono', value: `${Math.round(sensoNota)}%`, inline: true },
                   { name: '📋 Pendências', value: pendentes.length > 0 ? `${pendentes.length} pendência(s)` : 'Nenhuma! 🎉', inline: true },
                   { name: '👤 Fechamento', value: diaria?.gestor_ativo || 'José Carlos', inline: true },
-                  { name: '📧 E-mail Enviado', value: recipientEmail, inline: true }
+                  { name: '📧 E-mail Entregue', value: emailDispatched ? `Sim (${recipientEmail})` : `Pendente (${recipientEmail})`, inline: true }
                 ],
                 footer: { text: 'Service Desk Chat | Softcom Tecnologia • Fechamento 22:00' },
                 timestamp: new Date().toISOString()
@@ -192,6 +265,11 @@ serve(async (req) => {
       success: true,
       message: `Relatório de fechamento consolidado para ${dataFormatada} processado com sucesso!`,
       recipient: recipientEmail,
+      emailDispatched,
+      emailMessageId,
+      emailNotice: emailDispatched
+        ? `E-mail entregue com sucesso via Resend para ${recipientEmail}`
+        : (resendApiKey ? `Aviso no envio de e-mail: ${JSON.stringify(emailError)}` : 'RESEND_API_KEY não configurada nos Secrets do Supabase. Adicione a chave para entrega direta na caixa de entrada corporativa.'),
       stats: {
         total: totalTarefas,
         concluidas,
