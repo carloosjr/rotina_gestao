@@ -2076,7 +2076,7 @@
       } else if (!loadedAdminUsers || loadedAdminUsers.length === 0) {
         // 4. Fallback com os gestores administrativos padrão do Service Desk
         const defaultAdmins = [
-          { nome: 'Bruno', role: 'admin', desc: 'Abertura (08:00), 13:24 & Almoço 13:12' },
+          { nome: 'Bruno', role: 'admin', desc: 'Abertura (08:00 - 08:30), 13:24 & Almoço 13:12' },
           { nome: 'Maurício', role: 'admin', desc: 'Entradas (09:00 - 11:00), Almoços 11-12h & Produtividade' },
           { nome: 'José Carlos', role: 'admin', desc: 'Almoços 14-17:30, Produtividade, Almoço 15:30 & Fluxo do Plantão (17h às 21h)' }
         ];
@@ -2200,10 +2200,10 @@
 
     // Full Operational Catalogue mapping every single responsibility from 07:45 to 21:00
     const masterSchedule = [
-      { id: 't_0745', time: '08:00', title: 'Verificar grupo do WhatsApp - Atrasos e avisos', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Avisos da equipe, atestados e ajustes no início da operação' },
-      { id: 't_0800_sala', time: '08:00', title: 'Verificar sala', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Organização, máquinas, TVs e limpeza' },
-      { id: 't_0800_equipe', time: '08:00', title: 'Verificar equipe das 8 e WorkDesk', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Presenças, logons iniciais e checagem do painel' },
-      { id: 't_0800_chama', time: '08:00', title: 'Logar no Chama Gestor', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Prontidão para chamados internos' },
+      { id: 't_0745', time: '08:00', timeEnd: '08:30', title: 'Verificar grupo do WhatsApp - Atrasos e avisos', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Avisos da equipe, atestados e ajustes no início da operação (Janela de abertura até 08:30)' },
+      { id: 't_0800_sala', time: '08:05', timeEnd: '08:30', title: 'Verificar sala', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Organização, máquinas, TVs e limpeza (Janela de abertura até 08:30)' },
+      { id: 't_0800_equipe', time: '08:10', timeEnd: '08:30', title: 'Verificar equipe das 8 e WorkDesk', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Presenças, logons iniciais e checagem do painel (Janela de abertura até 08:30)' },
+      { id: 't_0800_chama', time: '08:15', timeEnd: '08:30', title: 'Logar no Chama Gestor', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Prontidão para chamados internos (Janela de abertura até 08:30)' },
       { id: 't_0800_0900_salao', time: '08:00', timeEnd: '09:00', title: 'Monitoramento da Operação (08h às 09h)', resp: 'Bruno', category: 'monitoramento', critical: false, desc: 'Cobertura exclusiva de abertura na operação' },
       
       { id: 't_0900_equipe', time: '09:00', title: 'Verificar equipe das 9', resp: 'Maurício', category: 'entradas', critical: true, desc: 'Presença e entrada dos operadores das 09h' },
@@ -5525,6 +5525,10 @@ END \$\$;
       let targetMins = parseTimeToMinutes(taskDef?.time);
       if (lunchDef) {
         targetMins = parseTimeToMinutes(lunchDef.returnTime);
+      } else if (taskDef?.timeEnd) {
+        // Para atividades com intervalo de execução (como abertura 08h-08h30 ou monitoramento de salão),
+        // o prazo limite para SLA sem atraso é o final da janela (timeEnd)
+        targetMins = parseTimeToMinutes(taskDef.timeEnd);
       }
 
       const nowMins = now.getHours() * 60 + now.getMinutes();
