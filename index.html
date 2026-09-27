@@ -434,9 +434,10 @@
     </div>
 
     <!-- Divider & Page Breadcrumb -->
-    <div class="navbar-page-title hidden sm:flex">
+    <div class="navbar-page-title hidden sm:flex items-center">
       <span class="navbar-page-sep">|</span>
       <span class="navbar-page-name font-semibold text-slate-200">Gestão Operacional</span>
+      <span class="hidden md:inline-flex items-center gap-1 ml-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#181818] border border-[#2a2a2a] text-slate-400 font-bold" title="Operação regular de Segunda a Sexta-feira"><i class="ti ti-calendar text-[#fbbf24]"></i> Seg a Sex</span>
     </div>
 
     <!-- Live Clock Display Badge -->
@@ -643,6 +644,40 @@
 
   <!-- Main Container -->
   <main class="max-w-[1800px] w-full mx-auto px-4 sm:px-6 py-6 flex-1 space-y-6">
+
+    <!-- WEEKEND NOTICE BANNER: Operação ativa exclusivamente de segunda a sexta -->
+    <div id="weekendNoticeBanner" class="hidden system-card p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-[#1c1c1c] to-amber-500/5 shadow-xl relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-start sm:items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-400 text-xl shadow-inner">
+            <i class="ti ti-calendar-pause"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                Fim de Semana • Rotina Operacional em Pausa
+              </h3>
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Segunda a Sexta-feira
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">
+              Todas as rotinas de gestão, rondas do WorkDesk (30m), réguas de almoço e alertas são ativas exclusivamente de <strong>segunda a sexta-feira</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+          <button onclick="goToLastFriday()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#252525] hover:bg-[#303030] text-amber-300 border border-amber-500/40 hover:border-amber-400 transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <i class="ti ti-arrow-back-up text-sm"></i>
+            <span>Ver Última Sexta-feira</span>
+          </button>
+          <button onclick="goToNextMonday()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 hover:border-amber-300 transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <span>Ir para Próxima Segunda</span>
+            <i class="ti ti-arrow-forward text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ========================================================================= -->
     <!-- MÓDULO 1: TRILHA & ROTINA DIÁRIA (Rondas, HUD, Almoços, Timeline, Senso)  -->
@@ -2323,7 +2358,19 @@
     let tvModeActive = false;
     let workdeskSecondsLeft = 30 * 60;
     let hasNotifiedThreeMinAlert = false;
-    let selectedDate = getFormattedTodayDate();
+    let selectedDate = (function() {
+      const d = new Date();
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek === 0) { // Domingo -> Sexta
+        d.setDate(d.getDate() - 2);
+      } else if (dayOfWeek === 6) { // Sábado -> Sexta
+        d.setDate(d.getDate() - 1);
+      }
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dt = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dt}`;
+    })();
 
     // In-memory persistent database for the session
     const dbState = {
@@ -2659,6 +2706,61 @@
       return `${year}-${month}-${day}`;
     }
 
+    // Validação de Dias Úteis: Operação exclusiva de Segunda a Sexta
+    function isWeekend(dateStr) {
+      if (!dateStr) return false;
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const day = new Date(y, m - 1, d).getDay();
+      return day === 0 || day === 6; // 0 = Domingo, 6 = Sábado
+    }
+
+    function getLastWorkingDay(baseDateStr) {
+      const parts = (baseDateStr || getFormattedTodayDate()).split('-').map(Number);
+      const cur = new Date(parts[0], parts[1] - 1, parts[2]);
+      const day = cur.getDay();
+      if (day === 0) cur.setDate(cur.getDate() - 2); // Domingo -> Sexta
+      else if (day === 6) cur.setDate(cur.getDate() - 1); // Sábado -> Sexta
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth() + 1).padStart(2, '0');
+      const d = String(cur.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getNextWorkingDay(baseDateStr) {
+      const parts = (baseDateStr || getFormattedTodayDate()).split('-').map(Number);
+      const cur = new Date(parts[0], parts[1] - 1, parts[2]);
+      const day = cur.getDay();
+      if (day === 0) cur.setDate(cur.getDate() + 1); // Domingo -> Segunda
+      else if (day === 6) cur.setDate(cur.getDate() + 2); // Sábado -> Segunda
+      else cur.setDate(cur.getDate() + 1);
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth() + 1).padStart(2, '0');
+      const d = String(cur.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function goToLastFriday() {
+      const lastFriday = getLastWorkingDay();
+      onDateSwitched(lastFriday);
+      showToast(`Exibindo última sexta-feira útil (${lastFriday.split('-').reverse().join('/')})`);
+    }
+
+    function goToNextMonday() {
+      const nextMonday = getNextWorkingDay();
+      onDateSwitched(nextMonday);
+      showToast(`Exibindo próxima segunda-feira (${nextMonday.split('-').reverse().join('/')})`);
+    }
+
+    function renderWeekendNotice() {
+      const banner = document.getElementById('weekendNoticeBanner');
+      if (!banner) return;
+      if (isWeekend(selectedDate)) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
     // --- MÓDULOS DE NAVEGAÇÃO & PLANTÃO NOTURNO ---
     let currentMainView = 'routine'; // 'routine' | 'plantao' | 'agenda' | 'all'
     try {
@@ -2743,6 +2845,11 @@
 
     // Floor coverage slot logic
     function getCurrentCoverageSlot() {
+      const todayStr = getFormattedTodayDate();
+      if (isWeekend(selectedDate) || (selectedDate === todayStr && isWeekend(todayStr))) {
+        return { label: 'Fim de Semana (Operação de Segunda a Sexta)', badge: 'bg-[#1c1c1c] text-slate-400 border-[#2a2a2a]' };
+      }
+
       const now = new Date();
       const currentMins = now.getHours() * 60 + now.getMinutes();
 
@@ -2819,7 +2926,14 @@
     }
 
     function setTodayDate() {
-      onDateSwitched(getFormattedTodayDate());
+      const todayStr = getFormattedTodayDate();
+      if (isWeekend(todayStr)) {
+        const lastFri = getLastWorkingDay(todayStr);
+        onDateSwitched(lastFri);
+        showToast('Hoje é fim de semana! A operação é de segunda a sexta. Exibindo a última sexta-feira.');
+      } else {
+        onDateSwitched(todayStr);
+      }
     }
 
     // --- SUPABASE CLOUD SYNC & REALTIME ENGINE ---
@@ -3876,6 +3990,9 @@ END \$\$;
     }
 
     function checkCriticalTaskAlerts() {
+      // Rotina e alertas operacionais exclusivamente de segunda a sexta-feira
+      if (isWeekend(getFormattedTodayDate())) return;
+
       const currentMins = getCurrentTimeMinutes();
       const state = ensureDateState(selectedDate);
       const isToday = selectedDate === getFormattedTodayDate();
@@ -5467,16 +5584,20 @@ END \$\$;
         const retMins = depMins + (item.duration || 72); // 1h12 (72 min)
         const maxTolMins = retMins + 15; // 15 min de tolerância máxima
 
-        // Estados em tempo real do ciclo de 1h12
-        const isBefore = isToday && currentMins < depMins;
-        const isInLunch = isToday && currentMins >= depMins && currentMins < retMins && !isDone;
-        const isInTolerance = isToday && currentMins >= retMins && currentMins <= maxTolMins && !isDone;
-        const isOverdue = isToday && currentMins > maxTolMins && !isDone;
+        const isWeekendDay = isWeekend(selectedDate);
+
+        // Estados em tempo real do ciclo de 1h12 (apenas ativos em dias úteis)
+        const isBefore = isToday && !isWeekendDay && currentMins < depMins;
+        const isInLunch = isToday && !isWeekendDay && currentMins >= depMins && currentMins < retMins && !isDone;
+        const isInTolerance = isToday && !isWeekendDay && currentMins >= retMins && currentMins <= maxTolMins && !isDone;
+        const isOverdue = isToday && !isWeekendDay && currentMins > maxTolMins && !isDone;
 
         // Estilos visuais dinâmicos
         let cardBg = 'bg-[#1c1c1c] border-[#2a2a2a]';
-        let statusBadge = '<span class="status-badge status-badge-sm pendente">Pendente</span>';
-        let timeColor = 'text-white';
+        let statusBadge = isWeekendDay
+          ? '<span class="status-badge status-badge-sm bg-[#252525] text-slate-400 border border-[#2a2a2a]"><i class="ti ti-calendar-pause text-[10px]"></i> Pausa (Fim de Semana)</span>'
+          : '<span class="status-badge status-badge-sm pendente">Pendente</span>';
+        let timeColor = isWeekendDay ? 'text-slate-400' : 'text-white';
 
         if (isDone) {
           cardBg = 'bg-[#1c1c1c] border-[#22c55e]/40';
@@ -5657,6 +5778,29 @@ END \$\$;
       if (tvHealth) tvHealth.textContent = `${healthScore}%`;
       if (tvRounds) tvRounds.textContent = state.workdeskRounds;
 
+      if (isWeekend(selectedDate)) {
+        const titleEl = document.getElementById('hudTaskTitle');
+        const subEl = document.getElementById('hudTaskSub');
+        const previewEl = document.getElementById('hudNextPreview');
+        const completeBtn = document.getElementById('hudCompleteBtn');
+        const pendingEl = document.getElementById('hudPendingCount');
+
+        if (titleEl) titleEl.textContent = 'Fim de Semana • Operação Regular em Pausa';
+        if (subEl) subEl.textContent = 'A rotina de gestão é ativa de segunda a sexta-feira. Retorno na próxima segunda-feira às 08:00 (Abertura).';
+        if (previewEl) previewEl.textContent = 'Próximo ciclo regular: Segunda-feira às 08:00 com Bruno';
+        if (pendingEl) pendingEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-500"></span><span class="text-slate-400">Rotina de Segunda a Sexta</span>';
+        if (completeBtn) {
+          completeBtn.classList.add('opacity-60', 'pointer-events-none');
+          completeBtn.innerHTML = '<i class="ti ti-calendar-pause"></i> <span>Operação em Pausa (Fim de Semana)</span>';
+        }
+
+        const tvActiveTitle = document.getElementById('tvActiveTaskTitle');
+        const tvActiveSub = document.getElementById('tvActiveTaskSub');
+        if (tvActiveTitle) tvActiveTitle.textContent = 'Fim de Semana • Operação de Segunda a Sexta';
+        if (tvActiveSub) tvActiveSub.textContent = 'Rotina operacional em pausa. Retorno programado para segunda-feira às 08h.';
+        return;
+      }
+
       const currentMins = getCurrentTimeMinutes();
       let activeTask = null;
       let nextTask = null;
@@ -5718,12 +5862,37 @@ END \$\$;
       const lastCheckedLabel = document.getElementById('rondaLastCheckedLabel');
       const statusBadge = document.getElementById('rondaStatusBadge');
       const container = document.getElementById('rondaProminentSection');
+      const headerCountdown = document.getElementById('countdownWorkdesk');
+      const headerWorkdeskTag = document.getElementById('workdeskTag');
+
+      if (isWeekend(selectedDate)) {
+        if (bigCountdown) bigCountdown.textContent = 'PAUSA';
+        if (bigCount) bigCount.textContent = state.workdeskRounds || 0;
+        if (progressPct) progressPct.textContent = 'Fim de semana • Operação de Segunda a Sexta';
+        if (cycleBar) cycleBar.style.width = '0%';
+        if (headerCountdown) headerCountdown.textContent = 'PAUSA';
+        if (headerWorkdeskTag) {
+          headerWorkdeskTag.className = 'text-[9px] px-1 rounded bg-[#252525] text-slate-400 font-bold border border-[#2a2a2a]';
+          headerWorkdeskTag.textContent = 'Fim de Semana';
+        }
+        if (lastCheckedLabel) {
+          lastCheckedLabel.textContent = 'Operação em pausa no fim de semana';
+        }
+        if (container && statusBadge) {
+          container.classList.remove('ronda-glow', 'ronda-glow-warning', 'ronda-glow-urgent', 'border-[#fbbf24]', 'border-[#ef4444]');
+          container.classList.add('border-[#2a2a2a]');
+          statusBadge.className = 'status-badge bg-[#252525] text-slate-400 border border-[#2a2a2a]';
+          statusBadge.innerHTML = '<i class="ti ti-calendar-pause"></i> <span>Fim de Semana (Pausa)</span>';
+        }
+        return;
+      }
 
       const mins = Math.floor(workdeskSecondsLeft / 60);
       const secs = workdeskSecondsLeft % 60;
       const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
       if (bigCountdown) bigCountdown.textContent = formatted;
+      if (headerCountdown) headerCountdown.textContent = formatted;
       if (bigCount) bigCount.textContent = state.workdeskRounds;
 
       const pct = Math.round((workdeskSecondsLeft / (30 * 60)) * 100);
@@ -5781,12 +5950,15 @@ END \$\$;
         const taskMins = parseTimeToMinutes(task.time);
         const taskEndMins = task.timeEnd ? parseTimeToMinutes(task.timeEnd) : taskMins + 30;
 
-        const isCurrentNow = currentMins >= taskMins - 15 && currentMins <= taskEndMins && !isDone;
-        const isOverdue = currentMins > taskEndMins + 15 && !isDone && selectedDate === getFormattedTodayDate();
+        const isWeekendDay = isWeekend(selectedDate);
+        const isCurrentNow = !isWeekendDay && currentMins >= taskMins - 15 && currentMins <= taskEndMins && !isDone;
+        const isOverdue = !isWeekendDay && currentMins > taskEndMins + 15 && !isDone && selectedDate === getFormattedTodayDate();
 
         let nodeColor = 'bg-[#252525] text-slate-400 border-[#2a2a2a]';
         let cardBorder = 'border-[#2a2a2a]';
-        let statusBadge = '<span class="status-badge pendente">Pendente</span>';
+        let statusBadge = isWeekendDay 
+          ? '<span class="status-badge bg-[#252525] text-slate-400 border border-[#2a2a2a]"><i class="ti ti-calendar-pause"></i> Pausa (Fim de Semana)</span>'
+          : '<span class="status-badge pendente">Pendente</span>';
 
         if (isDone) {
           nodeColor = 'bg-[#22c55e] text-white border-[#22c55e]';
@@ -6225,8 +6397,10 @@ END \$\$;
       }
     }
 
-    // WorkDesk 30m countdown tick
+    // WorkDesk 30m countdown tick (Apenas ativo de segunda a sexta)
     setInterval(() => {
+      if (isWeekend(getFormattedTodayDate())) return;
+
       if (workdeskSecondsLeft > 0) {
         workdeskSecondsLeft--;
 
@@ -7692,6 +7866,7 @@ END \$\$;
     }
 
     function renderApp() {
+      renderWeekendNotice();
       updateModuleNavigationUI();
       updateFilterButtonsUI();
       renderClockAndCoverage();
@@ -7752,6 +7927,12 @@ END \$\$;
         setActiveFilter(activeOperator);
       }
       updateNotificationButtonUI();
+
+      if (isWeekend(getFormattedTodayDate())) {
+        setTimeout(() => {
+          showToast('Fim de semana: A rotina é de segunda a sexta. Exibindo última sexta-feira útil.');
+        }, 600);
+      }
 
 
       // Seed um exemplo inicial de Senso de Dono se não houver registros e nunca tiver sido excluído pelo usuário
