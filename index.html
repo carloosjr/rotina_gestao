@@ -1812,7 +1812,11 @@
           </span>
         </div>
 
-        <div class="flex items-center gap-3 text-xs text-slate-400">
+        <div class="flex items-center gap-2.5 sm:gap-3 text-xs text-slate-400 flex-wrap">
+          <button onclick="toggleAllCompletedTasksCollapse()" class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 border border-[#2a2a2a] hover:border-[#fbbf24]/40 transition" title="Alternar visualização compacta ou expandida das tarefas já concluídas">
+            <i class="ti ti-fold text-xs text-[#fbbf24]"></i>
+            <span>Alternar Concluídas</span>
+          </button>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#22c55e]"></span> Concluído</span>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#fbbf24]"></span> Em Horário</span>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Pendente</span>
@@ -4798,6 +4802,36 @@
       return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
+    // Controle de estado colapsado (Tarefas concluídas colapsam automaticamente)
+    let taskCollapseOverrides = {};
+
+    function isTaskCollapsed(taskId, isDone) {
+      if (taskCollapseOverrides[taskId] !== undefined) {
+        return taskCollapseOverrides[taskId];
+      }
+      // Por padrão: se a tarefa está concluída, fica colapsada de forma automática!
+      return !!isDone;
+    }
+
+    function toggleTaskCollapse(taskId) {
+      const state = ensureDateState(selectedDate);
+      const isDone = !!state.tasks[taskId]?.completed;
+      const current = isTaskCollapsed(taskId, isDone);
+      taskCollapseOverrides[taskId] = !current;
+      renderTimeline();
+    }
+
+    function toggleAllCompletedTasksCollapse() {
+      const state = ensureDateState(selectedDate);
+      const doneTasks = masterSchedule.filter(t => !!state.tasks[t.id]?.completed);
+      if (doneTasks.length === 0) return;
+      const anyExpanded = doneTasks.some(t => !isTaskCollapsed(t.id, true));
+      doneTasks.forEach(t => {
+        taskCollapseOverrides[t.id] = anyExpanded;
+      });
+      renderTimeline();
+    }
+
     // Floor coverage slot logic
     function getCurrentCoverageSlot() {
       const todayStr = getFormattedTodayDate();
@@ -4851,6 +4885,7 @@
 
     function onDateSwitched(newDate) {
       selectedDate = newDate;
+      taskCollapseOverrides = {};
       const picker = document.getElementById('datePicker');
       if (picker) picker.value = selectedDate;
       loadLocalState(selectedDate);
@@ -5335,6 +5370,7 @@
           if (payload.type === 'task_toggle') {
             const { taskId, taskRecord } = payload.data;
             if (taskId && taskRecord) {
+              delete taskCollapseOverrides[taskId];
               state.tasks[taskId] = taskRecord;
               saveLocalState(selectedDate);
               renderApp();
@@ -8226,6 +8262,58 @@ END \$\$;
         const prodChecklist = (state.productivityChecklists && state.productivityChecklists[task.id]) || { fila: false, pausas: false, tickets: false };
         const prodAllChecked = prodChecklist.fila && prodChecklist.pausas && prodChecklist.tickets;
 
+        const isCollapsed = isTaskCollapsed(task.id, isDone);
+
+        if (isCollapsed) {
+          // --- CARD COLAPSADO (AUTOMÁTICO AO CONCLUIR) ---
+          return `
+            <div id="task-card-${task.id}" class="relative flex items-start gap-3 sm:gap-5 group z-10 transition-all duration-200">
+              <!-- Node Connector -->
+              <div class="w-10 sm:w-14 shrink-0 flex flex-col items-center">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs shadow-md ${nodeColor} opacity-85">
+                  ${isDone ? '<i class="ti ti-check"></i>' : index + 1}
+                </div>
+                <span class="text-[11px] font-mono font-bold text-slate-500 mt-1">${task.time}</span>
+              </div>
+
+              <!-- Card Content: Versão Colapsada Compacta -->
+              <div class="flex-1 system-card px-3.5 py-2.5 sm:px-4 sm:py-3 border transition-all ${cardBorder} hover:border-[#22c55e]/60 bg-[#161616]/95 hover:bg-[#1a1a1a]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <!-- Badges + Título (clicável para expandir) -->
+                  <div class="flex items-center gap-2 flex-wrap min-w-0 flex-1 cursor-pointer select-none" onclick="toggleTaskCollapse('${task.id}')" title="Clique para expandir os detalhes da tarefa">
+                    <span class="${respBadgeClass} text-[10px] py-0.5 px-2">
+                      ${task.resp}
+                    </span>
+                    ${task.critical ? '<span class="task-badge status-badge critico text-[10px] py-0.5 px-2">Crítico</span>' : ''}
+                    ${statusBadge}
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-300 line-through truncate max-w-sm sm:max-w-md md:max-w-lg hover:text-white transition">
+                      ${task.title}
+                    </h4>
+                  </div>
+
+                  <!-- Ações Rápidas -->
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="toggleTaskStatus('${task.id}')" title="Reabrir / Desmarcar tarefa" class="px-2.5 py-1 rounded-md text-xs font-bold btn-outline text-slate-400 hover:text-slate-200 transition flex items-center gap-1 active:scale-95">
+                      <i class="ti ti-arrow-back-up text-xs"></i>
+                      <span class="hidden sm:inline text-[11px]">Desmarcar</span>
+                    </button>
+
+                    <button onclick="openAuditModal('${task.id}')" title="Ver histórico de auditoria" class="p-1.5 rounded-md btn-outline text-xs text-slate-400 hover:text-slate-200">
+                      <i class="ti ti-history"></i>
+                    </button>
+
+                    <button onclick="toggleTaskCollapse('${task.id}')" title="Expandir detalhes da tarefa" class="p-1.5 px-2 rounded-md btn-outline text-xs text-slate-300 hover:text-white flex items-center gap-1 border-[#2a2a2a] hover:border-[#fbbf24]/50 transition">
+                      <i class="ti ti-chevron-down text-sm text-[#fbbf24]"></i>
+                      <span class="text-[11px] hidden md:inline">Detalhes</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // --- CARD EXPANDIDO ---
         return `
           <div id="task-card-${task.id}" class="relative flex items-start gap-3 sm:gap-5 group z-10 transition-all duration-200">
             <!-- Node Connector -->
@@ -8282,6 +8370,13 @@ END \$\$;
                   <button onclick="openAuditModal('${task.id}')" title="Ver histórico de auditoria" class="p-2 rounded-lg btn-outline text-xs">
                     <i class="ti ti-history"></i>
                   </button>
+
+                  ${isDone ? `
+                    <button onclick="toggleTaskCollapse('${task.id}')" title="Recolher tarefa concluída" class="p-2 rounded-lg btn-outline text-xs text-slate-400 hover:text-white flex items-center gap-1 border-[#2a2a2a] hover:border-[#fbbf24]/50 transition">
+                      <i class="ti ti-chevron-up text-sm"></i>
+                      <span class="text-[11px] hidden sm:inline">Recolher</span>
+                    </button>
+                  ` : ''}
                 </div>
               </div>
 
@@ -8526,6 +8621,9 @@ END \$\$;
         };
         showToast('Atividade reaberta.');
       }
+
+      // Colapso automático ao concluir tarefa (e expansão automática ao reabrir)
+      delete taskCollapseOverrides[taskId];
 
       renderApp();
       broadcastRealtimeAction('task_toggle', { taskId, taskRecord: state.tasks[taskId], taskTitle: taskDef?.title });
