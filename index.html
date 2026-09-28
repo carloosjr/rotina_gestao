@@ -1813,9 +1813,13 @@
         </div>
 
         <div class="flex items-center gap-2.5 sm:gap-3 text-xs text-slate-400 flex-wrap">
-          <button onclick="toggleAllCompletedTasksCollapse()" class="flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 border border-[#2a2a2a] hover:border-[#fbbf24]/40 transition" title="Alternar visualização compacta ou expandida das tarefas já concluídas">
+          <button onclick="openNewTaskModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold btn-accent shadow-xs active:scale-95" title="Adicionar uma nova tarefa operacional à rotina">
+            <i class="ti ti-plus text-xs"></i>
+            <span>Nova Tarefa</span>
+          </button>
+          <button onclick="toggleAllCompletedTasksCollapse()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 border border-[#2a2a2a] hover:border-[#fbbf24]/40 transition" title="Alternar visualização compacta ou expandida das tarefas já concluídas">
             <i class="ti ti-fold text-xs text-[#fbbf24]"></i>
-            <span>Alternar Concluídas</span>
+            <span class="hidden sm:inline">Alternar Concluídas</span>
           </button>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#22c55e]"></span> Concluído</span>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#fbbf24]"></span> Em Horário</span>
@@ -3434,6 +3438,123 @@
         <button onclick="closeSupabaseModal()" class="px-3 py-1.5 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] text-slate-300 font-bold transition">Fechar</button>
       </div>
     </div>
+  <!-- MODAL: ADICIONAR / EDITAR TAREFA OPERACIONAL -->
+  <div id="taskFormModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 relative">
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-[#2a2a2a]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-[#fbbf24]/15 text-[#fbbf24] flex items-center justify-center border border-[#fbbf24]/30">
+            <i class="ti ti-checklist text-lg"></i>
+          </div>
+          <div>
+            <h3 id="taskModalHeaderTitle" class="font-bold text-white text-base">Nova Tarefa Operacional</h3>
+            <p class="text-xs text-slate-400">Personalize os horários e responsabilidades da rotina</p>
+          </div>
+        </div>
+        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#252525] transition" title="Fechar (Esc)">
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form onsubmit="saveTaskForm(event)" class="space-y-3.5">
+        <input type="hidden" id="taskFormId" value="" />
+
+        <!-- Horários -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+              Horário Início <span class="text-[#ef4444]">*</span>
+            </label>
+            <input type="time" id="taskFormTime" title="Horário de Início da Tarefa" required class="system-input w-full px-3 py-2 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+              Horário Fim (Opcional)
+            </label>
+            <input type="time" id="taskFormTimeEnd" title="Horário de Término da Tarefa (Opcional)" class="system-input w-full px-3 py-2 text-xs text-white" />
+          </div>
+        </div>
+
+        <!-- Título -->
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+            Título da Tarefa <span class="text-[#ef4444]">*</span>
+          </label>
+          <input type="text" id="taskFormTitle" title="Título da Tarefa" required placeholder="Ex: Verificar filas de e-mail e chats represados" class="system-input w-full px-3 py-2 text-xs text-white placeholder-slate-500" />
+        </div>
+
+        <!-- Responsável & Categoria -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+              Responsável <span class="text-[#ef4444]">*</span>
+            </label>
+            <input type="text" id="taskFormResp" title="Responsável pela Tarefa" list="respSuggestions" required placeholder="Ex: Bruno, Maurício, José Carlos..." class="system-input w-full px-3 py-2 text-xs text-white" />
+            <datalist id="respSuggestions">
+              <option value="Bruno"></option>
+              <option value="Maurício"></option>
+              <option value="José Carlos"></option>
+              <option value="Bruno e Maurício"></option>
+              <option value="Bruno, Maurício e José Carlos"></option>
+              <option value="Maurício e José Carlos"></option>
+              <option value="José Carlos / Plantão"></option>
+              <option value="Equipe / Todos"></option>
+            </datalist>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+              Categoria
+            </label>
+            <select id="taskFormCategory" title="Categoria da Tarefa" class="system-input w-full px-3 py-2 text-xs text-white">
+              <option value="abertura">Abertura</option>
+              <option value="entradas">Entradas de Equipe</option>
+              <option value="produtividade">Produtividade</option>
+              <option value="monitoramento">Monitoramento de Salão</option>
+              <option value="almoco">Almoço da Equipe</option>
+              <option value="almoco_sup">Almoço do Supervisor</option>
+              <option value="plantao">Plantão Noturno</option>
+              <option value="encerramento">Encerramento</option>
+              <option value="geral" selected>Geral / Outros</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tarefa Crítica -->
+        <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#141414] border border-[#2a2a2a]">
+          <input type="checkbox" id="taskFormCritical" class="w-4 h-4 rounded text-[#fbbf24] bg-[#252525] border-[#333] focus:ring-0 cursor-pointer" />
+          <label for="taskFormCritical" class="text-xs text-slate-300 font-medium cursor-pointer select-none">
+            <strong class="text-white">Tarefa Crítica</strong> — exibe destaque vermelho e alerta de SLA rigoroso
+          </label>
+        </div>
+
+        <!-- Descrição / Instruções -->
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+            Instruções Operacionais / Descrição
+          </label>
+          <textarea id="taskFormDesc" rows="3" placeholder="Detalhes do que deve ser verificado, painéis a checar, metas..." class="system-input w-full px-3 py-2 text-xs text-white placeholder-slate-500"></textarea>
+        </div>
+
+        <!-- Rodapé do Modal -->
+        <div class="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+          <button type="button" onclick="resetMasterScheduleToDefault()" class="text-[11px] text-slate-400 hover:text-amber-400 transition underline">
+            Restaurar Catálogo Padrão
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="closeTaskModal()" class="px-3.5 py-1.5 rounded-lg btn-outline text-xs text-slate-300 hover:text-white transition">
+              Cancelar
+            </button>
+            <button type="submit" class="px-4 py-1.5 rounded-lg btn-accent text-xs font-bold transition flex items-center gap-1.5 active:scale-95">
+              <i class="ti ti-check"></i>
+              <span>Salvar Tarefa</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- ============================================================== -->
@@ -4501,7 +4622,7 @@
     }
 
     // Full Operational Catalogue mapping every single responsibility from 07:45 to 21:00
-    const masterSchedule = [
+    const defaultMasterSchedule = [
       { id: 't_0745', time: '08:00', timeEnd: '08:30', title: 'Verificar grupo do WhatsApp - Atrasos e avisos', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Avisos da equipe, atestados e ajustes no início da operação (Janela de abertura até 08:30)' },
       { id: 't_0800_sala', time: '08:05', timeEnd: '08:30', title: 'Verificar sala', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Organização, máquinas, TVs e limpeza (Janela de abertura até 08:30)' },
       { id: 't_0800_equipe', time: '08:10', timeEnd: '08:30', title: 'Verificar equipe das 8 e WorkDesk', resp: 'Bruno', category: 'abertura', critical: true, desc: 'Presenças, logons iniciais e checagem do painel (Janela de abertura até 08:30)' },
@@ -4556,6 +4677,40 @@
       { id: 't_2030_saida', time: '20:30', title: 'Fluxo do Plantão - Saída: Gilseph', resp: 'José Carlos / Plantão', category: 'plantao', critical: false, desc: 'Conferir logoff e saída do operador Gilseph' },
       { id: 't_2100_saida', time: '21:00', title: 'Fluxo do Plantão - Saída: David (Fechamento Geral)', resp: 'José Carlos / Plantão', category: 'plantao', critical: true, desc: 'Conferir encerramento final e saída do David' }
     ];
+
+    function sortSchedule(list) {
+      if (!Array.isArray(list)) return [];
+      return [...list].sort((a, b) => {
+        const ma = parseTimeToMinutes(a.time);
+        const mb = parseTimeToMinutes(b.time);
+        if (ma !== mb) return ma - mb;
+        return (a.title || '').localeCompare(b.title || '', 'pt-BR');
+      });
+    }
+
+    function loadMasterSchedule() {
+      try {
+        const saved = localStorage.getItem('rotina_master_schedule_v2');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return sortSchedule(parsed);
+          }
+        }
+      } catch (e) {}
+      return [...defaultMasterSchedule];
+    }
+
+    function saveMasterSchedule(schedule) {
+      masterSchedule = sortSchedule(schedule);
+      try {
+        localStorage.setItem('rotina_master_schedule_v2', JSON.stringify(masterSchedule));
+      } catch (e) {}
+      broadcastRealtimeAction('schedule_sync', { schedule: masterSchedule });
+      scheduleCloudSync();
+    }
+
+    let masterSchedule = loadMasterSchedule();
 
     // Only the 7 team lunch windows (1h12 = 72m duração padrão + 15m tolerância máxima)
     const lunchSchedule = [
@@ -5201,6 +5356,7 @@
 
       state.passagemPlantao = state.passagemPlantao || {};
       state.passagemPlantao.acompanhamento = state.acompanhamentoPlantao;
+      state.passagemPlantao.catalogo_tarefas = masterSchedule;
       if (state.productivityChecklists) {
         state.passagemPlantao.checklists_produtividade = state.productivityChecklists;
       }
@@ -5418,6 +5574,15 @@
               renderLunchRuler();
               showToast(`⚡ ${payload.sender} atualizou a tolerância de almoço (+15m)`);
             }
+          } else if (payload.type === 'schedule_sync') {
+            if (Array.isArray(payload.data?.schedule) && payload.data.schedule.length > 0) {
+              masterSchedule = sortSchedule(payload.data.schedule);
+              try {
+                localStorage.setItem('rotina_master_schedule_v2', JSON.stringify(masterSchedule));
+              } catch(e) {}
+              renderApp();
+              showToast(`⚡ Catálogo de tarefas atualizado em tempo real por ${payload.sender}`);
+            }
           }
         })
         .on(
@@ -5570,6 +5735,12 @@
           if (Array.isArray(a.queueLogs)) state.acompanhamentoPlantao.queueLogs = a.queueLogs;
           if (Array.isArray(a.ligacoes)) state.acompanhamentoPlantao.ligacoes = a.ligacoes;
           if (Array.isArray(a.agendaLogs)) state.acompanhamentoPlantao.agendaLogs = a.agendaLogs;
+        }
+        if (data.passagem_plantao.catalogo_tarefas && Array.isArray(data.passagem_plantao.catalogo_tarefas) && data.passagem_plantao.catalogo_tarefas.length > 0) {
+          masterSchedule = sortSchedule(data.passagem_plantao.catalogo_tarefas);
+          try {
+            localStorage.setItem('rotina_master_schedule_v2', JSON.stringify(masterSchedule));
+          } catch (e) {}
         }
       }
 
@@ -8298,6 +8469,14 @@ END \$\$;
                       <span class="hidden sm:inline text-[11px]">Desmarcar</span>
                     </button>
 
+                    <button onclick="editTask('${task.id}')" title="Editar esta tarefa" class="p-1.5 rounded-md btn-outline text-xs text-slate-400 hover:text-[#fbbf24] hover:border-[#fbbf24]/50 transition">
+                      <i class="ti ti-edit"></i>
+                    </button>
+
+                    <button onclick="confirmDeleteTask('${task.id}')" title="Excluir esta tarefa" class="p-1.5 rounded-md btn-outline text-xs text-slate-400 hover:text-[#ef4444] hover:border-[#ef4444]/50 transition">
+                      <i class="ti ti-trash"></i>
+                    </button>
+
                     <button onclick="openAuditModal('${task.id}')" title="Ver histórico de auditoria" class="p-1.5 rounded-md btn-outline text-xs text-slate-400 hover:text-slate-200">
                       <i class="ti ti-history"></i>
                     </button>
@@ -8352,7 +8531,7 @@ END \$\$;
                 </div>
 
                 <!-- Check Action Button -->
-                <div class="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 pt-2 sm:pt-0 flex-wrap">
                   <button onclick="sendDiscordTaskAlert('${task.id}')" title="Disparar alerta no Discord para ${task.resp}" class="p-2 rounded-lg btn-outline text-xs text-[#5865F2] hover:bg-[#5865F2]/10 border-[#5865F2]/30 hover:border-[#5865F2] transition flex items-center gap-1 active:scale-95">
                     <i class="ti ti-brand-discord text-sm"></i>
                     <span class="hidden xl:inline text-[11px] font-bold">Discord</span>
@@ -8365,6 +8544,14 @@ END \$\$;
 
                   <button onclick="toggleTaskStatus('${task.id}')" class="px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${isDone ? 'btn-outline text-slate-300' : 'btn-accent'}">
                     <span>${isDone ? '↩ Desmarcar' : '✓ Concluir'}</span>
+                  </button>
+
+                  <button onclick="editTask('${task.id}')" title="Editar esta tarefa" class="p-2 rounded-lg btn-outline text-xs text-slate-400 hover:text-[#fbbf24] hover:border-[#fbbf24]/50 transition">
+                    <i class="ti ti-edit"></i>
+                  </button>
+
+                  <button onclick="confirmDeleteTask('${task.id}')" title="Excluir esta tarefa" class="p-2 rounded-lg btn-outline text-xs text-slate-400 hover:text-[#ef4444] hover:border-[#ef4444]/50 transition">
+                    <i class="ti ti-trash"></i>
                   </button>
 
                   <button onclick="openAuditModal('${task.id}')" title="Ver histórico de auditoria" class="p-2 rounded-lg btn-outline text-xs">
@@ -8628,6 +8815,157 @@ END \$\$;
       renderApp();
       broadcastRealtimeAction('task_toggle', { taskId, taskRecord: state.tasks[taskId], taskTitle: taskDef?.title });
       scheduleCloudSync();
+    }
+
+    // ==============================================================
+    // GESTÃO DE TAREFAS: ADICIONAR, EDITAR, EXCLUIR E RESTAURAR
+    // ==============================================================
+
+    function openNewTaskModal() {
+      const modal = document.getElementById('taskFormModal');
+      if (!modal) return;
+
+      document.getElementById('taskModalHeaderTitle').textContent = 'Nova Tarefa Operacional';
+      document.getElementById('taskFormId').value = '';
+      document.getElementById('taskFormTime').value = '';
+      document.getElementById('taskFormTimeEnd').value = '';
+      document.getElementById('taskFormTitle').value = '';
+      document.getElementById('taskFormResp').value = activeOperator || 'Bruno';
+      document.getElementById('taskFormCategory').value = 'geral';
+      document.getElementById('taskFormCritical').checked = false;
+      document.getElementById('taskFormDesc').value = '';
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        const timeInput = document.getElementById('taskFormTime');
+        if (timeInput) timeInput.focus();
+      }, 50);
+    }
+
+    function editTask(taskId) {
+      const task = masterSchedule.find(t => t.id === taskId);
+      if (!task) {
+        showToast('Tarefa não encontrada para edição', 'error');
+        return;
+      }
+
+      const modal = document.getElementById('taskFormModal');
+      if (!modal) return;
+
+      document.getElementById('taskModalHeaderTitle').textContent = 'Editar Tarefa Operacional';
+      document.getElementById('taskFormId').value = task.id;
+      document.getElementById('taskFormTime').value = task.time || '';
+      document.getElementById('taskFormTimeEnd').value = task.timeEnd || '';
+      document.getElementById('taskFormTitle').value = task.title || '';
+      document.getElementById('taskFormResp').value = task.resp || '';
+      document.getElementById('taskFormCategory').value = task.category || 'geral';
+      document.getElementById('taskFormCritical').checked = !!task.critical;
+      document.getElementById('taskFormDesc').value = task.desc || '';
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        const titleInput = document.getElementById('taskFormTitle');
+        if (titleInput) titleInput.focus();
+      }, 50);
+    }
+
+    function closeTaskModal() {
+      const modal = document.getElementById('taskFormModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveTaskForm(e) {
+      if (e) e.preventDefault();
+
+      const id = document.getElementById('taskFormId').value.trim();
+      const time = document.getElementById('taskFormTime').value.trim();
+      const timeEnd = document.getElementById('taskFormTimeEnd').value.trim();
+      const title = document.getElementById('taskFormTitle').value.trim();
+      const resp = document.getElementById('taskFormResp').value.trim();
+      const category = document.getElementById('taskFormCategory').value || 'geral';
+      const critical = document.getElementById('taskFormCritical').checked;
+      const desc = document.getElementById('taskFormDesc').value.trim();
+
+      if (!time || !title || !resp) {
+        showToast('Por favor, preencha horário, título e responsável.', 'error');
+        return;
+      }
+
+      if (id) {
+        // Modo Edição
+        const index = masterSchedule.findIndex(t => t.id === id);
+        if (index !== -1) {
+          masterSchedule[index] = {
+            ...masterSchedule[index],
+            time,
+            timeEnd: timeEnd || undefined,
+            title,
+            resp,
+            category,
+            critical,
+            desc
+          };
+          showToast(`✓ Tarefa "${title}" atualizada com sucesso!`);
+        }
+      } else {
+        // Nova Tarefa
+        const newId = 't_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+        const newTask = {
+          id: newId,
+          time,
+          timeEnd: timeEnd || undefined,
+          title,
+          resp,
+          category,
+          critical,
+          desc
+        };
+        masterSchedule.push(newTask);
+        showToast(`✓ Tarefa "${title}" adicionada com sucesso!`);
+      }
+
+      saveMasterSchedule(masterSchedule);
+      closeTaskModal();
+      renderApp();
+    }
+
+    function confirmDeleteTask(taskId) {
+      const task = masterSchedule.find(t => t.id === taskId);
+      if (!task) return;
+
+      const confirmMsg = `Tem certeza que deseja excluir esta tarefa?\n\n"${task.title}" (${task.time})\nResponsável: ${task.resp}\n\nEsta alteração será sincronizada em tempo real para toda a equipe.`;
+      if (confirm(confirmMsg)) {
+        deleteTask(taskId);
+      }
+    }
+
+    function deleteTask(taskId) {
+      const task = masterSchedule.find(t => t.id === taskId);
+      const title = task ? task.title : taskId;
+
+      masterSchedule = masterSchedule.filter(t => t.id !== taskId);
+
+      // Limpar overrides e status se houver
+      delete taskCollapseOverrides[taskId];
+      const state = ensureDateState(selectedDate);
+      if (state.tasks && state.tasks[taskId]) {
+        delete state.tasks[taskId];
+      }
+
+      saveMasterSchedule(masterSchedule);
+      renderApp();
+      showToast(`Tarefa "${title}" removida do catálogo.`);
+    }
+
+    function resetMasterScheduleToDefault() {
+      const confirmMsg = 'Deseja restaurar as 28 tarefas operacionais originais do sistema?\n\nQualquer tarefa personalizada criada ou alterada será substituída pelo catálogo padrão oficial.';
+      if (!confirm(confirmMsg)) return;
+
+      masterSchedule = defaultMasterSchedule.map(t => ({ ...t }));
+      saveMasterSchedule(masterSchedule);
+      closeTaskModal();
+      renderApp();
+      showToast('✓ Catálogo oficial de 28 tarefas restaurado!');
     }
 
     function completeHudCurrentTask() {
@@ -12236,6 +12574,7 @@ END \$\$;
       }
       if (e.key === 'Escape') {
         toggleTvMode(false);
+        closeTaskModal();
         closeAuditModal();
         closePlantaoHandoverModal();
         closeSettingsModal();
