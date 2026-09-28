@@ -5129,6 +5129,14 @@
         saveLocalState(dateStr);
         renderApp();
 
+        // 9. Se o cliente possui tarefas concluídas localmente que ainda não estão registradas na nuvem, sobe para o Supabase
+        const stateCur = ensureDateState(dateStr);
+        const hasLocalCompletedTasks = Object.keys(stateCur.tasks).some(k => stateCur.tasks[k]?.completed);
+        const remoteHasTasks = diariaData && diariaData.tarefas && Object.keys(diariaData.tarefas).some(k => diariaData.tarefas[k]?.completed);
+        if (hasLocalCompletedTasks && !remoteHasTasks && !isSyncingToCloud) {
+          saveToSupabase(dateStr);
+        }
+
         if (!silent) {
           if (diariaData || tarefasRows.length > 0 || sensoRowsList.length > 0) {
             updateCloudSyncUI('connected', `Dados de ${dateStr} sincronizados da nuvem.`);
@@ -5152,6 +5160,9 @@
 
       state.passagemPlantao = state.passagemPlantao || {};
       state.passagemPlantao.acompanhamento = state.acompanhamentoPlantao;
+      if (state.productivityChecklists) {
+        state.passagemPlantao.checklists_produtividade = state.productivityChecklists;
+      }
 
       const payload = {
         data: dateStr,
@@ -5166,7 +5177,6 @@
         },
         passagem_plantao: state.passagemPlantao || {},
         almocos: state.lunchDeviations || {},
-        checklists_produtividade: state.productivityChecklists || {},
         progresso_percentual: pct,
         updated_at: new Date().toISOString()
       };
@@ -5212,8 +5222,6 @@
                 concluida_em: rec.timestamp || null,
                 checked_time: rec.checkedTime || null,
                 no_horario: rec.onTime ?? true,
-                delay_minutes: rec.delayMinutes ?? (rec.onTime === false ? 25 : 0),
-                sla_status: rec.slaStatus || (rec.onTime === false ? 'delayed' : 'on_time'),
                 logs: rec.logs || [],
                 updated_at: new Date().toISOString()
               });
