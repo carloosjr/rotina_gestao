@@ -274,3 +274,38 @@ SELECT cron.schedule(
 );
 */
 
+-- 16. TABELA DE CASOS SMART (Padronização e Gerador de Casos POS / Smart)
+CREATE TABLE IF NOT EXISTS public.plantaonoturno_casos_smart (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    tipo TEXT NOT NULL DEFAULT 'Bug',
+    numero_caso BIGINT,
+    cliente_registro BIGINT NOT NULL,
+    cliente_nome TEXT,
+    link_cliente TEXT,
+    cnpj TEXT,
+    adquirente TEXT NOT NULL,
+    versao TEXT NOT NULL,
+    conexao TEXT NOT NULL,
+    modelo TEXT NOT NULL,
+    produto TEXT DEFAULT 'Smart',
+    caminho TEXT NOT NULL,
+    resumo TEXT NOT NULL,
+    descricoes JSONB DEFAULT '[]'::jsonb,
+    passos JSONB DEFAULT '[]'::jsonb,
+    link_hedgedoc TEXT,
+    link_print TEXT,
+    link_video TEXT,
+    link_arquivo TEXT,
+    link_discord TEXT,
+    score INT DEFAULT 0,
+    relatorio_markdown TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Ativar RLS e permitir operações de leitura e gravação
+ALTER TABLE public.plantaonoturno_casos_smart ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_casos_smart_all" ON public.plantaonoturno_casos_smart;
+CREATE POLICY "plantaonoturno_casos_smart_all" ON public.plantaonoturno_casos_smart FOR ALL USING (true) WITH CHECK (true);
+
+

@@ -419,6 +419,786 @@
     .pulse-dot {
       animation: pulseDot 2s ease-in-out infinite;
     }
+
+    /* ==========================================================================
+       SMART POS CASE GENERATOR & DASHBOARD STYLES
+       ========================================================================== */
+    .smart-page {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .smart-actions-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-xs {
+      padding: 5px 10px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+    .btn-danger-soft {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .btn-danger-soft:hover {
+      background: rgba(239, 68, 68, 0.22);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+    .highlight-spark {
+      border-color: rgba(251, 191, 36, 0.4);
+      color: #fef08a;
+    }
+    .highlight-spark:hover {
+      border-color: rgba(251, 191, 36, 0.7);
+      background: rgba(251, 191, 36, 0.1);
+    }
+    .smart-status-bar {
+      background: rgba(17, 17, 17, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .smart-status-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+    .smart-info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    .smart-quality-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      justify-content: flex-end;
+    }
+    .smart-quality-label {
+      color: #94a3b8;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .smart-progress-track {
+      flex: 1;
+      max-width: 160px;
+      height: 8px;
+      background: #1e1e1e;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .smart-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+    }
+    .smart-quality-score {
+      font-weight: 800;
+      font-family: 'Ubuntu Mono', monospace;
+      min-width: 42px;
+      text-align: right;
+      font-size: 13px;
+    }
+    .smart-progress-fill.score-danger, .score-danger {
+      background-color: #ef4444;
+      color: #f87171;
+    }
+    .smart-progress-fill.score-warning, .score-warning {
+      background-color: #f59e0b;
+      color: #fbbf24;
+    }
+    .smart-progress-fill.score-success, .score-success {
+      background-color: #22c55e;
+      color: #4ade80;
+    }
+    .smart-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .smart-form-col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .smart-preview-col {
+      position: relative;
+    }
+    .smart-sticky-panel {
+      position: sticky;
+      top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .smart-panel {
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .smart-panel-highlight {
+      border-color: rgba(6, 182, 212, 0.35);
+      background: #1d2228;
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.08), 0 10px 25px rgba(0, 0, 0, 0.35);
+    }
+    .smart-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .smart-panel-header.justify-between {
+      justify-content: space-between;
+    }
+    .smart-step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .num-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .num-blue {
+      background: rgba(79, 70, 229, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(79, 70, 229, 0.3);
+    }
+    .num-indigo {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .num-emerald {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .num-purple {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .smart-panel-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .smart-panel-icon {
+      font-size: 14px;
+    }
+    .smart-panel-desc {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .smart-panel-subtitle {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .smart-badge-homologado {
+      font-size: 11px;
+      font-family: 'Ubuntu Mono', monospace;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #161616;
+      color: #94a3b8;
+      border: 1px solid #2a2a2a;
+    }
+    .smart-badge-homologado.active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+    .smart-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .smart-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+    .smart-sublabel {
+      display: block;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .smart-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .smart-char-counter {
+      font-size: 11px;
+      font-family: 'Ubuntu Mono', monospace;
+      color: #94a3b8;
+    }
+    .smart-char-counter.counter-danger {
+      color: #f87171;
+      font-weight: bold;
+    }
+    .smart-type-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .smart-type-btn {
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #252525;
+      border: 1px solid #2a2a2a;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .smart-type-btn:hover {
+      background: #2e2e2e;
+      color: #f1f5f9;
+    }
+    .smart-type-btn.active.bug {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .smart-type-btn.active.melhoria {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+    }
+    .smart-desc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .smart-desc-item {
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .smart-desc-row-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .smart-desc-index {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: 'Ubuntu Mono', monospace;
+      color: #22d3ee;
+      width: 26px;
+      flex-shrink: 0;
+    }
+    .smart-desc-input-main {
+      flex: 1;
+      font-weight: 500;
+      background: #252525;
+      border: 1px solid #333333;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #fff;
+    }
+    .smart-desc-subs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-left: 20px;
+    }
+    .smart-desc-row-sub {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .smart-desc-sub-index {
+      font-size: 11px;
+      font-family: 'Ubuntu Mono', monospace;
+      color: #64748b;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .smart-desc-input-sub {
+      flex: 1;
+      font-size: 11px;
+      padding: 5px 8px;
+      background: #202020;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #e2e8f0;
+    }
+    .smart-desc-add-sub {
+      padding-left: 44px;
+    }
+    .smart-btn-link {
+      background: none;
+      border: none;
+      color: #22d3ee;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .smart-btn-link:hover {
+      text-decoration: underline;
+      color: #67e8f9;
+    }
+    .smart-desc-img-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
+      margin-top: 2px;
+    }
+    .smart-input-xs {
+      font-size: 11px;
+      padding: 5px 8px;
+      background: #202020;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #e2e8f0;
+      width: 100%;
+    }
+    .smart-btn-icon {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .smart-btn-icon:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+    }
+    .smart-btn-icon.danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+    }
+    .smart-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .smart-step-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .smart-step-index {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Ubuntu Mono', monospace;
+      color: #34d399;
+      width: 24px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .smart-step-row input {
+      flex: 1;
+      background: #252525;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #fff;
+    }
+    .smart-md-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      font-weight: 800;
+      font-size: 10px;
+    }
+    .smart-badge-pattern {
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'Ubuntu Mono', monospace;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: rgba(6, 182, 212, 0.1);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.25);
+    }
+    .smart-output-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .smart-output-textarea {
+      width: 100%;
+      background: #0d0d0d !important;
+      border: 1px solid #2a2a2a !important;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'Ubuntu Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #34d399 !important;
+      resize: vertical;
+      min-height: 260px;
+      outline: none;
+    }
+    .smart-copy-btn {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .smart-copy-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.45);
+    }
+    .smart-checklist-panel {
+      padding: 14px;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+    }
+    .smart-checklist-title {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .smart-checklist-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .smart-chk-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: #64748b;
+      font-family: 'Ubuntu Mono', monospace;
+      transition: color 0.15s ease;
+    }
+    .smart-chk-item.valid {
+      color: #22d3ee;
+      font-weight: 600;
+    }
+    .smart-chk-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      font-size: 9px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.05);
+      color: #64748b;
+      flex-shrink: 0;
+    }
+    .smart-chk-item.valid .smart-chk-icon {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+    }
+
+    /* KPI CARDS & CHARTS IN DASHBOARD */
+    .smart-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .smart-kpi-card {
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: all 0.15s ease;
+    }
+    .smart-kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(6, 182, 212, 0.35);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+    .smart-bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .smart-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .smart-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .smart-bar-label {
+      color: #e2e8f0;
+      font-weight: 500;
+      max-width: 75%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .smart-bar-value {
+      font-family: 'Ubuntu Mono', monospace;
+      color: #94a3b8;
+      font-size: 11px;
+    }
+    .smart-bar-track {
+      width: 100%;
+      height: 7px;
+      background: #252525;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .smart-bar-fill {
+      height: 100%;
+      background: #fbbf24;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .smart-bar-fill.accent-cyan {
+      background: #06b6d4;
+    }
+
+    /* TABLE & BADGES */
+    .smart-table-wrapper {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #2a2a2a;
+    }
+    .smart-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+    .smart-table th {
+      background: #181818;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-bottom: 1px solid #2a2a2a;
+      white-space: nowrap;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .smart-table td {
+      padding: 12px;
+      border-bottom: 1px solid #242424;
+      vertical-align: middle;
+    }
+    .smart-table-row {
+      transition: background 0.15s ease;
+    }
+    .smart-table-row:hover {
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .smart-badge-tipo {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .smart-badge-tipo.bug {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .smart-badge-tipo.melhoria {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .smart-reg-badge {
+      font-family: 'Ubuntu Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .smart-badge-adq {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .smart-badge-model {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+    }
+    .smart-ev-tag {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .smart-ev-tag.hedge {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .smart-ev-tag.print {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .smart-ev-tag.video {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .smart-ev-tag.file {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .smart-ev-tag.discord {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .smart-card-tag {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+    .smart-card-score {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Ubuntu Mono', monospace;
+      display: inline-block;
+    }
+    .smart-card-score.score-success {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .smart-card-score.score-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .smart-card-score.score-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    @media (max-width: 1024px) {
+      .smart-layout {
+        grid-template-columns: 1fr;
+      }
+      .smart-sticky-panel {
+        position: static;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col bg-[#111111]">
@@ -588,6 +1368,17 @@
             <span id="moduleBadgeAgenda" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 hidden">0</span>
           </button>
 
+          <button onclick="switchMainView('smartDashboard')" id="moduleTab-smartDashboard" class="filter-tab" title="Dashboard analítico, gráficos de falhas e histórico de Casos Smart">
+            <i class="ti ti-chart-bar text-cyan-400"></i>
+            <span>Dashboard Smart</span>
+            <span id="moduleBadgeSmartCasos" class="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/30 hidden">0</span>
+          </button>
+
+          <button onclick="switchMainView('smartGerador')" id="moduleTab-smartGerador" class="filter-tab" title="Gerador padronizado de casos e bugs do Smart POS">
+            <i class="ti ti-device-mobile text-emerald-400"></i>
+            <span>Gerador de Caso Smart</span>
+          </button>
+
           <button onclick="switchMainView('all')" id="moduleTab-all" class="filter-tab" title="Exibir todos os módulos integrados em uma única tela">
             <i class="ti ti-layers-linked"></i>
             <span>Visão Integrada (Tudo)</span>
@@ -599,6 +1390,8 @@
           <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">1: Rotina</kbd>
           <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">2: Plantão</kbd>
           <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">3: Agenda</kbd>
+          <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">4: Dash Smart</kbd>
+          <kbd class="text-[10px] bg-[#181818] border border-[#2a2a2a] px-1.5 py-0.5 rounded text-slate-300 font-mono">5: Gerador Smart</kbd>
         </div>
       </div>
 
@@ -1463,6 +2256,960 @@
     </div>
     <!-- /agendaModuleContainer -->
 
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 4: DASHBOARD ANALÍTICO DE CASOS SMART POS                      -->
+    <!-- ===================================================================== -->
+    <div id="smartDashboardModuleContainer" class="space-y-6 hidden">
+      <!-- Header do Dashboard Smart -->
+      <header class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+            <i class="ti ti-chart-dots"></i>
+            <span>Padronização de Casos &bull; Softcom Smart</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+            <i class="ti ti-chart-bar text-cyan-400"></i>
+            <span>Dashboard dos Casos do Smart</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            Visão analítica, métricas de conformidade e histórico consolidado dos chamados padronizados no Smart POS.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="smart-period-select-wrap">
+            <select
+              id="smartPeriodSelect"
+              class="bg-[#252525] border border-[#2a2a2a] text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-cyan-400"
+              onchange="onSmartPeriodChange(this.value)"
+              aria-label="Filtrar período do dashboard"
+            >
+              <option value="7">Últimos 7 dias</option>
+              <option value="15">Últimos 15 dias</option>
+              <option value="30" selected>Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="tudo">Todo o período</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onclick="carregarCasosSmart()"
+            class="px-3 py-2 rounded-xl bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition active:scale-95"
+            title="Recarregar casos do banco"
+          >
+            <i class="ti ti-refresh text-cyan-400" id="smartReloadIcon"></i>
+            <span>Atualizar</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="exportarCasosSmartCsv()"
+            class="px-3 py-2 rounded-xl bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition active:scale-95"
+            title="Exportar casos filtrados em planilha CSV"
+          >
+            <i class="ti ti-download text-emerald-400"></i>
+            <span>Exportar CSV</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="switchMainView('smartGerador')"
+            class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-cyan-600/20 transition active:scale-95"
+            title="Abrir o Gerador de Casos Smart"
+          >
+            <i class="ti ti-plus"></i>
+            <span>Novo Caso Smart</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI Cards do Dashboard Smart -->
+      <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- 1. Total de Casos -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Total de casos</span>
+            <i class="ti ti-files text-cyan-400"></i>
+          </div>
+          <div id="smartKpiTotal" class="text-xl sm:text-2xl font-black text-white font-mono">0</div>
+          <div id="smartKpiTotalFoot" class="text-[11px] text-slate-500 mt-1 truncate">Últimos 30 dias &bull; 0 🪲 / 0 💡</div>
+        </article>
+
+        <!-- 2. Qualidade Média -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Qualidade média</span>
+            <i class="ti ti-shield-check text-emerald-400"></i>
+          </div>
+          <div id="smartKpiScore" class="text-xl sm:text-2xl font-black font-mono text-emerald-400">0%</div>
+          <div id="smartKpiScoreFoot" class="text-[11px] text-slate-500 mt-1 truncate">Conformidade técnica</div>
+        </article>
+
+        <!-- 3. Clientes Únicos -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Clientes únicos</span>
+            <i class="ti ti-building-store text-amber-400"></i>
+          </div>
+          <div id="smartKpiClientes" class="text-xl sm:text-2xl font-black text-white font-mono">0</div>
+          <div class="text-[11px] text-slate-500 mt-1 truncate">Lojas distintas</div>
+        </article>
+
+        <!-- 4. Adquirente Líder -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Adquirente líder</span>
+            <i class="ti ti-credit-card text-sky-400"></i>
+          </div>
+          <div id="smartKpiAdq" class="text-base sm:text-lg font-bold text-white truncate">—</div>
+          <div id="smartKpiAdqFoot" class="text-[11px] text-slate-500 mt-1 truncate">Sem registros</div>
+        </article>
+
+        <!-- 5. Hardware Frequente -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Hardware frequente</span>
+            <i class="ti ti-device-mobile text-purple-400"></i>
+          </div>
+          <div id="smartKpiModelo" class="text-base sm:text-lg font-bold text-white truncate">—</div>
+          <div id="smartKpiModeloFoot" class="text-[11px] text-slate-500 mt-1 truncate">Sem registros</div>
+        </article>
+
+        <!-- 6. Taxa com Evidências -->
+        <article class="smart-kpi-card">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span>Com evidências</span>
+            <i class="ti ti-link text-indigo-400"></i>
+          </div>
+          <div id="smartKpiEvid" class="text-xl sm:text-2xl font-black text-white font-mono">0%</div>
+          <div id="smartKpiEvidFoot" class="text-[11px] text-slate-500 mt-1 truncate">0 de 0 com links</div>
+        </article>
+      </section>
+
+      <!-- Gráficos de Distribuição (BarList) -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- 1. Distribuição por Adquirente -->
+        <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="ti ti-credit-card text-[#fbbf24]"></i>
+                <span>Distribuição por Adquirente</span>
+              </h3>
+              <p class="text-xs text-slate-400">Concentração de bugs por maquininha homologada</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#252525] text-slate-400 border border-[#2a2a2a]">POS Homologados</span>
+          </div>
+          <div id="smartBarAdquirente" class="smart-bar-list">
+            <!-- Dynamic bars rendered here -->
+          </div>
+        </div>
+
+        <!-- 2. Módulos & Telas Mais Afetados -->
+        <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="ti ti-sitemap text-cyan-400"></i>
+                <span>Áreas do aplicativo Smart com maior incidência de falhas</span>
+              </h3>
+              <p class="text-xs text-slate-400">Módulos, telas e rotinas com mais relatos de erro</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#252525] text-slate-400 border border-[#2a2a2a]">Caminho em Tela</span>
+          </div>
+          <div id="smartBarCaminho" class="smart-bar-list">
+            <!-- Dynamic bars rendered here -->
+          </div>
+        </div>
+
+        <!-- 3. Distribuição por Versão do Smart -->
+        <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="ti ti-versions text-purple-400"></i>
+                <span>Distribuição por Versão do Smart</span>
+              </h3>
+              <p class="text-xs text-slate-400">Incidência em versões atuais vs legadas</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#252525] text-slate-400 border border-[#2a2a2a]">Builds</span>
+          </div>
+          <div id="smartBarVersao" class="smart-bar-list">
+            <!-- Dynamic bars rendered here -->
+          </div>
+        </div>
+
+        <!-- 4. Dispositivos & Modelos POS -->
+        <div class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="ti ti-device-mobile text-emerald-400"></i>
+                <span>Dispositivos &amp; Modelos POS</span>
+              </h3>
+              <p class="text-xs text-slate-400">Modelos de terminais com mais relatos de erro</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#252525] text-slate-400 border border-[#2a2a2a]">Hardware</span>
+          </div>
+          <div id="smartBarModelo" class="smart-bar-list">
+            <!-- Dynamic bars rendered here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Qualidade do Preenchimento dos Relatórios -->
+      <section class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 shadow-xl space-y-3">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="ti ti-clipboard-check text-emerald-400"></i>
+            <span>Qualidade do Preenchimento dos Relatórios</span>
+          </h3>
+          <p class="text-xs text-slate-400">Índice de riqueza técnica dos chamados gerados pela equipe do plantão</p>
+        </div>
+
+        <div id="smartQualityBars" class="smart-quality-bars">
+          <!-- Dynamic quality bars -->
+        </div>
+      </section>
+
+      <!-- Histórico Analítico de Casos Smart -->
+      <section class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#2a2a2a]">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="ti ti-history text-cyan-400"></i>
+              <span>Histórico Analítico de Casos Smart</span>
+            </h3>
+            <p id="smartTabelaSubtitle" class="text-xs text-slate-400 mt-0.5">Exibindo registros no período selecionado</p>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center gap-2">
+            <span id="smartCasosTotalCountBadge" class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono font-bold border border-cyan-500/30">0 casos</span>
+          </div>
+        </div>
+
+        <!-- Toolbar de Filtros e Busca -->
+        <div class="smart-filter-toolbar">
+          <div class="smart-filter-inputs">
+            <div class="smart-search-box">
+              <i class="ti ti-search smart-search-icon"></i>
+              <input
+                id="smartSearchInput"
+                type="text"
+                class="smart-search-input"
+                placeholder="Buscar por registro, cliente, CNPJ, resumo, caminho..."
+                oninput="onSmartSearchChange(this.value)"
+                aria-label="Buscar casos"
+              />
+              <button
+                id="smartSearchClearBtn"
+                type="button"
+                class="smart-search-clear hidden"
+                onclick="limparBuscaSmart()"
+                aria-label="Limpar busca"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div class="smart-filter-select-group">
+              <!-- Filtro Tipo -->
+              <select
+                id="smartFiltroTipo"
+                class="bg-[#252525] border border-[#2a2a2a] text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-400"
+                onchange="onSmartFiltroChange()"
+                aria-label="Filtrar por tipo"
+              >
+                <option value="todos">Todos os Tipos</option>
+                <option value="Bug">🪲 Apenas Bugs</option>
+                <option value="Melhoria">💡 Apenas Melhorias</option>
+              </select>
+
+              <!-- Filtro Adquirente -->
+              <select
+                id="smartFiltroAdquirente"
+                class="bg-[#252525] border border-[#2a2a2a] text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-400"
+                onchange="onSmartFiltroChange()"
+                aria-label="Filtrar por adquirente"
+              >
+                <option value="todas">Todas as Adquirentes</option>
+                <!-- Preenchido via JS -->
+              </select>
+
+              <!-- Filtro Conexão -->
+              <select
+                id="smartFiltroConexao"
+                class="bg-[#252525] border border-[#2a2a2a] text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-400"
+                onchange="onSmartFiltroChange()"
+                aria-label="Filtrar por conexão"
+              >
+                <option value="todas">Todas as Conexões</option>
+                <option value="Wi-Fi">Wi-Fi</option>
+                <option value="4G / Dados Móveis">4G / Dados Móveis</option>
+                <option value="Wi-Fi + 4G">Wi-Fi + 4G</option>
+                <option value="Ethernet / Cabo">Ethernet / Cabo</option>
+              </select>
+
+              <!-- Filtro Qualidade -->
+              <select
+                id="smartFiltroQualidade"
+                class="bg-[#252525] border border-[#2a2a2a] text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-400"
+                onchange="onSmartFiltroChange()"
+                aria-label="Filtrar por qualidade"
+              >
+                <option value="todas">Todas as Qualidades</option>
+                <option value="excelente">Excelente (&ge; 85%)</option>
+                <option value="bom">Bom (70-84%)</option>
+                <option value="critico">Atenção (&lt; 70%)</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            id="smartBtnLimparFiltros"
+            type="button"
+            class="px-2.5 py-1.5 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs text-slate-300 hidden items-center gap-1 transition"
+            onclick="limparTodosFiltrosSmart()"
+          >
+            <i class="ti ti-x text-rose-400"></i>
+            <span>Limpar Filtros</span>
+          </button>
+        </div>
+
+        <!-- Tabela Responsiva de Casos -->
+        <div id="smartCasosTabelaWrapper" class="smart-table-wrapper">
+          <table class="smart-table">
+            <thead>
+              <tr>
+                <th scope="col">Data / Hora</th>
+                <th scope="col">Cliente / Registro</th>
+                <th scope="col">Dispositivo POS</th>
+                <th scope="col">Caminho &amp; Ocorrência</th>
+                <th scope="col" style="text-align: center;">Qualidade</th>
+                <th scope="col">Evidências</th>
+                <th scope="col" style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="smartCasosTabelaBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vazio da Tabela -->
+        <div id="smartCasosEmptyState" class="hidden text-center py-12 px-4 space-y-3">
+          <div class="w-12 h-12 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-2xl mx-auto border border-cyan-500/20">
+            <i class="ti ti-inbox"></i>
+          </div>
+          <h4 class="text-sm font-bold text-white">Nenhum caso encontrado</h4>
+          <p id="smartCasosEmptyText" class="text-xs text-slate-400 max-w-md mx-auto">
+            Nenhum registro corresponde aos filtros selecionados. Tente ajustar os termos de busca ou utilize o Gerador de Casos para registrar novos chamados.
+          </p>
+          <button
+            type="button"
+            onclick="switchMainView('smartGerador')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition"
+          >
+            <i class="ti ti-plus"></i>
+            <span>Registrar Novo Caso no Gerador</span>
+          </button>
+        </div>
+      </section>
+    </div>
+    <!-- /smartDashboardModuleContainer -->
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 5: GERADOR DE CASO SMART POS                                   -->
+    <!-- ===================================================================== -->
+    <div id="smartGeradorModuleContainer" class="space-y-6 hidden">
+      <!-- Header do Gerador Smart -->
+      <header class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
+            <i class="ti ti-device-mobile"></i>
+            <span>Padronização de Casos &bull; Service Desk &amp; Plantão</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+            <i class="ti ti-device-mobile text-emerald-400"></i>
+            <span>Softcom Smart</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            Padronização de Casos &amp; Registro de Erros Smart POS com validação de qualidade em tempo real.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onclick="switchMainView('smartDashboard')"
+            class="px-3 py-2 rounded-xl bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-cyan-400 flex items-center gap-1.5 transition active:scale-95"
+            title="Abrir Dashboard analítico com métricas, gráficos e histórico de Casos Smart"
+          >
+            <i class="ti ti-chart-bar"></i>
+            <span>Ver Dashboard</span>
+          </button>
+
+          <button
+            id="smartBtnSalvarTopo"
+            type="button"
+            onclick="handleSalvarCasoSmart()"
+            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition active:scale-95"
+            title="Salvar este caso no banco de dados do Supabase"
+          >
+            <i class="ti ti-device-floppy"></i>
+            <span id="smartBtnSalvarTopoText">Salvar Caso no Banco</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="carregarModeloVazioSmart()"
+            class="px-3 py-2 rounded-xl bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition active:scale-95"
+            title="Gerar modelo em branco"
+          >
+            <i class="ti ti-file"></i>
+            <span>Modelo Vazio</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="carregarExemploSmart()"
+            class="px-3 py-2 rounded-xl bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-[#fbbf24] flex items-center gap-1.5 transition active:scale-95"
+            title="Carregar exemplo homologado completo"
+          >
+            <i class="ti ti-bolt"></i>
+            <span>Carregar Exemplo</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="limparFormularioSmart()"
+            class="btn-danger-soft px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition active:scale-95"
+            title="Limpar formulário"
+          >
+            <i class="ti ti-trash"></i>
+            <span>Limpar</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Status Bar & Quality Score Header -->
+      <div class="smart-status-bar">
+        <div class="smart-status-info">
+          <span class="smart-info-icon" aria-hidden="true">
+            <i class="ti ti-info-circle text-[12px]"></i>
+          </span>
+          <span class="text-xs text-slate-300">
+            Produto fixado como <strong class="text-white">Smart</strong>. Os dispositivos são filtrados dinamicamente pela adquirência.
+          </span>
+        </div>
+
+        <div class="smart-quality-box">
+          <span class="smart-quality-label text-xs">Qualidade do Chamado:</span>
+          <div class="smart-progress-track">
+            <div
+              id="smartScoreFill"
+              class="smart-progress-fill score-success"
+              style="width: 100%;"
+            ></div>
+          </div>
+          <span id="smartScoreText" class="smart-quality-score score-success">
+            100%
+          </span>
+        </div>
+      </div>
+
+      <!-- Layout 2 Colunas: Formulário + Preview/Checklist -->
+      <div class="smart-layout">
+        <!-- Coluna Esquerda: Formulário Estruturado -->
+        <div class="smart-form-col">
+          <!-- 1. IDENTIFICAÇÃO DO CLIENTE -->
+          <section class="smart-panel">
+            <div class="smart-panel-header">
+              <div class="smart-step-num num-cyan">1</div>
+              <div>
+                <h3 class="smart-panel-title">
+                  <i class="ti ti-user text-cyan-400 smart-panel-icon"></i>
+                  <span>Identificação do Cliente</span>
+                </h3>
+                <p class="smart-panel-desc">Informações da conta e acesso ao ambiente</p>
+              </div>
+            </div>
+
+            <div class="smart-grid-2">
+              <div>
+                <label class="smart-label" for="smart-numero-caso">Número do Caso</label>
+                <div class="flex items-center bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 focus-within:border-cyan-400">
+                  <span class="text-slate-400 text-xs font-mono mr-1.5">#</span>
+                  <input
+                    id="smart-numero-caso"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="Ex: 104592"
+                    class="bg-transparent border-none outline-none text-xs text-white w-full"
+                    oninput="atualizarCampoSmart('numeroCaso', this.value.replace(/\D/g, ''))"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-registro">Registro <span class="text-rose-400 font-bold">*</span></label>
+                <div class="flex items-center bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 focus-within:border-cyan-400">
+                  <span class="text-slate-400 text-xs font-mono mr-1.5">Nº</span>
+                  <input
+                    id="smart-registro"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="Ex: 65190"
+                    class="bg-transparent border-none outline-none text-xs text-white w-full"
+                    oninput="atualizarCampoSmart('registro', this.value.replace(/\D/g, ''))"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-nome">Nome do Cliente</label>
+                <input
+                  id="smart-nome"
+                  type="text"
+                  placeholder="Ex: Mercado Silva LTDA"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('nome', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-cnpj">CNPJ (quando necessário)</label>
+                <input
+                  id="smart-cnpj"
+                  type="text"
+                  placeholder="Ex: 00.000.000/0001-00"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('cnpj', this.value)"
+                />
+              </div>
+
+              <div class="col-span-2">
+                <label class="smart-label" for="smart-link-cliente">Link do Sistema</label>
+                <input
+                  id="smart-link-cliente"
+                  type="url"
+                  placeholder="Ex: https://exemplo.meusoftcom.com.br/"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkCliente', this.value)"
+                />
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. DISPOSITIVO & ADQUIRÊNCIA SMART -->
+          <section class="smart-panel smart-panel-highlight">
+            <div class="smart-panel-header justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="smart-step-num num-cyan">2</div>
+                <div>
+                  <h3 class="smart-panel-title">
+                    <i class="ti ti-device-mobile text-cyan-400 smart-panel-icon"></i>
+                    <span>Dispositivo &amp; Adquirência Smart</span>
+                  </h3>
+                  <p class="smart-panel-desc">Configurações técnicas homologadas para o terminal POS</p>
+                </div>
+              </div>
+              <span id="smartBadgeHomologado" class="smart-badge-homologado active">
+                Selecione a Adquirência
+              </span>
+            </div>
+
+            <div class="smart-grid-2">
+              <div>
+                <label class="smart-label" for="smart-adquirente">Adquirência <span class="text-rose-400 font-bold">*</span></label>
+                <select
+                  id="smart-adquirente"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  onchange="onAdquirenteChangeSmart(this.value)"
+                >
+                  <option value="">Selecione a adquirência...</option>
+                  <!-- Preenchido via JS -->
+                </select>
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-versao">Versão Atual <span class="text-rose-400 font-bold">*</span></label>
+                <input
+                  id="smart-versao"
+                  type="text"
+                  placeholder="Ex: 8.0.0.0"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white font-mono outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('versao', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-conexao">Conexão <span class="text-rose-400 font-bold">*</span></label>
+                <select
+                  id="smart-conexao"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  onchange="atualizarCampoSmart('conexao', this.value)"
+                >
+                  <option value="">Selecione o tipo de conexão...</option>
+                  <option value="Wi-Fi">Wi-Fi</option>
+                  <option value="4G / Dados Móveis">4G / Dados Móveis</option>
+                  <option value="Wi-Fi + 4G">Wi-Fi + 4G</option>
+                  <option value="Ethernet / Cabo">Ethernet / Cabo</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-modelo">Modelo do Dispositivo <span class="text-rose-400 font-bold">*</span></label>
+                <select
+                  id="smart-modelo"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  onchange="atualizarCampoSmart('modelo', this.value)"
+                >
+                  <option value="">Selecione a adquirência primeiro...</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. LINHA DE CABEÇALHO (SMART) -->
+          <section class="smart-panel">
+            <div class="smart-panel-header">
+              <div class="smart-step-num num-blue">3</div>
+              <div>
+                <h3 class="smart-panel-title">
+                  <i class="ti ti-layout-navbar text-blue-400 smart-panel-icon"></i>
+                  <span>Linha de Cabeçalho (Smart)</span>
+                </h3>
+                <p class="smart-panel-desc">Formato: Smart &gt; Caminho em tela: descrição resumida</p>
+              </div>
+            </div>
+
+            <div class="smart-grid-2">
+              <div>
+                <label class="smart-label">Tipo de Demanda <span class="text-rose-400 font-bold">*</span></label>
+                <div class="smart-type-buttons">
+                  <button
+                    type="button"
+                    id="smartTypeBtnBug"
+                    class="smart-type-btn active bug"
+                    onclick="setTipoSmart('Bug')"
+                  >
+                    <span>🪲</span>
+                    <span>Bug / Falha</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="smartTypeBtnMelhoria"
+                    class="smart-type-btn"
+                    onclick="setTipoSmart('Melhoria')"
+                  >
+                    <span>💡</span>
+                    <span>Melhoria</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-caminho">Caminho em Tela no Smart <span class="text-rose-400 font-bold">*</span></label>
+                <input
+                  id="smart-caminho"
+                  type="text"
+                  placeholder="Ex: Mesas>Comanda>Lançamento de Itens"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('caminho', this.value)"
+                />
+              </div>
+
+              <div class="col-span-2">
+                <div class="smart-label-row">
+                  <label class="smart-label" for="smart-resumo">
+                    Descrição Resumida (máx. 180 caracteres) <span class="text-rose-400 font-bold">*</span>
+                  </label>
+                  <span id="smartCharCounter" class="smart-char-counter">0 / 180</span>
+                </div>
+                <input
+                  id="smart-resumo"
+                  type="text"
+                  maxlength="180"
+                  placeholder="Ex: Ao selecionar observação personalizada no produto, o app do Smart fecha abruptamente."
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('resumo', this.value)"
+                />
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. DETALHAMENTO DINÂMICO -->
+          <section class="smart-panel">
+            <div class="smart-panel-header justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="smart-step-num num-indigo">4</div>
+                <div>
+                  <h3 class="smart-panel-title">
+                    <i class="ti ti-list-details text-indigo-400 smart-panel-icon"></i>
+                    <span>Detalhamento Dinâmico</span>
+                  </h3>
+                  <p class="smart-panel-desc">Estrutura de itens: 1 -, 1.1 -, 1.2 -, etc.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onclick="addDescGroupSmart()"
+                class="px-2.5 py-1 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-cyan-400 transition"
+              >
+                + Add Item Principal
+              </button>
+            </div>
+
+            <div id="smartDescListContainer" class="smart-desc-list">
+              <!-- Dynamic description groups rendered here -->
+            </div>
+          </section>
+
+          <!-- 5. PASSOS A REPRODUZIR -->
+          <section class="smart-panel">
+            <div class="smart-panel-header justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="smart-step-num num-emerald">5</div>
+                <div>
+                  <h3 class="smart-panel-title">
+                    <i class="ti ti-player-play text-emerald-400 smart-panel-icon"></i>
+                    <span>Passos a Reproduzir no Smart</span>
+                  </h3>
+                  <p class="smart-panel-desc">Passos sequenciais curtos (1-, 2-, ...)</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onclick="addStepSmart()"
+                class="px-2.5 py-1 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-emerald-400 transition"
+              >
+                + Add Passo
+              </button>
+            </div>
+
+            <div id="smartStepsContainer" class="smart-steps-list">
+              <!-- Dynamic steps rendered here -->
+            </div>
+          </section>
+
+          <!-- 6. EVIDÊNCIAS & ANEXOS -->
+          <section class="smart-panel">
+            <div class="smart-panel-header">
+              <div class="smart-step-num num-purple">6</div>
+              <div>
+                <h3 class="smart-panel-title">
+                  <i class="ti ti-paperclip text-purple-400 smart-panel-icon"></i>
+                  <span>Evidências &amp; Anexos</span>
+                </h3>
+                <p class="smart-panel-desc">Links de prints, vídeos e registros de conversa</p>
+              </div>
+            </div>
+
+            <div class="smart-grid-2">
+              <div class="col-span-2">
+                <label class="smart-label" for="smart-hedgedoc">🔗 Link do HedgeDoc / Servidor de Retaguarda</label>
+                <input
+                  id="smart-hedgedoc"
+                  type="url"
+                  placeholder="Ex: https://hedgedoc.softhubs.com.br/..."
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkHedgedoc', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-print">📷 [Print] Link do Print da Tela</label>
+                <input
+                  id="smart-print"
+                  type="text"
+                  placeholder="Link do print"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkPrint', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-video">🎥 [Vídeo] Gravação da Operação</label>
+                <input
+                  id="smart-video"
+                  type="text"
+                  placeholder="Link do vídeo gravado"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkVideo', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-arquivo">📁 [Arquivo] Log / Arquivo Anexo</label>
+                <input
+                  id="smart-arquivo"
+                  type="text"
+                  placeholder="Link do arquivo no Discord"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkArquivo', this.value)"
+                />
+              </div>
+
+              <div>
+                <label class="smart-label" for="smart-discord">💬 Thread de Conversa no Discord</label>
+                <input
+                  id="smart-discord"
+                  type="text"
+                  placeholder="Ex: Discord: #smart-mobile > caso-obs-fechando"
+                  class="w-full bg-[#252525] border border-[#333] rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-400"
+                  oninput="atualizarCampoSmart('linkDiscord', this.value)"
+                />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Coluna Direita: Live Markdown Preview & Checklist Técnico -->
+        <div class="smart-preview-col">
+          <div class="smart-sticky-panel">
+            <!-- Relatório Formatado Markdown -->
+            <div class="smart-panel smart-panel-preview">
+              <div class="smart-panel-header justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="smart-md-badge" aria-hidden="true">M&darr;</span>
+                  <h3 class="smart-panel-subtitle">Relatório Smart Formatado</h3>
+                </div>
+                <span class="smart-badge-pattern">Padrão Equipe</span>
+              </div>
+
+              <p class="smart-preview-hint">
+                Pronto para envio nos chamados e tickets do time:
+              </p>
+
+              <div class="smart-output-wrap">
+                <textarea
+                  id="smartOutputMarkdown"
+                  class="smart-output-textarea"
+                  readonly
+                  spellcheck="false"
+                  aria-label="Código markdown do relatório Smart"
+                ></textarea>
+
+                <button
+                  type="button"
+                  onclick="copiarRelatorioSmartAtual()"
+                  class="smart-copy-btn active:scale-95"
+                  title="Copiar relatório formatado para a área de transferência"
+                >
+                  <i class="ti ti-copy"></i>
+                  <span>Copiar Relatório (Markdown)</span>
+                </button>
+
+                <button
+                  id="smartBtnSalvarLateral"
+                  type="button"
+                  onclick="handleSalvarCasoSmart()"
+                  class="w-full py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95"
+                  title="Salvar este caso no banco de dados do Supabase"
+                >
+                  <i class="ti ti-device-floppy"></i>
+                  <span>Salvar Caso no Banco</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Painel de Checklist de Qualidade Técnica -->
+            <div class="smart-checklist-panel">
+              <h4 class="smart-checklist-title">
+                <i class="ti ti-list-check text-emerald-400"></i>
+                <span>Checklist de Qualidade Técnica</span>
+              </h4>
+
+              <ul class="smart-checklist-items">
+                <li id="smartChkCliente" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Registro do cliente informado (15%)</span>
+                </li>
+                <li id="smartChkDevice" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Adquirente, Versão, Conexão e Modelo (15%)</span>
+                </li>
+                <li id="smartChkCaminho" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Cabeçalho Smart &gt; Caminho: Resumo (15%)</span>
+                </li>
+                <li id="smartChkResumo" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Resumo dentro do limite (&le; 180 chars) (15%)</span>
+                </li>
+                <li id="smartChkDesc" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Descrição com itens 1 - e 1.1 - (15%)</span>
+                </li>
+                <li id="smartChkSteps" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Passos a reproduzir (1-, 2-) (15%)</span>
+                </li>
+                <li id="smartChkEvid" class="smart-chk-item">
+                  <span class="smart-chk-icon">&times;</span>
+                  <span>Evidência anexada (Print/Vídeo/Discord) (10%)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção Histórico de Casos Salvos no Gerador -->
+      <section class="smart-history-section">
+        <div class="smart-history-header">
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              class="smart-history-toggle"
+              onclick="toggleHistoricoGeradorSmart()"
+              aria-expanded="true"
+            >
+              <span id="smartHistoryArrow" class="smart-history-arrow">&minus;</span>
+              <i class="ti ti-database text-cyan-400"></i>
+              <h3 class="smart-history-title">Casos Smart Salvos no Banco</h3>
+            </button>
+            <span id="smartHistoryCountBadge" class="smart-history-count">0 registros</span>
+          </div>
+
+          <div class="smart-history-filters">
+            <input
+              id="smartHistorySearchInput"
+              type="text"
+              class="smart-history-search"
+              placeholder="Filtrar por registro, cliente, adquirente..."
+              oninput="onSmartHistorySearchChange(this.value)"
+              aria-label="Filtrar casos salvos"
+            />
+            <button
+              type="button"
+              class="px-2.5 py-1.5 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs text-slate-300 flex items-center gap-1 transition"
+              onclick="carregarCasosSmart()"
+              title="Atualizar lista do banco"
+            >
+              <i class="ti ti-refresh text-cyan-400"></i>
+              <span>Atualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="smartHistoryContent" class="smart-history-content">
+          <div id="smartHistoryGrid" class="smart-history-grid">
+            <!-- Dynamic saved case cards rendered here -->
+          </div>
+          <div id="smartHistoryEmpty" class="smart-history-empty hidden">
+            <i class="ti ti-inbox text-3xl text-slate-500 mb-2"></i>
+            <p class="text-sm font-semibold text-slate-300">Nenhum caso Smart encontrado no banco de dados.</p>
+            <span class="smart-empty-hint text-xs text-slate-500">
+              Preencha o formulário acima e clique em <strong>Salvar Caso no Banco</strong> para gravar.
+            </span>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- /smartGeradorModuleContainer -->
+
   </main>
 
   <!-- Feature 3: MODAL DE PASSAGEM FORMAL DE TURNO PARA O PLANTÃO (19:00) -->
@@ -1507,6 +3254,47 @@
           <button onclick="copyPlantaoHandoverText()" class="btn-accent px-4 py-2 text-xs font-bold flex items-center gap-2 active:scale-95">
             <i class="ti ti-copy"></i>
             <span>Copiar WhatsApp</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalhes do Caso Smart -->
+  <div id="smartCaseDetailModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#18181b] border border-[#2a2a2a] rounded-2xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between pb-3 border-b border-[#2a2a2a]">
+        <div>
+          <div class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-1">Detalhes do Caso Smart</div>
+          <h3 id="smartDetailModalTitle" class="text-lg sm:text-xl font-black text-white">
+            Cliente #00000 &bull; Sem nome
+          </h3>
+        </div>
+        <button onclick="fecharDetalhesCasoSmart()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-[#252525] text-lg font-bold">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div id="smartDetailModalBadges" class="flex items-center gap-2 flex-wrap">
+        <!-- Badges rendered dynamically -->
+      </div>
+
+      <div id="smartDetailModalBody" class="space-y-4 text-xs text-slate-300">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="pt-4 border-t border-[#2a2a2a] flex items-center justify-between gap-3 flex-wrap">
+        <button onclick="fecharDetalhesCasoSmart()" class="btn-outline px-4 py-2 text-xs font-bold">
+          Fechar
+        </button>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="smartDetailBtnGerador" onclick="" class="px-4 py-2 text-xs font-bold rounded-lg text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition flex items-center gap-1.5 active:scale-95">
+            <i class="ti ti-edit"></i>
+            <span>Abrir no Gerador</span>
+          </button>
+          <button id="smartDetailBtnCopiar" onclick="" class="btn-accent px-4 py-2 text-xs font-bold flex items-center gap-1.5 active:scale-95">
+            <i class="ti ti-copy"></i>
+            <span>Copiar Relatório</span>
           </button>
         </div>
       </div>
@@ -3764,6 +5552,10 @@ CREATE POLICY "plantaonoturno_ligacoes_all" ON public.plantaonoturno_ligacoes FO
 ALTER TABLE IF EXISTS public.plantaonoturno_agenda_indevida ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "plantaonoturno_agenda_all" ON public.plantaonoturno_agenda_indevida;
 CREATE POLICY "plantaonoturno_agenda_all" ON public.plantaonoturno_agenda_indevida FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.plantaonoturno_casos_smart ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "plantaonoturno_casos_smart_all" ON public.plantaonoturno_casos_smart;
+CREATE POLICY "plantaonoturno_casos_smart_all" ON public.plantaonoturno_casos_smart FOR ALL USING (true) WITH CHECK (true);
 
 -- Habilitar leitura pública dos perfis para o Dashboard (ADMIN para o login e TIME para equipe)
 DROP POLICY IF EXISTS "Permitir leitura de admins para todos" ON public.profiles;
@@ -7264,7 +9056,7 @@ END \$\$;
     // =========================================================================
 
     function switchMainView(viewName) {
-      if (!['routine', 'plantao', 'agenda', 'all'].includes(viewName)) viewName = 'routine';
+      if (!['routine', 'plantao', 'agenda', 'smartDashboard', 'smartGerador', 'all'].includes(viewName)) viewName = 'routine';
       currentMainView = viewName;
       try {
         localStorage.setItem('rotina_active_module_view', viewName);
@@ -7277,16 +9069,22 @@ END \$\$;
       const routineBtn = document.getElementById('moduleTab-routine');
       const plantaoBtn = document.getElementById('moduleTab-plantao');
       const agendaBtn = document.getElementById('moduleTab-agenda');
+      const smartDashBtn = document.getElementById('moduleTab-smartDashboard');
+      const smartGeradorBtn = document.getElementById('moduleTab-smartGerador');
       const allBtn = document.getElementById('moduleTab-all');
 
       if (routineBtn) routineBtn.classList.toggle('active', currentMainView === 'routine');
       if (plantaoBtn) plantaoBtn.classList.toggle('active', currentMainView === 'plantao');
       if (agendaBtn) agendaBtn.classList.toggle('active', currentMainView === 'agenda');
+      if (smartDashBtn) smartDashBtn.classList.toggle('active', currentMainView === 'smartDashboard');
+      if (smartGeradorBtn) smartGeradorBtn.classList.toggle('active', currentMainView === 'smartGerador');
       if (allBtn) allBtn.classList.toggle('active', currentMainView === 'all');
 
       const routineContainer = document.getElementById('routineModuleContainer');
       const plantaoContainer = document.getElementById('plantaoModuleContainer');
       const agendaContainer = document.getElementById('agendaModuleContainer');
+      const smartDashContainer = document.getElementById('smartDashboardModuleContainer');
+      const smartGeradorContainer = document.getElementById('smartGeradorModuleContainer');
       const timelineFilterRow = document.getElementById('timelineFilterButtonsRow');
 
       if (routineContainer) {
@@ -7298,8 +9096,14 @@ END \$\$;
       if (agendaContainer) {
         agendaContainer.classList.toggle('hidden', currentMainView !== 'agenda' && currentMainView !== 'all');
       }
+      if (smartDashContainer) {
+        smartDashContainer.classList.toggle('hidden', currentMainView !== 'smartDashboard' && currentMainView !== 'all');
+      }
+      if (smartGeradorContainer) {
+        smartGeradorContainer.classList.toggle('hidden', currentMainView !== 'smartGerador' && currentMainView !== 'all');
+      }
       if (timelineFilterRow) {
-        timelineFilterRow.classList.toggle('hidden', currentMainView === 'plantao' || currentMainView === 'agenda');
+        timelineFilterRow.classList.toggle('hidden', currentMainView !== 'routine' && currentMainView !== 'all');
       }
     }
 
@@ -8261,6 +10065,1777 @@ END \$\$;
       });
     }
 
+    // =========================================================================
+    // MÓDULOS 4 & 5: GERADOR DE CASOS SMART & DASHBOARD SMART (INTEGRADOS)
+    // =========================================================================
+
+    const ADQUIRENTES_CONFIG = {
+      Playstore: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['Smartphone Android']
+      },
+      Rede: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['L400', 'N960K']
+      },
+      Stone: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['L400', 'P2', 'GPOS700X', 'A8', 'T8', 'L300', 'P2 A11', 'GPOS730']
+      },
+      Pagbank: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['P2', 'A50', 'A920', 'A930', 'SK800']
+      },
+      Cielo: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['Lio v3', 'L400', 'L300', 'DX8000', 'GPOS720']
+      },
+      Getnet: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['P3', 'P2', 'DX8000', 'A8', 'N920']
+      },
+      Safrapay: {
+        versao: '7.0.1.0',
+        conexao: 'Wi-Fi',
+        modelos: ['P3', 'A8', 'P2']
+      },
+      'Sicoob/Sipag': {
+        versao: '7.0.1.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['DX8000', 'P2', 'X990', 'X990 Plus', 'X990 Pro']
+      },
+      'Fiserv Caixa/Bin/Sicredi': {
+        versao: '6.1.6.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['DX8000', 'P2']
+      },
+      'Mercado Pago': {
+        versao: '7.0.1.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['N950']
+      },
+      Clover: {
+        versao: '8.0.0.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['Clover Flex 3 (C405)']
+      },
+      Quickpay: {
+        versao: '6.0.7.0',
+        conexao: 'Wi-Fi + 4G',
+        modelos: ['GPOS720', 'A910']
+      }
+    };
+
+    const CONEXOES_SMART = [
+      'Wi-Fi',
+      '4G / Dados Móveis',
+      'Wi-Fi + 4G',
+      'Ethernet / Cabo'
+    ];
+
+    const ESTADO_SMART_VAZIO = {
+      tipo: 'Bug',
+      numeroCaso: '',
+      registro: '',
+      nome: '',
+      linkCliente: '',
+      cnpj: '',
+      adquirente: '',
+      versao: '',
+      conexao: '',
+      modelo: '',
+      produto: 'Smart',
+      caminho: '',
+      resumo: '',
+      descricoes: [{ id: '1', main: '', subs: [''], img: '' }],
+      passos: [''],
+      linkHedgedoc: '',
+      linkPrint: '',
+      linkVideo: '',
+      linkArquivo: '',
+      linkDiscord: ''
+    };
+
+    const EXEMPLO_SMART = {
+      tipo: 'Bug',
+      numeroCaso: '104829',
+      registro: '58410',
+      nome: 'Restaurante Sabor & Arte',
+      linkCliente: 'https://saborarte.meusoftcom.com.br/',
+      cnpj: '12.345.678/0001-99',
+      adquirente: 'Stone',
+      versao: '8.0.0.0',
+      conexao: 'Wi-Fi + 4G',
+      modelo: 'L400',
+      produto: 'Smart',
+      caminho: 'Mesas>Comanda>Lançamento de Itens',
+      resumo: 'Ao selecionar observação personalizada no produto, o app do Smart fecha abruptamente.',
+      descricoes: [
+        {
+          id: 'd-1',
+          main: 'Ao abrir o Smart e acessar o atendimento de mesa:',
+          subs: ['Mesas > Mesa 04 > Adicionar Produto', 'Selecionar produto com complementos'],
+          img: 'https://hedgedoc.softhubs.com.br/uploads/49851b87-39c8-4d08-9b08-fe6e293e1cb5.png'
+        },
+        {
+          id: 'd-2',
+          main: 'Tentar incluir texto livre nas observações:',
+          subs: ["Clicar no campo 'Observações'", 'Digitar instrução personalizada e confirmar'],
+          img: 'https://hedgedoc.softhubs.com.br/uploads/d908358b-050f-4c3f-b7b4-1437d8e5497b.png'
+        },
+        {
+          id: 'd-3',
+          main: 'Ao clicar em Confirmar Lançamento:',
+          subs: ['O aplicativo fecha inesperadamente retornando para a tela inicial da maquininha'],
+          img: 'https://hedgedoc.softhubs.com.br/uploads/38ebb9c9-6809-4860-b948-aaa277fdbe98.png'
+        }
+      ],
+      passos: [
+        'Realizar login no aplicativo Smart',
+        'Acessar o mapa de mesas',
+        'Abrir a mesa 04',
+        'Selecionar o item com adicionais',
+        'Digitar uma observação e salvar'
+      ],
+      linkHedgedoc: 'https://hedgedoc.softhubs.com.br/smart-bug-obs',
+      linkPrint: 'https://hedgedoc.softhubs.com.br/uploads/smart-crash.png',
+      linkVideo: 'https://drive.google.com/file/d/smart-video-crash',
+      linkArquivo: 'https://cdn.discordapp.com/attachments/log-smart.txt',
+      linkDiscord: 'Discord: #smart-mobile > caso-obs-fechando'
+    };
+
+    // Estados locais dos Módulos Smart
+    let smartFormState = JSON.parse(JSON.stringify(EXEMPLO_SMART));
+    let smartCasosList = [];
+    let smartPeriodo = '30';
+    let smartFiltroTipo = 'todos';
+    let smartFiltroAdquirente = 'todas';
+    let smartFiltroConexao = 'todas';
+    let smartFiltroQualidade = 'todas';
+    let smartBusca = '';
+    let smartHistorySearch = '';
+    let smartHistoricoExpandido = true;
+    let smartCasoSelecionado = null;
+    let isSavingSmartCaso = false;
+
+    const CACHE_KEY_SMART_CASOS = 'rotina_casos_smart_cache';
+
+    function validarChecklistSmart(form) {
+      const hasCliente = Boolean(form.registro && form.registro.trim());
+      const hasDevice = Boolean(
+        form.adquirente && form.adquirente.trim() &&
+        form.versao && form.versao.trim() &&
+        form.conexao && form.conexao.trim() &&
+        form.modelo && form.modelo.trim()
+      );
+      const hasCaminho = Boolean(form.caminho && form.caminho.trim());
+      const resumoTrim = (form.resumo || '').trim();
+      const resumoValid = Boolean(resumoTrim && resumoTrim.length <= 180);
+
+      const descricoes = Array.isArray(form.descricoes) ? form.descricoes : [];
+      const descValid = descricoes.some(g => g.main && g.main.trim().length > 0);
+
+      const passos = Array.isArray(form.passos) ? form.passos : [];
+      const validSteps = passos.filter(s => s && s.trim().length > 0);
+      const stepsValid = validSteps.length >= 2;
+
+      const temEvidencia = Boolean(
+        (form.linkHedgedoc && form.linkHedgedoc.trim()) ||
+        (form.linkPrint && form.linkPrint.trim()) ||
+        (form.linkVideo && form.linkVideo.trim()) ||
+        (form.linkArquivo && form.linkArquivo.trim()) ||
+        (form.linkDiscord && form.linkDiscord.trim()) ||
+        (form.linkCliente && form.linkCliente.trim())
+      );
+
+      let score = 0;
+      if (hasCliente) score += 15;
+      if (hasDevice) score += 15;
+      if (hasCaminho) score += 15;
+      if (resumoValid) score += 15;
+      if (descValid) score += 15;
+      if (stepsValid) score += 15;
+      if (temEvidencia) score += 10;
+
+      return {
+        hasCliente,
+        hasDevice,
+        hasCaminho,
+        resumoValid,
+        descValid,
+        stepsValid,
+        evidValid: temEvidencia,
+        score
+      };
+    }
+
+    function gerarRelatorioSmart(form) {
+      const numeroCaso = (form.numeroCaso || '').trim();
+      const registro = (form.registro || '').trim();
+      const nome = (form.nome || '').trim();
+      const linkCliente = (form.linkCliente || '').trim();
+      const cnpj = (form.cnpj || '').trim();
+
+      const adquirente = (form.adquirente || '').trim();
+      const versao = (form.versao || '').trim();
+      const conexao = (form.conexao || '').trim();
+      const modelo = (form.modelo || '').trim();
+
+      const produto = 'Smart';
+      let caminho = (form.caminho || '').trim();
+      if (caminho) {
+        caminho = caminho.replace(/\s*>\s*/g, '>');
+      }
+      const resumo = (form.resumo || '').trim();
+
+      const linkHedge = (form.linkHedgedoc || '').trim();
+      const printEv = (form.linkPrint || '').trim();
+      const videoEv = (form.linkVideo || '').trim();
+      const arqEv = (form.linkArquivo || '').trim();
+      const discordEv = (form.linkDiscord || '').trim();
+
+      // 1) Metadados
+      let clienteInfo = '';
+      const tipo = form.tipo || 'Bug';
+      if (numeroCaso || registro || nome || cnpj || tipo) {
+        const infoItems = [];
+        if (numeroCaso) infoItems.push(`Caso: #${numeroCaso}`);
+        if (registro) infoItems.push(`Registro: ${registro}`);
+        if (nome) infoItems.push(`Cliente: ${nome}`);
+        if (cnpj) infoItems.push(`CNPJ: ${cnpj}`);
+        if (tipo) infoItems.push(`Tipo: ${tipo}`);
+        clienteInfo = `<!-- Identificação: ${infoItems.join(' | ')} -->\n`;
+      }
+
+      // 2) Cabeçalho: Smart > Caminho: Resumo
+      const camText = caminho || 'Não informado';
+      const resText = resumo || 'Não informado';
+      const headerLine = `${produto} > ${camText}: ${resText}`;
+
+      // 3) Descrição detalhada
+      const descLines = [];
+      const descricoes = Array.isArray(form.descricoes) ? form.descricoes : [];
+      descricoes.forEach((group, gIdx) => {
+        const mainText = (group.main || '').trim();
+        if (mainText) {
+          descLines.push(`${gIdx + 1} - ${mainText}`);
+          if (Array.isArray(group.subs)) {
+            group.subs.forEach((sub, sIdx) => {
+              if (sub && sub.trim()) {
+                descLines.push(`${gIdx + 1}.${sIdx + 1} - ${sub.trim()}`);
+              }
+            });
+          }
+          if (group.img && group.img.trim()) {
+            const imgUrl = group.img.trim();
+            descLines.push(imgUrl.startsWith('![](') ? imgUrl : `![](${imgUrl})`);
+          }
+          descLines.push('');
+        }
+      });
+
+      const detailedDescText = descLines.length > 0 ? descLines.join('\n').trim() : '1 - Não informado';
+
+      // 4) Passos a reproduzir
+      const passos = Array.isArray(form.passos) ? form.passos : [];
+      const validSteps = passos.filter(s => s && s.trim() !== '');
+      let stepsText = '';
+      if (validSteps.length > 0) {
+        stepsText = validSteps.map((s, i) => `${i + 1}- ${s.trim()}`).join('\n');
+      } else {
+        stepsText = '1- Não informado';
+      }
+
+      // 5) Evidências e Dados do Dispositivo
+      const dadosTerminal = [];
+      if (adquirente) dadosTerminal.push(`Adquirente: ${adquirente}`);
+      if (versao) dadosTerminal.push(`Versão Atual: ${versao}`);
+      if (conexao) dadosTerminal.push(`Conexão: ${conexao}`);
+      if (modelo) dadosTerminal.push(`Dispositivo: ${modelo}`);
+
+      const evidenciasList = [];
+      if (dadosTerminal.length > 0) {
+        evidenciasList.push(`[Terminal Smart] ${dadosTerminal.join(' | ')}`);
+      }
+      if (linkCliente) evidenciasList.push(linkCliente);
+      if (linkHedge) evidenciasList.push(linkHedge);
+      if (printEv) {
+        evidenciasList.push(printEv.startsWith('http') ? `[Print] ${printEv}` : printEv);
+      }
+      if (videoEv) evidenciasList.push(`[Vídeo] ${videoEv}`);
+      if (arqEv) evidenciasList.push(`[Arquivo] ${arqEv}`);
+      if (discordEv) evidenciasList.push(discordEv);
+
+      const evidenciasText = evidenciasList.length > 0 ? evidenciasList.join('\n') : 'Não informado';
+
+      // 6) Faltou:
+      const missingQuestions = [];
+      if (!registro) missingQuestions.push('Qual é o número de registro do cliente?');
+      if (!adquirente) missingQuestions.push('Qual é a adquirência do Smart (Playstore, Rede, Stone, Cielo, etc.)?');
+      if (!versao) missingQuestions.push('Qual é a versão atual do Smart instalada?');
+      if (!conexao) missingQuestions.push('Qual é a conexão utilizada (Wi-Fi ou 4G)?');
+      if (!modelo) missingQuestions.push('Qual é o modelo do dispositivo POS homologado?');
+      if (!caminho) missingQuestions.push('Qual é o caminho em tela no Smart?');
+      if (!resumo) missingQuestions.push('Qual é a descrição resumida do ocorrido?');
+      if (validSteps.length === 0) missingQuestions.push('Quais são os passos a reproduzir no Smart?');
+      if (evidenciasList.length === 0) missingQuestions.push('Tem link das prints, vídeos ou conversa no Discord?');
+
+      let finalReport = `${clienteInfo}${headerLine}\n\n${detailedDescText}\n\n**Passos a reproduzir:**\n${stepsText}\n\n**Evidências:**\n${evidenciasText}`;
+
+      if (missingQuestions.length > 0) {
+        finalReport += `\n\nFaltou:\n` + missingQuestions.map(q => `- ${q}`).join('\n');
+      }
+
+      return finalReport;
+    }
+
+    function atualizarPreviewEChecklistSmart() {
+      const chk = validarChecklistSmart(smartFormState);
+      const markdown = gerarRelatorioSmart(smartFormState);
+
+      const textarea = document.getElementById('smartOutputMarkdown');
+      if (textarea) textarea.value = markdown;
+
+      const fill = document.getElementById('smartScoreFill');
+      const scoreTxt = document.getElementById('smartScoreText');
+      if (fill && scoreTxt) {
+        fill.style.width = `${chk.score}%`;
+        fill.className = `smart-progress-fill ${chk.score <= 40 ? 'score-danger' : chk.score <= 75 ? 'score-warning' : 'score-success'}`;
+        scoreTxt.textContent = `${chk.score}%`;
+        scoreTxt.className = `smart-quality-score ${chk.score <= 40 ? 'score-danger' : chk.score <= 75 ? 'score-warning' : 'score-success'}`;
+      }
+
+      const counter = document.getElementById('smartCharCounter');
+      if (counter) {
+        const len = (smartFormState.resumo || '').length;
+        counter.textContent = `${len} / 180`;
+        counter.classList.toggle('counter-danger', len > 180);
+      }
+
+      function updateChkItem(elId, valid) {
+        const item = document.getElementById(elId);
+        if (!item) return;
+        item.classList.toggle('valid', valid);
+        const icon = item.querySelector('.smart-chk-icon');
+        if (icon) icon.innerHTML = valid ? '&check;' : '&times;';
+      }
+
+      updateChkItem('smartChkCliente', chk.hasCliente);
+      updateChkItem('smartChkDevice', chk.hasDevice);
+      updateChkItem('smartChkCaminho', chk.hasCaminho);
+      updateChkItem('smartChkResumo', chk.resumoValid);
+      updateChkItem('smartChkDesc', chk.descValid);
+      updateChkItem('smartChkSteps', chk.stepsValid);
+      updateChkItem('smartChkEvid', chk.evidValid);
+    }
+
+    function atualizarCampoSmart(campo, valor) {
+      smartFormState[campo] = valor;
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function setTipoSmart(tipo) {
+      smartFormState.tipo = tipo;
+      const btnBug = document.getElementById('smartTypeBtnBug');
+      const btnMelhoria = document.getElementById('smartTypeBtnMelhoria');
+      if (btnBug) btnBug.classList.toggle('active', tipo === 'Bug');
+      if (btnMelhoria) btnMelhoria.classList.toggle('active', tipo === 'Melhoria');
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function onAdquirenteChangeSmart(novaAdquirente) {
+      smartFormState.adquirente = novaAdquirente;
+      const config = ADQUIRENTES_CONFIG[novaAdquirente];
+
+      const badge = document.getElementById('smartBadgeHomologado');
+      const inputVersao = document.getElementById('smartFormVersao');
+      const selectConexao = document.getElementById('smartFormConexao');
+      const selectModelo = document.getElementById('smartFormModelo');
+
+      if (config) {
+        smartFormState.versao = config.versao;
+        smartFormState.conexao = config.conexao;
+        smartFormState.modelo = config.modelos.length === 1 ? config.modelos[0] : '';
+
+        if (badge) {
+          badge.textContent = `Homologado v${config.versao}`;
+          badge.classList.add('active');
+        }
+        if (inputVersao) inputVersao.value = config.versao;
+        if (selectConexao) selectConexao.value = config.conexao;
+
+        if (selectModelo) {
+          selectModelo.innerHTML = '<option value="">Selecione o modelo homologado...</option>' +
+            config.modelos.map(m => `<option value="${m}" ${m === smartFormState.modelo ? 'selected' : ''}>${m}</option>`).join('');
+        }
+      } else {
+        smartFormState.versao = '';
+        smartFormState.conexao = '';
+        smartFormState.modelo = '';
+
+        if (badge) {
+          badge.textContent = 'Selecione a Adquirência';
+          badge.classList.remove('active');
+        }
+        if (inputVersao) inputVersao.value = '';
+        if (selectConexao) selectConexao.value = '';
+        if (selectModelo) {
+          selectModelo.innerHTML = '<option value="">Selecione a adquirência primeiro...</option>';
+        }
+      }
+
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function addDescGroupSmart() {
+      if (!Array.isArray(smartFormState.descricoes)) smartFormState.descricoes = [];
+      smartFormState.descricoes.push({
+        id: 'd-' + Date.now(),
+        main: '',
+        subs: [''],
+        img: ''
+      });
+      renderSmartDescList();
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function removeDescGroupSmart(index) {
+      if (!Array.isArray(smartFormState.descricoes)) return;
+      smartFormState.descricoes.splice(index, 1);
+      renderSmartDescList();
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function updateMainDescSmart(index, val) {
+      if (smartFormState.descricoes && smartFormState.descricoes[index]) {
+        smartFormState.descricoes[index].main = val;
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function updateImgDescSmart(index, val) {
+      if (smartFormState.descricoes && smartFormState.descricoes[index]) {
+        smartFormState.descricoes[index].img = val;
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function addSubDescSmart(groupIndex) {
+      const g = smartFormState.descricoes && smartFormState.descricoes[groupIndex];
+      if (g) {
+        if (!Array.isArray(g.subs)) g.subs = [];
+        g.subs.push('');
+        renderSmartDescList();
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function removeSubDescSmart(groupIndex, subIndex) {
+      const g = smartFormState.descricoes && smartFormState.descricoes[groupIndex];
+      if (g && Array.isArray(g.subs)) {
+        g.subs.splice(subIndex, 1);
+        renderSmartDescList();
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function updateSubDescSmart(groupIndex, subIndex, val) {
+      const g = smartFormState.descricoes && smartFormState.descricoes[groupIndex];
+      if (g && Array.isArray(g.subs) && g.subs[subIndex] !== undefined) {
+        g.subs[subIndex] = val;
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function addStepSmart() {
+      if (!Array.isArray(smartFormState.passos)) smartFormState.passos = [];
+      smartFormState.passos.push('');
+      renderSmartStepsList();
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function removeStepSmart(index) {
+      if (!Array.isArray(smartFormState.passos)) return;
+      smartFormState.passos.splice(index, 1);
+      renderSmartStepsList();
+      atualizarPreviewEChecklistSmart();
+    }
+
+    function updateStepSmart(index, val) {
+      if (smartFormState.passos && smartFormState.passos[index] !== undefined) {
+        smartFormState.passos[index] = val;
+        atualizarPreviewEChecklistSmart();
+      }
+    }
+
+    function renderSmartDescList() {
+      const container = document.getElementById('smartDescListContainer');
+      if (!container) return;
+
+      const descricoes = Array.isArray(smartFormState.descricoes) ? smartFormState.descricoes : [];
+      if (descricoes.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 italic p-2">Nenhum ponto principal cadastrado. Clique no botão acima para adicionar.</div>';
+        return;
+      }
+
+      container.innerHTML = descricoes.map((group, gIdx) => `
+        <div class="smart-desc-item">
+          <div class="smart-desc-row-main">
+            <span class="smart-desc-index">${gIdx + 1} -</span>
+            <input
+              type="text"
+              class="smart-desc-input-main"
+              placeholder="Descrição do ponto principal"
+              value="${(group.main || '').replace(/"/g, '&quot;')}"
+              oninput="updateMainDescSmart(${gIdx}, this.value)"
+            />
+            <button
+              type="button"
+              class="smart-btn-icon danger"
+              onclick="removeDescGroupSmart(${gIdx})"
+              title="Remover Item"
+            >
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+
+          <div class="smart-desc-subs">
+            ${(group.subs || []).map((sub, sIdx) => `
+              <div class="smart-desc-row-sub">
+                <span class="smart-desc-sub-index">${gIdx + 1}.${sIdx + 1} -</span>
+                <input
+                  type="text"
+                  class="smart-desc-input-sub"
+                  placeholder="Subpasso (ex: Mesas > Adicionar Produto)"
+                  value="${(sub || '').replace(/"/g, '&quot;')}"
+                  oninput="updateSubDescSmart(${gIdx}, ${sIdx}, this.value)"
+                />
+                <button
+                  type="button"
+                  class="smart-btn-icon danger sub-remove"
+                  onclick="removeSubDescSmart(${gIdx}, ${sIdx})"
+                  title="Remover Subpasso"
+                >
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+            `).join('')}
+
+            <div class="smart-desc-add-sub">
+              <button
+                type="button"
+                class="smart-btn-link"
+                onclick="addSubDescSmart(${gIdx})"
+              >
+                + Adicionar Subpasso (${gIdx + 1}.${(group.subs || []).length + 1})
+              </button>
+            </div>
+          </div>
+
+          <div class="smart-desc-img-row">
+            <label class="smart-sublabel">
+              📷 Imagem deste ponto (Markdown ![](URL) opcional):
+            </label>
+            <input
+              type="text"
+              class="smart-input-xs font-mono"
+              placeholder="https://hedgedoc.softhubs.com.br/uploads/..."
+              value="${(group.img || '').replace(/"/g, '&quot;')}"
+              oninput="updateImgDescSmart(${gIdx}, this.value)"
+            />
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSmartStepsList() {
+      const container = document.getElementById('smartStepsContainer');
+      if (!container) return;
+
+      const passos = Array.isArray(smartFormState.passos) ? smartFormState.passos : [];
+      if (passos.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 italic p-2">Nenhum passo adicionado.</div>';
+        return;
+      }
+
+      container.innerHTML = passos.map((passo, pIdx) => `
+        <div class="smart-step-row">
+          <span class="smart-step-index">${pIdx + 1}-</span>
+          <input
+            type="text"
+            placeholder="Descreva o passo ${pIdx + 1}"
+            value="${(passo || '').replace(/"/g, '&quot;')}"
+            oninput="updateStepSmart(${pIdx}, this.value)"
+          />
+          <button
+            type="button"
+            class="smart-btn-icon danger"
+            onclick="removeStepSmart(${pIdx})"
+            title="Remover Passo"
+          >
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function carregarExemploSmart() {
+      smartFormState = JSON.parse(JSON.stringify(EXEMPLO_SMART));
+      renderSmartGerador();
+      showToast('Exemplo homologado do Smart carregado com sucesso!');
+    }
+
+    function carregarModeloVazioSmart() {
+      smartFormState = JSON.parse(JSON.stringify(ESTADO_SMART_VAZIO));
+      renderSmartGerador();
+      showToast('Modelo em branco carregado.');
+    }
+
+    function limparFormularioSmart() {
+      smartFormState = {
+        ...ESTADO_SMART_VAZIO,
+        descricoes: [],
+        passos: []
+      };
+      renderSmartGerador();
+      showToast('Formulário limpo.');
+    }
+
+    function copiarRelatorioSmartAtual() {
+      const markdown = gerarRelatorioSmart(smartFormState);
+      navigator.clipboard.writeText(markdown).then(() => {
+        showToast('Relatório Smart copiado para a área de transferência!');
+      }).catch(() => {
+        showToast('Texto copiado.');
+      });
+    }
+
+    function converterRowParaCasoSmart(row) {
+      return {
+        id: row.id,
+        tipo: row.tipo || 'Bug',
+        numeroCaso: row.numero_caso ? String(row.numero_caso) : '',
+        registro: String(row.cliente_registro || ''),
+        nome: row.cliente_nome || '',
+        linkCliente: row.link_cliente || '',
+        cnpj: row.cnpj || '',
+        adquirente: row.adquirente || '',
+        versao: row.versao || '',
+        conexao: row.conexao || '',
+        modelo: row.modelo || '',
+        produto: row.produto || 'Smart',
+        caminho: row.caminho || '',
+        resumo: row.resumo || '',
+        descricoes: Array.isArray(row.descricoes) ? row.descricoes : [],
+        passos: Array.isArray(row.passos) ? row.passos : [],
+        linkHedgedoc: row.link_hedgedoc || '',
+        linkPrint: row.link_print || '',
+        linkVideo: row.link_video || '',
+        linkArquivo: row.link_arquivo || '',
+        linkDiscord: row.link_discord || '',
+        score: Number(row.score) || 0,
+        relatorioMarkdown: row.relatorio_markdown || '',
+        createdAt: row.created_at || new Date().toISOString()
+      };
+    }
+
+    // Persistência: Carregar Casos
+    async function carregarCasosSmart() {
+      const reloadIcon = document.getElementById('smartReloadIcon');
+      if (reloadIcon) reloadIcon.classList.add('animate-spin');
+
+      // 1. Carrega imediatamente do cache local para renderização sem lag
+      let casosLocais = [];
+      try {
+        const cached = localStorage.getItem(CACHE_KEY_SMART_CASOS);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) casosLocais = parsed;
+        }
+      } catch (e) {}
+
+      smartCasosList = casosLocais;
+      renderSmartDashboard();
+      renderSmartSavedHistoryCards();
+
+      // 2. Tenta sincronizar com o banco Supabase
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('plantaonoturno_casos_smart')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(500);
+
+          if (!error && Array.isArray(data)) {
+            const remotos = data.map(converterRowParaCasoSmart);
+            // Mescla sem duplicidade com os locais
+            const mapa = new Map();
+            remotos.forEach(c => mapa.set(c.id, c));
+            casosLocais.forEach(c => {
+              if (!mapa.has(c.id)) mapa.set(c.id, c);
+            });
+
+            smartCasosList = Array.from(mapa.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            try {
+              localStorage.setItem(CACHE_KEY_SMART_CASOS, JSON.stringify(smartCasosList));
+            } catch (e) {}
+          }
+        } catch (err) {
+          console.warn('[Smart] Erro ao sincronizar casos do Supabase:', err);
+        }
+      }
+
+      if (reloadIcon) {
+        setTimeout(() => reloadIcon.classList.remove('animate-spin'), 400);
+      }
+
+      // Atualiza badge de contagem na navegação
+      const badgeNav = document.getElementById('moduleBadgeSmartCasos');
+      if (badgeNav) {
+        badgeNav.textContent = String(smartCasosList.length);
+        badgeNav.classList.toggle('hidden', smartCasosList.length === 0);
+      }
+
+      renderSmartDashboard();
+      renderSmartSavedHistoryCards();
+    }
+
+    // Persistência: Salvar Caso
+    async function handleSalvarCasoSmart() {
+      if (isSavingSmartCaso) return;
+
+      const reg = (smartFormState.registro || '').trim();
+      const numReg = Number(reg.replace(/\D/g, ''));
+      if (!numReg || numReg <= 0) {
+        showToast('⚠️ Informe o número de registro do cliente (somente números positivos).');
+        const regInput = document.getElementById('smartFormRegistro');
+        if (regInput) regInput.focus();
+        return;
+      }
+
+      if (!smartFormState.adquirente || !smartFormState.modelo || !smartFormState.versao) {
+        showToast('⚠️ Selecione a adquirência, versão e modelo homologado.');
+        return;
+      }
+
+      if (!smartFormState.caminho.trim() || !smartFormState.resumo.trim()) {
+        showToast('⚠️ Preencha o caminho em tela e a descrição resumida.');
+        return;
+      }
+
+      const chk = validarChecklistSmart(smartFormState);
+      const markdown = gerarRelatorioSmart(smartFormState);
+      const novoId = 'smart-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+
+      const novoCasoRecord = {
+        ...smartFormState,
+        id: novoId,
+        score: chk.score,
+        relatorioMarkdown: markdown,
+        createdAt: new Date().toISOString()
+      };
+
+      isSavingSmartCaso = true;
+      const btnTopo = document.getElementById('smartBtnSalvarTopoText');
+      if (btnTopo) btnTopo.textContent = 'Salvando...';
+
+      let salvouNaCloud = false;
+
+      if (supabaseClient) {
+        try {
+          const numCaso = smartFormState.numeroCaso ? Number(smartFormState.numeroCaso.replace(/\D/g, '')) : null;
+          const objetoInsercao = {
+            tipo: smartFormState.tipo || 'Bug',
+            cliente_registro: numReg,
+            cliente_nome: smartFormState.nome.trim() || null,
+            link_cliente: smartFormState.linkCliente.trim() || null,
+            cnpj: smartFormState.cnpj.trim() || null,
+            adquirente: smartFormState.adquirente.trim(),
+            versao: smartFormState.versao.trim(),
+            conexao: smartFormState.conexao.trim(),
+            modelo: smartFormState.modelo.trim(),
+            produto: 'Smart',
+            caminho: smartFormState.caminho.trim(),
+            resumo: smartFormState.resumo.trim(),
+            descricoes: smartFormState.descricoes,
+            passos: smartFormState.passos,
+            link_hedgedoc: smartFormState.linkHedgedoc.trim() || null,
+            link_print: smartFormState.linkPrint.trim() || null,
+            link_video: smartFormState.linkVideo.trim() || null,
+            link_arquivo: smartFormState.linkArquivo.trim() || null,
+            link_discord: smartFormState.linkDiscord.trim() || null,
+            score: chk.score,
+            relatorio_markdown: markdown
+          };
+
+          if (numCaso && Number.isInteger(numCaso)) {
+            objetoInsercao.numero_caso = numCaso;
+          }
+
+          const { data, error } = await supabaseClient
+            .from('plantaonoturno_casos_smart')
+            .insert(objetoInsercao)
+            .select('*')
+            .single();
+
+          if (!error && data) {
+            novoCasoRecord.id = data.id;
+            novoCasoRecord.createdAt = data.created_at;
+            salvouNaCloud = true;
+          }
+        } catch (e) {
+          console.warn('[Smart] Erro ao salvar caso no Supabase:', e);
+        }
+      }
+
+      // Adiciona na lista local (substitui se mesmo ID)
+      smartCasosList = [novoCasoRecord, ...smartCasosList.filter(c => c.id !== novoCasoRecord.id)];
+      try {
+        localStorage.setItem(CACHE_KEY_SMART_CASOS, JSON.stringify(smartCasosList));
+      } catch (e) {}
+
+      isSavingSmartCaso = false;
+      if (btnTopo) btnTopo.textContent = 'Salvar Caso no Banco';
+
+      const badgeNav = document.getElementById('moduleBadgeSmartCasos');
+      if (badgeNav) {
+        badgeNav.textContent = String(smartCasosList.length);
+        badgeNav.classList.remove('hidden');
+      }
+
+      renderSmartDashboard();
+      renderSmartSavedHistoryCards();
+
+      showToast(salvouNaCloud
+        ? `✅ Caso #${numReg} gravado com sucesso no Supabase!`
+        : `💾 Caso #${numReg} salvo no armazenamento local do navegador.`);
+    }
+
+    // Persistência: Excluir Caso
+    async function excluirCasoSmart(id, registro) {
+      if (!confirm(`Deseja realmente excluir o caso do cliente #${registro}?`)) {
+        return;
+      }
+
+      smartCasosList = smartCasosList.filter(c => c.id !== id);
+      try {
+        localStorage.setItem(CACHE_KEY_SMART_CASOS, JSON.stringify(smartCasosList));
+      } catch (e) {}
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('plantaonoturno_casos_smart').delete().eq('id', id);
+        } catch (e) {
+          console.warn('[Smart] Erro ao deletar no Supabase:', e);
+        }
+      }
+
+      const badgeNav = document.getElementById('moduleBadgeSmartCasos');
+      if (badgeNav) {
+        badgeNav.textContent = String(smartCasosList.length);
+        badgeNav.classList.toggle('hidden', smartCasosList.length === 0);
+      }
+
+      renderSmartDashboard();
+      renderSmartSavedHistoryCards();
+      showToast(`Caso #${registro} excluído.`);
+    }
+
+    // Carregar Caso no Formulário do Gerador
+    function carregarCasoNoGerador(id) {
+      const caso = smartCasosList.find(c => c.id === id);
+      if (!caso) return;
+
+      smartFormState = {
+        tipo: caso.tipo === 'Melhoria' ? 'Melhoria' : 'Bug',
+        numeroCaso: caso.numeroCaso || '',
+        registro: caso.registro || '',
+        nome: caso.nome || '',
+        linkCliente: caso.linkCliente || '',
+        cnpj: caso.cnpj || '',
+        adquirente: caso.adquirente || '',
+        versao: caso.versao || '',
+        conexao: caso.conexao || '',
+        modelo: caso.modelo || '',
+        produto: caso.produto || 'Smart',
+        caminho: caso.caminho || '',
+        resumo: caso.resumo || '',
+        descricoes: Array.isArray(caso.descricoes) && caso.descricoes.length > 0
+          ? JSON.parse(JSON.stringify(caso.descricoes))
+          : [{ id: 'd-' + Date.now(), main: '', subs: [''], img: '' }],
+        passos: Array.isArray(caso.passos) && caso.passos.length > 0
+          ? [...caso.passos]
+          : [''],
+        linkHedgedoc: caso.linkHedgedoc || '',
+        linkPrint: caso.linkPrint || '',
+        linkVideo: caso.linkVideo || '',
+        linkArquivo: caso.linkArquivo || '',
+        linkDiscord: caso.linkDiscord || ''
+      };
+
+      switchMainView('smartGerador');
+      renderSmartGerador();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast(`Caso #${caso.registro} carregado no Gerador.`);
+    }
+
+    function formatarDataHoraSmart(isoString) {
+      if (!isoString) return '—';
+      try {
+        const d = new Date(isoString);
+        if (isNaN(d.getTime())) return String(isoString);
+        return d.toLocaleString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return String(isoString);
+      }
+    }
+
+    function filtrarCasosPorPeriodo(casos, periodo) {
+      if (periodo === 'tudo') return casos;
+      const dias = Number(periodo);
+      if (isNaN(dias) || dias <= 0) return casos;
+
+      const agora = new Date();
+      const limiteData = new Date(agora.getTime() - dias * 24 * 60 * 60 * 1000);
+
+      return casos.filter(c => {
+        if (!c.createdAt) return true;
+        const dataCaso = new Date(c.createdAt);
+        return dataCaso >= limiteData;
+      });
+    }
+
+    function calcularEstatisticasSmart(casos) {
+      const total = casos.length;
+      if (total === 0) {
+        return {
+          total: 0,
+          scoreMedio: 0,
+          clientesUnicos: 0,
+          adquirenteTop: null,
+          modeloTop: null,
+          versaoTop: null,
+          taxaEvidencias: 0,
+          comEvidenciasCount: 0,
+          bugsCount: 0,
+          melhoriasCount: 0,
+          porTipo: [
+            { rotulo: 'Bug', quantidade: 0, percentual: 0 },
+            { rotulo: 'Melhoria', quantidade: 0, percentual: 0 }
+          ],
+          porAdquirente: [],
+          porVersao: [],
+          porConexao: [],
+          porModelo: [],
+          porCaminho: [],
+          faixasQualidade: [
+            { chave: 'excelente', rotulo: 'Excelente (≥ 85%)', quantidade: 0, percentual: 0, cor: '#22c55e' },
+            { chave: 'bom', rotulo: 'Bom (70-84%)', quantidade: 0, percentual: 0, cor: '#fbbf24' },
+            { chave: 'critico', rotulo: 'Atenção (< 70%)', quantidade: 0, percentual: 0, cor: '#ef4444' }
+          ]
+        };
+      }
+
+      const somaScore = casos.reduce((acc, c) => acc + (Number(c.score) || 0), 0);
+      const scoreMedio = Math.round(somaScore / total);
+
+      const registrosSet = new Set();
+      casos.forEach(c => {
+        if (c.registro) registrosSet.add(String(c.registro).trim());
+      });
+      const clientesUnicos = registrosSet.size;
+
+      const comEvidencias = casos.filter(c =>
+        Boolean(
+          (c.linkHedgedoc && c.linkHedgedoc.trim()) ||
+          (c.linkPrint && c.linkPrint.trim()) ||
+          (c.linkVideo && c.linkVideo.trim()) ||
+          (c.linkArquivo && c.linkArquivo.trim()) ||
+          (c.linkDiscord && c.linkDiscord.trim())
+        )
+      );
+      const taxaEvidencias = Math.round((comEvidencias.length / total) * 1000) / 10;
+
+      function agrupar(chaveFn, maxItens = 10) {
+        const mapa = new Map();
+        casos.forEach(c => {
+          const valor = (chaveFn(c) || '').trim() || 'Não informado';
+          mapa.set(valor, (mapa.get(valor) || 0) + 1);
+        });
+
+        const ordenado = Array.from(mapa.entries())
+          .map(([rotulo, quantidade]) => ({
+            rotulo,
+            quantidade,
+            percentual: Math.round((quantidade / total) * 1000) / 10
+          }))
+          .sort((a, b) => b.quantidade - a.quantidade);
+
+        return ordenado.slice(0, maxItens);
+      }
+
+      const porAdquirente = agrupar(c => c.adquirente);
+      const porVersao = agrupar(c => (c.versao ? (c.versao.startsWith('v') ? c.versao : `v${c.versao}`) : ''));
+      const porConexao = agrupar(c => c.conexao);
+      const porModelo = agrupar(c => c.modelo);
+      const porCaminho = agrupar(c => {
+        if (!c.caminho) return '';
+        const partes = c.caminho.split('>');
+        return (partes[0] || c.caminho).trim();
+      }, 8);
+
+      const adquirenteTop = porAdquirente[0] ? porAdquirente[0] : null;
+      const modeloTop = porModelo[0] ? porModelo[0] : null;
+      const versaoTop = porVersao[0] ? porVersao[0] : null;
+
+      let excelenteCount = 0;
+      let bomCount = 0;
+      let criticoCount = 0;
+
+      casos.forEach(c => {
+        const s = Number(c.score) || 0;
+        if (s >= 85) excelenteCount++;
+        else if (s >= 70) bomCount++;
+        else criticoCount++;
+      });
+
+      const faixasQualidade = [
+        {
+          chave: 'excelente',
+          rotulo: 'Excelente (≥ 85%)',
+          quantidade: excelenteCount,
+          percentual: Math.round((excelenteCount / total) * 1000) / 10,
+          cor: '#22c55e'
+        },
+        {
+          chave: 'bom',
+          rotulo: 'Bom (70-84%)',
+          quantidade: bomCount,
+          percentual: Math.round((bomCount / total) * 1000) / 10,
+          cor: '#fbbf24'
+        },
+        {
+          chave: 'critico',
+          rotulo: 'Atenção (< 70%)',
+          quantidade: criticoCount,
+          percentual: Math.round((criticoCount / total) * 1000) / 10,
+          cor: '#ef4444'
+        }
+      ];
+
+      const bugsCount = casos.filter(c => c.tipo !== 'Melhoria').length;
+      const melhoriasCount = casos.filter(c => c.tipo === 'Melhoria').length;
+
+      return {
+        total,
+        scoreMedio,
+        clientesUnicos,
+        adquirenteTop,
+        modeloTop,
+        versaoTop,
+        taxaEvidencias,
+        comEvidenciasCount: comEvidencias.length,
+        bugsCount,
+        melhoriasCount,
+        porAdquirente,
+        porVersao,
+        porConexao,
+        porModelo,
+        porCaminho,
+        faixasQualidade
+      };
+    }
+
+    function onSmartPeriodChange(val) {
+      smartPeriodo = val;
+      renderSmartDashboard();
+    }
+
+    function onSmartSearchChange(val) {
+      smartBusca = val;
+      const clearBtn = document.getElementById('smartSearchClearBtn');
+      if (clearBtn) clearBtn.classList.toggle('hidden', !val.trim());
+      renderSmartCasosTabela();
+    }
+
+    function limparBuscaSmart() {
+      smartBusca = '';
+      const input = document.getElementById('smartSearchInput');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('smartSearchClearBtn');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderSmartCasosTabela();
+    }
+
+    function onSmartFiltroChange() {
+      const selTipo = document.getElementById('smartFiltroTipo');
+      const selAdq = document.getElementById('smartFiltroAdquirente');
+      const selCon = document.getElementById('smartFiltroConexao');
+      const selQual = document.getElementById('smartFiltroQualidade');
+
+      if (selTipo) smartFiltroTipo = selTipo.value;
+      if (selAdq) smartFiltroAdquirente = selAdq.value;
+      if (selCon) smartFiltroConexao = selCon.value;
+      if (selQual) smartFiltroQualidade = selQual.value;
+
+      const hasActiveFilters = smartFiltroTipo !== 'todos' ||
+        smartFiltroAdquirente !== 'todas' ||
+        smartFiltroConexao !== 'todas' ||
+        smartFiltroQualidade !== 'todas' ||
+        smartBusca.trim() !== '';
+
+      const btnLimpar = document.getElementById('smartBtnLimparFiltros');
+      if (btnLimpar) btnLimpar.classList.toggle('hidden', !hasActiveFilters);
+
+      renderSmartCasosTabela();
+    }
+
+    function limparTodosFiltrosSmart() {
+      smartFiltroTipo = 'todos';
+      smartFiltroAdquirente = 'todas';
+      smartFiltroConexao = 'todas';
+      smartFiltroQualidade = 'todas';
+      smartBusca = '';
+
+      const selTipo = document.getElementById('smartFiltroTipo');
+      const selAdq = document.getElementById('smartFiltroAdquirente');
+      const selCon = document.getElementById('smartFiltroConexao');
+      const selQual = document.getElementById('smartFiltroQualidade');
+      const inputBusca = document.getElementById('smartSearchInput');
+      const clearBtn = document.getElementById('smartSearchClearBtn');
+      const btnLimpar = document.getElementById('smartBtnLimparFiltros');
+
+      if (selTipo) selTipo.value = 'todos';
+      if (selAdq) selAdq.value = 'todas';
+      if (selCon) selCon.value = 'todas';
+      if (selQual) selQual.value = 'todas';
+      if (inputBusca) inputBusca.value = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      if (btnLimpar) btnLimpar.classList.add('hidden');
+
+      renderSmartCasosTabela();
+    }
+
+    function onSmartHistorySearchChange(val) {
+      smartHistorySearch = val;
+      renderSmartSavedHistoryCards();
+    }
+
+    function toggleHistoricoGeradorSmart() {
+      smartHistoricoExpandido = !smartHistoricoExpandido;
+      const content = document.getElementById('smartHistoryContent');
+      const arrow = document.getElementById('smartHistoryArrow');
+      if (content) content.classList.toggle('hidden', !smartHistoricoExpandido);
+      if (arrow) arrow.innerHTML = smartHistoricoExpandido ? '&minus;' : '+';
+    }
+
+    function renderSmartBarList(containerId, items) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 italic py-2">Nenhum registro no período.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="smart-bar-item">
+          <div class="smart-bar-header">
+            <span class="smart-bar-label" title="${item.rotulo}">${item.rotulo}</span>
+            <span class="smart-bar-value">${item.quantidade} (${item.percentual}%)</span>
+          </div>
+          <div class="smart-bar-track">
+            <div class="smart-bar-fill" style="width: ${Math.max(item.percentual, 3)}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSmartDashboard() {
+      const casosNoPeriodo = filtrarCasosPorPeriodo(smartCasosList, smartPeriodo);
+      const stats = calcularEstatisticasSmart(casosNoPeriodo);
+
+      // 1. Atualizar KPIs
+      const elTotal = document.getElementById('smartKpiTotal');
+      const elTotalFoot = document.getElementById('smartKpiTotalFoot');
+      const elScore = document.getElementById('smartKpiScore');
+      const elScoreFoot = document.getElementById('smartKpiScoreFoot');
+      const elCli = document.getElementById('smartKpiClientes');
+      const elAdq = document.getElementById('smartKpiAdq');
+      const elAdqFoot = document.getElementById('smartKpiAdqFoot');
+      const elMod = document.getElementById('smartKpiModelo');
+      const elModFoot = document.getElementById('smartKpiModeloFoot');
+      const elEvid = document.getElementById('smartKpiEvid');
+      const elEvidFoot = document.getElementById('smartKpiEvidFoot');
+
+      if (elTotal) elTotal.textContent = stats.total.toLocaleString('pt-BR');
+      if (elTotalFoot) {
+        elTotalFoot.textContent = `${smartPeriodo === 'tudo' ? 'Histórico geral' : 'Últimos ' + smartPeriodo + ' dias'} • ${stats.bugsCount} 🪲 / ${stats.melhoriasCount} 💡`;
+      }
+
+      if (elScore) {
+        elScore.textContent = `${stats.scoreMedio}%`;
+        elScore.className = `text-xl sm:text-2xl font-black font-mono ${stats.scoreMedio >= 85 ? 'text-emerald-400' : stats.scoreMedio >= 70 ? 'text-amber-400' : 'text-rose-400'}`;
+      }
+      if (elScoreFoot) {
+        elScoreFoot.textContent = stats.scoreMedio >= 85 ? 'Conformidade excelente' : stats.scoreMedio >= 70 ? 'Conformidade média' : 'Necessita atenção';
+      }
+
+      if (elCli) elCli.textContent = stats.clientesUnicos.toLocaleString('pt-BR');
+
+      if (elAdq) elAdq.textContent = stats.adquirenteTop ? stats.adquirenteTop.rotulo : '—';
+      if (elAdqFoot) {
+        elAdqFoot.textContent = stats.adquirenteTop
+          ? `${stats.adquirenteTop.quantidade} casos (${stats.adquirenteTop.percentual}%)`
+          : 'Sem registros';
+      }
+
+      if (elMod) elMod.textContent = stats.modeloTop ? stats.modeloTop.rotulo : '—';
+      if (elModFoot) {
+        elModFoot.textContent = stats.modeloTop
+          ? `${stats.modeloTop.quantidade} casos (${stats.modeloTop.percentual}%)`
+          : 'Sem registros';
+      }
+
+      if (elEvid) elEvid.textContent = `${stats.taxaEvidencias}%`;
+      if (elEvidFoot) elEvidFoot.textContent = `${stats.comEvidenciasCount} de ${stats.total} com links/mídias`;
+
+      // 2. Gráficos de Distribuição
+      renderSmartBarList('smartBarAdquirente', stats.porAdquirente);
+      renderSmartBarList('smartBarCaminho', stats.porCaminho);
+      renderSmartBarList('smartBarVersao', stats.porVersao);
+      renderSmartBarList('smartBarModelo', stats.porModelo);
+
+      // 3. Faixas de Qualidade
+      const containerQuality = document.getElementById('smartQualityBars');
+      if (containerQuality) {
+        containerQuality.innerHTML = stats.faixasQualidade.map(fq => `
+          <div class="smart-quality-bar-item">
+            <div class="smart-quality-header">
+              <span class="smart-quality-label flex items-center gap-1.5" style="color: ${fq.cor};">
+                <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${fq.cor};"></span>
+                <span>${fq.rotulo}</span>
+              </span>
+              <span class="smart-quality-numbers font-mono">${fq.quantidade} (${fq.percentual}%)</span>
+            </div>
+            <div class="smart-progress-track">
+              <div class="smart-progress-fill" style="width: ${fq.percentual}%; background-color: ${fq.cor};"></div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 4. Popula seletor de adquirentes do filtro se necessário
+      const selAdq = document.getElementById('smartFiltroAdquirente');
+      if (selAdq && selAdq.options.length <= 1) {
+        Object.keys(ADQUIRENTES_CONFIG).forEach(adq => {
+          const opt = document.createElement('option');
+          opt.value = adq;
+          opt.textContent = adq;
+          selAdq.appendChild(opt);
+        });
+      }
+
+      // 5. Renderiza a tabela filtrada
+      renderSmartCasosTabela();
+    }
+
+    function renderSmartCasosTabela() {
+      const casosNoPeriodo = filtrarCasosPorPeriodo(smartCasosList, smartPeriodo);
+
+      const casosFiltrados = casosNoPeriodo.filter(c => {
+        if (smartFiltroTipo !== 'todos' && (c.tipo || 'Bug') !== smartFiltroTipo) return false;
+        if (smartFiltroAdquirente !== 'todas' && c.adquirente !== smartFiltroAdquirente) return false;
+        if (smartFiltroConexao !== 'todas' && c.conexao !== smartFiltroConexao) return false;
+        if (smartFiltroQualidade === 'excelente' && (c.score < 85 || !c.score)) return false;
+        if (smartFiltroQualidade === 'bom' && (c.score < 70 || c.score >= 85)) return false;
+        if (smartFiltroQualidade === 'critico' && c.score >= 70) return false;
+
+        if (smartBusca.trim()) {
+          const termo = smartBusca.toLowerCase().trim();
+          const textoBusca = [
+            c.tipo,
+            c.numeroCaso,
+            c.registro,
+            c.nome,
+            c.cnpj,
+            c.adquirente,
+            c.modelo,
+            c.versao,
+            c.caminho,
+            c.resumo
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          if (!textoBusca.includes(termo)) return false;
+        }
+
+        return true;
+      });
+
+      const subTitle = document.getElementById('smartTabelaSubtitle');
+      if (subTitle) {
+        subTitle.textContent = `Exibindo ${casosFiltrados.length} de ${casosNoPeriodo.length} registros no período selecionado`;
+      }
+
+      const totalBadge = document.getElementById('smartCasosTotalCountBadge');
+      if (totalBadge) totalBadge.textContent = `${casosFiltrados.length} caso(s)`;
+
+      const tableWrapper = document.getElementById('smartCasosTabelaWrapper');
+      const emptyState = document.getElementById('smartCasosEmptyState');
+      const tbody = document.getElementById('smartCasosTabelaBody');
+
+      if (casosFiltrados.length === 0) {
+        if (tableWrapper) tableWrapper.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (tableWrapper) tableWrapper.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+
+      if (!tbody) return;
+
+      tbody.innerHTML = casosFiltrados.map(c => {
+        const scoreClasse = c.score <= 40 ? 'score-danger' : c.score <= 75 ? 'score-warning' : 'score-success';
+
+        const temHedge = Boolean(c.linkHedgedoc && c.linkHedgedoc.trim());
+        const temPrint = Boolean(c.linkPrint && c.linkPrint.trim());
+        const temVideo = Boolean(c.linkVideo && c.linkVideo.trim());
+        const temArquivo = Boolean(c.linkArquivo && c.linkArquivo.trim());
+        const temDiscord = Boolean(c.linkDiscord && c.linkDiscord.trim());
+
+        return `
+          <tr class="smart-table-row">
+            <td class="font-mono text-slate-400 whitespace-nowrap text-[11px]">
+              ${formatarDataHoraSmart(c.createdAt)}
+            </td>
+
+            <td>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="smart-badge-tipo ${c.tipo === 'Melhoria' ? 'melhoria' : 'bug'}">
+                    ${c.tipo === 'Melhoria' ? '💡 Melhoria' : '🪲 Bug'}
+                  </span>
+                  ${c.numeroCaso ? `
+                    <span class="smart-reg-badge" style="background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3);">
+                      #${c.numeroCaso}
+                    </span>
+                  ` : ''}
+                  <span class="smart-reg-badge font-mono">#${c.registro}</span>
+                </div>
+                <span class="smart-client-name font-semibold text-white truncate max-w-[200px]" title="${c.nome || 'Cliente não informado'}">
+                  ${c.nome || 'Cliente não informado'}
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="smart-badge-adq">${c.adquirente}</span>
+                  <span class="smart-badge-model">${c.modelo}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
+                  <span>v${c.versao}</span>
+                  <span>&bull;</span>
+                  <span>${c.conexao}</span>
+                </div>
+              </div>
+            </td>
+
+            <td style="max-width: 320px;">
+              <div class="flex flex-col gap-1">
+                <span class="text-xs font-bold text-cyan-300 truncate" title="${c.caminho}">
+                  📍 ${c.caminho}
+                </span>
+                <span class="text-xs text-slate-400 line-clamp-2" title="${c.resumo}">
+                  ${c.resumo}
+                </span>
+              </div>
+            </td>
+
+            <td style="text-align: center;">
+              <span class="smart-card-score ${scoreClasse} font-mono">
+                ${c.score}%
+              </span>
+            </td>
+
+            <td>
+              <div class="flex items-center gap-1 flex-wrap">
+                ${temHedge ? `<span class="smart-ev-tag hedge" title="HedgeDoc">🔗 Doc</span>` : ''}
+                ${temPrint ? `<span class="smart-ev-tag print" title="Captura de tela">📷 Print</span>` : ''}
+                ${temVideo ? `<span class="smart-ev-tag video" title="Vídeo">🎥 Vídeo</span>` : ''}
+                ${temArquivo ? `<span class="smart-ev-tag file" title="Arquivo/Log">📁 Log</span>` : ''}
+                ${temDiscord ? `<span class="smart-ev-tag discord" title="Discord">💬 Discord</span>` : ''}
+                ${!temHedge && !temPrint && !temVideo && !temArquivo && !temDiscord ? `<span class="text-slate-500 text-[11px]">—</span>` : ''}
+              </div>
+            </td>
+
+            <td style="text-align: right;">
+              <div class="flex items-center justify-end gap-1.5">
+                <button
+                  type="button"
+                  class="px-2 py-1 rounded bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-[11px] font-semibold text-slate-300 flex items-center gap-1 transition"
+                  onclick="abrirDetalhesCasoSmart('${c.id}')"
+                  title="Visualizar detalhes"
+                >
+                  <i class="ti ti-eye text-cyan-400"></i>
+                  <span>Detalhes</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="px-2 py-1 rounded bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-[11px] font-semibold text-slate-300 flex items-center gap-1 transition"
+                  onclick="copiarRelatorioMarkdownCaso('${c.id}')"
+                  title="Copiar markdown"
+                >
+                  <i class="ti ti-copy text-emerald-400"></i>
+                  <span>Copiar</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="px-2 py-1 rounded bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-[11px] font-semibold text-cyan-400 flex items-center gap-1 transition"
+                  onclick="carregarCasoNoGerador('${c.id}')"
+                  title="Abrir dados no Gerador"
+                >
+                  <i class="ti ti-edit"></i>
+                  <span>Gerador</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="p-1.5 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 transition"
+                  onclick="excluirCasoSmart('${c.id}', '${c.registro}')"
+                  title="Excluir este caso"
+                >
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderSmartSavedHistoryCards() {
+      const container = document.getElementById('smartHistoryGrid');
+      const emptyState = document.getElementById('smartHistoryEmpty');
+      const countBadge = document.getElementById('smartHistoryCountBadge');
+
+      let filtrados = smartCasosList;
+      if (smartHistorySearch.trim()) {
+        const termo = smartHistorySearch.toLowerCase().trim();
+        filtrados = filtrados.filter(c =>
+          (c.numeroCaso && c.numeroCaso.includes(termo)) ||
+          c.registro.includes(termo) ||
+          (c.nome && c.nome.toLowerCase().includes(termo)) ||
+          c.adquirente.toLowerCase().includes(termo) ||
+          c.modelo.toLowerCase().includes(termo) ||
+          c.resumo.toLowerCase().includes(termo)
+        );
+      }
+
+      if (countBadge) {
+        countBadge.textContent = `${filtrados.length} ${filtrados.length === 1 ? 'registro' : 'registros'}`;
+      }
+
+      if (!container) return;
+
+      if (filtrados.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      container.innerHTML = filtrados.map(c => {
+        const scoreClasse = c.score <= 40 ? 'score-danger' : c.score <= 75 ? 'score-warning' : 'score-success';
+
+        return `
+          <div class="smart-history-card">
+            <div class="smart-history-card-header">
+              <div class="smart-history-card-reg">
+                ${c.numeroCaso ? `<span class="smart-reg-badge" style="background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3);">Caso #${c.numeroCaso}</span>` : ''}
+                <span class="smart-reg-badge font-mono">Nº ${c.registro}</span>
+                ${c.nome ? `<span class="smart-card-client truncate max-w-[150px]" title="${c.nome}">${c.nome}</span>` : ''}
+              </div>
+              <div class="smart-history-card-meta">
+                <span class="smart-card-score ${scoreClasse} font-mono">${c.score}% qualidade</span>
+                <span class="smart-card-date">${formatarDataHoraSmart(c.createdAt)}</span>
+              </div>
+            </div>
+
+            <div class="smart-history-card-body">
+              <div class="smart-card-device-info">
+                <span class="smart-badge-tipo ${c.tipo === 'Melhoria' ? 'melhoria' : 'bug'}">
+                  ${c.tipo === 'Melhoria' ? '💡 Melhoria' : '🪲 Bug'}
+                </span>
+                <span class="smart-card-tag">${c.adquirente}</span>
+                <span class="smart-card-tag">${c.modelo}</span>
+                <span class="smart-card-tag font-mono">v${c.versao}</span>
+                <span class="smart-card-tag">${c.conexao}</span>
+              </div>
+
+              <div class="smart-card-summary">
+                <strong class="text-white">${c.caminho}:</strong> ${c.resumo}
+              </div>
+            </div>
+
+            <div class="smart-history-card-footer">
+              <button
+                type="button"
+                class="px-2.5 py-1 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-cyan-400 flex items-center gap-1 transition"
+                onclick="carregarCasoNoGerador('${c.id}')"
+                title="Carregar no formulário"
+              >
+                <i class="ti ti-edit"></i>
+                <span>Carregar no Formulário</span>
+              </button>
+
+              <button
+                type="button"
+                class="px-2.5 py-1 rounded-lg bg-[#252525] hover:bg-[#2e2e2e] border border-[#2a2a2a] text-xs font-semibold text-slate-300 flex items-center gap-1 transition"
+                onclick="copiarRelatorioMarkdownCaso('${c.id}')"
+                title="Copiar relatório"
+              >
+                <i class="ti ti-copy text-emerald-400"></i>
+                <span>Copiar Relatório</span>
+              </button>
+
+              <button
+                type="button"
+                class="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 transition"
+                onclick="excluirCasoSmart('${c.id}', '${c.registro}')"
+                title="Excluir do banco"
+              >
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSmartGerador() {
+      // 1. Popula adquirentes
+      const selectAdq = document.getElementById('smartFormAdquirente');
+      if (selectAdq && selectAdq.options.length <= 1) {
+        selectAdq.innerHTML = '<option value="">Selecione a adquirência...</option>' +
+          Object.keys(ADQUIRENTES_CONFIG).map(adq => `<option value="${adq}" ${adq === smartFormState.adquirente ? 'selected' : ''}>${adq}</option>`).join('');
+      } else if (selectAdq) {
+        selectAdq.value = smartFormState.adquirente || '';
+      }
+
+      // 2. Popula campos simples
+      const mapInputs = {
+        'smart-numero-caso': smartFormState.numeroCaso || '',
+        'smart-registro': smartFormState.registro || '',
+        'smart-nome': smartFormState.nome || '',
+        'smart-cnpj': smartFormState.cnpj || '',
+        'smart-link-cliente': smartFormState.linkCliente || '',
+        'smart-versao': smartFormState.versao || '',
+        'smart-conexao': smartFormState.conexao || '',
+        'smart-caminho': smartFormState.caminho || '',
+        'smart-resumo': smartFormState.resumo || '',
+        'smart-hedgedoc': smartFormState.linkHedgedoc || '',
+        'smart-print': smartFormState.linkPrint || '',
+        'smart-video': smartFormState.linkVideo || '',
+        'smart-arquivo': smartFormState.linkArquivo || '',
+        'smart-discord': smartFormState.linkDiscord || ''
+      };
+
+      Object.entries(mapInputs).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && el.value !== val) el.value = val;
+      });
+
+      // 3. Atualiza modelos
+      const selectModelo = document.getElementById('smartFormModelo');
+      if (selectModelo) {
+        if (smartFormState.adquirente && ADQUIRENTES_CONFIG[smartFormState.adquirente]) {
+          const modelos = ADQUIRENTES_CONFIG[smartFormState.adquirente].modelos;
+          selectModelo.innerHTML = '<option value="">Selecione o modelo homologado...</option>' +
+            modelos.map(m => `<option value="${m}" ${m === smartFormState.modelo ? 'selected' : ''}>${m}</option>`).join('');
+        } else {
+          selectModelo.innerHTML = '<option value="">Selecione a adquirência primeiro...</option>';
+        }
+      }
+
+      // 4. Badge homologado
+      const badge = document.getElementById('smartBadgeHomologado');
+      if (badge) {
+        if (smartFormState.adquirente && ADQUIRENTES_CONFIG[smartFormState.adquirente]) {
+          badge.textContent = `Homologado v${ADQUIRENTES_CONFIG[smartFormState.adquirente].versao}`;
+          badge.classList.add('active');
+        } else {
+          badge.textContent = 'Selecione a Adquirência';
+          badge.classList.remove('active');
+        }
+      }
+
+      // 5. Botões de tipo
+      const btnBug = document.getElementById('smartTypeBtnBug');
+      const btnMelhoria = document.getElementById('smartTypeBtnMelhoria');
+      if (btnBug) btnBug.classList.toggle('active', smartFormState.tipo !== 'Melhoria');
+      if (btnMelhoria) btnMelhoria.classList.toggle('active', smartFormState.tipo === 'Melhoria');
+
+      // 6. Listas dinâmicas
+      renderSmartDescList();
+      renderSmartStepsList();
+      atualizarPreviewEChecklistSmart();
+      renderSmartSavedHistoryCards();
+    }
+
+    function abrirDetalhesCasoSmart(id) {
+      const caso = smartCasosList.find(c => c.id === id);
+      if (!caso) return;
+      smartCasoSelecionado = caso;
+
+      const modal = document.getElementById('smartCaseDetailModal');
+      const title = document.getElementById('smartDetailModalTitle');
+      const badgesContainer = document.getElementById('smartDetailModalBadges');
+      const bodyContainer = document.getElementById('smartDetailModalBody');
+      const btnGerador = document.getElementById('smartDetailBtnGerador');
+      const btnCopiar = document.getElementById('smartDetailBtnCopiar');
+
+      if (title) {
+        title.innerHTML = `${caso.numeroCaso ? `Caso #${caso.numeroCaso} &bull; ` : ''}Cliente #${caso.registro} &mdash; ${caso.nome || 'Não informado'}`;
+      }
+
+      if (badgesContainer) {
+        const scoreClasse = caso.score <= 40 ? 'score-danger' : caso.score <= 75 ? 'score-warning' : 'score-success';
+        badgesContainer.innerHTML = `
+          <span class="smart-badge-tipo ${caso.tipo === 'Melhoria' ? 'melhoria' : 'bug'}">
+            ${caso.tipo === 'Melhoria' ? '💡 Melhoria' : '🪲 Bug'}
+          </span>
+          ${caso.numeroCaso ? `<span class="smart-reg-badge" style="background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3);">Caso #${caso.numeroCaso}</span>` : ''}
+          <span class="smart-reg-badge font-mono">Registro #${caso.registro}</span>
+          <span class="smart-card-tag">${caso.adquirente}</span>
+          <span class="smart-card-tag">${caso.modelo}</span>
+          <span class="smart-card-tag font-mono">v${caso.versao}</span>
+          <span class="smart-card-tag">${caso.conexao}</span>
+          <span class="smart-card-score ${scoreClasse} font-mono">${caso.score}% qualidade</span>
+          <span class="text-xs text-slate-400 font-mono ml-auto">${formatarDataHoraSmart(caso.createdAt)}</span>
+        `;
+      }
+
+      if (bodyContainer) {
+        bodyContainer.innerHTML = `
+          <div class="bg-[#111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
+            <div class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider">Caminho &amp; Ocorrência</div>
+            <div class="text-xs font-bold text-white">📍 ${caso.caminho}</div>
+            <div class="text-xs text-slate-300">${caso.resumo}</div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-[#111] p-3 rounded-xl border border-[#2a2a2a] space-y-1">
+              <span class="text-[11px] font-bold text-slate-400 uppercase">Cliente / CNPJ</span>
+              <div class="text-xs font-semibold text-white">${caso.nome || 'Não informado'}</div>
+              <div class="text-[11px] text-slate-400 font-mono">${caso.cnpj ? `CNPJ: ${caso.cnpj}` : 'CNPJ não informado'}</div>
+              ${caso.linkCliente ? `<a href="${caso.linkCliente}" target="_blank" class="text-[11px] text-cyan-400 hover:underline truncate block">🔗 Acessar ambiente do cliente</a>` : ''}
+            </div>
+
+            <div class="bg-[#111] p-3 rounded-xl border border-[#2a2a2a] space-y-1">
+              <span class="text-[11px] font-bold text-slate-400 uppercase">Terminal Smart</span>
+              <div class="text-xs font-semibold text-white">${caso.adquirente} &bull; ${caso.modelo}</div>
+              <div class="text-[11px] text-slate-400 font-mono">Versão ${caso.versao} &bull; Conexão ${caso.conexao}</div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Passos a Reproduzir</div>
+            <div class="bg-[#111] p-3 rounded-xl border border-[#2a2a2a] space-y-1">
+              ${Array.isArray(caso.passos) && caso.passos.length > 0
+                ? caso.passos.map((p, i) => `<div class="text-xs text-slate-300 font-mono"><strong class="text-emerald-400">${i + 1}-</strong> ${p}</div>`).join('')
+                : '<div class="text-xs text-slate-500 italic">Nenhum passo registrado.</div>'
+              }
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Evidências Anexadas</div>
+            <div class="flex items-center gap-2 flex-wrap">
+              ${caso.linkHedgedoc ? `<a href="${caso.linkHedgedoc}" target="_blank" class="smart-ev-tag hedge hover:opacity-80">🔗 HedgeDoc: ${caso.linkHedgedoc}</a>` : ''}
+              ${caso.linkPrint ? `<a href="${caso.linkPrint}" target="_blank" class="smart-ev-tag print hover:opacity-80">📷 Print: ${caso.linkPrint}</a>` : ''}
+              ${caso.linkVideo ? `<a href="${caso.linkVideo}" target="_blank" class="smart-ev-tag video hover:opacity-80">🎥 Vídeo: ${caso.linkVideo}</a>` : ''}
+              ${caso.linkArquivo ? `<a href="${caso.linkArquivo}" target="_blank" class="smart-ev-tag file hover:opacity-80">📁 Log: ${caso.linkArquivo}</a>` : ''}
+              ${caso.linkDiscord ? `<span class="smart-ev-tag discord">💬 ${caso.linkDiscord}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="space-y-1.5 pt-2">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Relatório Markdown Formatado</div>
+            <textarea class="smart-output-textarea" style="min-height: 140px;" readonly>${caso.relatorioMarkdown || ''}</textarea>
+          </div>
+        `;
+      }
+
+      if (btnGerador) {
+        btnGerador.onclick = () => {
+          fecharDetalhesCasoSmart();
+          carregarCasoNoGerador(id);
+        };
+      }
+
+      if (btnCopiar) {
+        btnCopiar.onclick = () => {
+          copiarRelatorioMarkdownCaso(id);
+        };
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function fecharDetalhesCasoSmart() {
+      const modal = document.getElementById('smartCaseDetailModal');
+      if (modal) modal.classList.add('hidden');
+      smartCasoSelecionado = null;
+    }
+
+    function copiarRelatorioMarkdownCaso(id) {
+      const caso = smartCasosList.find(c => c.id === id);
+      if (!caso) return;
+      navigator.clipboard.writeText(caso.relatorioMarkdown).then(() => {
+        showToast(`Relatório do caso #${caso.registro} copiado!`);
+      }).catch(() => {
+        showToast('Relatório copiado.');
+      });
+    }
+
+    function exportarCasosSmartCsv() {
+      const casosNoPeriodo = filtrarCasosPorPeriodo(smartCasosList, smartPeriodo);
+      if (casosNoPeriodo.length === 0) {
+        showToast('⚠️ Não há casos para exportar no período atual.');
+        return;
+      }
+      const csv = gerarCsvCasosSmart(casosNoPeriodo);
+      const hoje = new Date().toISOString().slice(0, 10);
+      baixarArquivoCsvSmart(csv, `casos_smart_pos_${hoje}.csv`);
+      showToast(`Planilha CSV com ${casosNoPeriodo.length} casos exportada com sucesso!`);
+    }
+
+    function initSmartModule() {
+      // Carrega os casos do banco e do cache local
+      carregarCasosSmart();
+      // Inicializa o formulário do gerador
+      renderSmartGerador();
+    }
+
     function renderApp() {
       renderWeekendNotice();
       updateModuleNavigationUI();
@@ -8274,6 +11849,8 @@ END \$\$;
       renderSensoDeDono();
       renderPlantaoAcompanhamento();
       renderValidacaoAgenda();
+      renderSmartDashboard();
+      renderSmartGerador();
     }
 
     // Keyboard shortcuts
@@ -8282,7 +11859,9 @@ END \$\$;
       if (e.key === '1') switchMainView('routine');
       if (e.key === '2') switchMainView('plantao');
       if (e.key === '3') switchMainView('agenda');
-      if (e.key === '4') switchMainView('all');
+      if (e.key === '4') switchMainView('smartDashboard');
+      if (e.key === '5') switchMainView('smartGerador');
+      if (e.key === '6') switchMainView('all');
       if (e.key === 't' || e.key === 'T') toggleTvMode(!tvModeActive);
       if (e.key === 'r' || e.key === 'R') triggerQuickWorkDeskRound();
       if (e.key === 'c' || e.key === 'C') copyShiftSummary();
@@ -8290,7 +11869,7 @@ END \$\$;
       if (e.key === 'e' || e.key === 'E') openExecutiveReportModal();
       if (e.key === 'a' || e.key === 'A') openAnalyticsModal();
       if (e.key === '?') {
-        showToast('⌨️ Atalhos: [1] Rotina | [2] Plantão | [3] Agenda | [4] Tudo | [R] Ronda | [P] Passagem 19h | [E] Relatório | [T] TV');
+        showToast('⌨️ Atalhos: [1] Rotina | [2] Plantão | [3] Agenda | [4] Dash Smart | [5] Gerador Smart | [6] Tudo | [R] Ronda | [P] Passagem 19h | [E] Relatório | [T] TV');
       }
       if (e.key === 'Escape') {
         toggleTvMode(false);
@@ -8304,6 +11883,7 @@ END \$\$;
         closeExecutiveReportModal();
         closeDeleteConfirmModal();
         closeCanalAttendantsModal();
+        fecharDetalhesCasoSmart();
       }
     });
 
@@ -8330,7 +11910,6 @@ END \$\$;
           showToast('Fim de semana: A rotina é de segunda a sexta. Exibindo última sexta-feira útil.');
         }, 600);
       }
-
 
       // Seed um exemplo inicial de Senso de Dono se não houver registros e nunca tiver sido excluído pelo usuário
       const hasUserClearedSenso = localStorage.getItem('rotina_senso_cleared_' + selectedDate);
@@ -8374,6 +11953,9 @@ END \$\$;
 
       // 7. Carrega configurações e webhook do WhatsApp (Supabase + LocalStorage)
       loadWhatsAppConfig();
+
+      // 8. Inicializa e carrega casos do Gerador e Dashboard Smart
+      initSmartModule();
     };
   </script>
 </body>
