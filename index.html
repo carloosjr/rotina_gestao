@@ -1402,9 +1402,9 @@
           <span>Filtro Trilha:</span>
         </span>
 
-        <button onclick="setActiveFilter('all')" id="filterBtn-all" class="filter-tab">
+        <button onclick="setActiveFilter('all')" id="filterBtn-all" class="filter-tab active">
           <i class="ti ti-list-check"></i>
-          <span>Trilha Completa (08:00 às 21:00)</span>
+          <span>Todos os Gestores (08:00 às 21:00)</span>
         </button>
 
         <button onclick="setActiveFilter('Bruno')" id="filterBtn-Bruno" class="filter-tab">
@@ -4826,9 +4826,7 @@
       if (select) select.value = val;
       const display = document.getElementById('sensoAuthorDisplay');
       if (display) display.textContent = val;
-      setActiveFilter(val);
       showToast(`Gestor ativo alterado para ${val}`);
-      scheduleCloudSync();
     }
 
     function selectInitialOperator(op) {
@@ -4842,9 +4840,7 @@
       if (display) display.textContent = op;
       const modal = document.getElementById('operatorSelectModal');
       if (modal) modal.classList.add('hidden');
-      setActiveFilter(op);
-      showToast(`Bem-vindo, ${op}! Operação pronta.`);
-      scheduleCloudSync();
+      showToast(`Bem-vindo, ${op}! Visualizando lançamentos de toda a equipe.`);
     }
 
     function onDateSwitched(newDate) {
@@ -4944,13 +4940,29 @@
       }
     }
 
-    async function fetchDateFromSupabase(dateStr) {
+    function mergeSensoRecords(existingList, incomingList) {
+      const map = new Map();
+      (existingList || []).forEach(item => {
+        if (item && item.id) map.set(String(item.id), item);
+      });
+      (incomingList || []).forEach(item => {
+        if (item && item.id) {
+          const old = map.get(String(item.id)) || {};
+          map.set(String(item.id), { ...old, ...item });
+        }
+      });
+      return Array.from(map.values()).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+    }
+
+    async function fetchDateFromSupabase(dateStr, silent = false) {
       if (!supabaseClient) {
-        updateCloudSyncUI('offline', 'Cliente Supabase não inicializado.');
+        if (!silent) updateCloudSyncUI('offline', 'Cliente Supabase não inicializado.');
         return;
       }
       try {
-        updateCloudSyncUI('syncing', 'Buscando dados da data ' + dateStr);
+        if (!silent) updateCloudSyncUI('syncing', 'Buscando dados da data ' + dateStr);
+
+        // 1. Buscar registro consolidado do dia
         const { data: diariaData, error: diariaErr } = await supabaseClient
           .from('rotina_operacional_diaria')
           .select('*')
@@ -4960,15 +4972,29 @@
         if (diariaErr) {
           if (diariaErr.code === 'PGRST205' || (diariaErr.message && diariaErr.message.includes('not find the table'))) {
             console.warn('[Supabase] Tabela rotina_operacional_diaria pendente no banco.');
-            updateCloudSyncUI('error_table');
+            if (!silent) updateCloudSyncUI('error_table');
             return;
           }
           console.warn('[Supabase] Erro na consulta:', diariaErr);
-          updateCloudSyncUI('offline', diariaErr.message);
+          if (!silent) updateCloudSyncUI('offline', diariaErr.message);
           return;
         }
 
-        // Buscar apontamentos do Senso de Dono na tabela dedicada rotina_operacional_senso_dono
+        // 2. Buscar tarefas individuais auditáveis registradas para a data
+        // Garante que tarefas concluídas por QUALQUER gestor sejam consolidadas
+        let tarefasRows = [];
+        try {
+          const { data: tRows, error: tErr } = await supabaseClient
+            .from('rotina_operacional_tarefas')
+            .select('*')
+            .eq('data', dateStr);
+          if (!tErr && Array.isArray(tRows)) {
+            tarefasRows = tRows;
+          }
+        } catch (e) {}
+
+        // 3. Buscar apontamentos do Senso de Dono na tabela dedicada rotina_operacional_senso_dono
+        let sensoRowsList = [];
         try {
           const { data: sensoRows, error: sensoErr } = await supabaseClient
             .from('rotina_operacional_senso_dono')
@@ -4977,7 +5003,7 @@
             .order('horario', { ascending: false });
 
           if (!sensoErr && Array.isArray(sensoRows) && sensoRows.length > 0) {
-            dbState.sensoDeDono[dateStr] = sensoRows.map(s => ({
+            sensoRowsList = sensoRows.map(s => ({
               id: s.id,
               timestamp: s.created_at,
               time: s.horario,
@@ -4992,7 +5018,7 @@
           }
         } catch (e) {}
 
-        // Buscar ausências da data na tabela rotina_operacional_ausencias
+        // 4. Buscar ausências da data na tabela rotina_operacional_ausencias
         try {
           const { data: ausenciasRows, error: ausErr } = await supabaseClient
             .from('rotina_operacional_ausencias')
@@ -5001,11 +5027,11 @@
 
           if (!ausErr && Array.isArray(ausenciasRows) && ausenciasRows.length > 0) {
             const state = ensureDateState(dateStr);
-            state.absentStaff = ausenciasRows.map(a => a.operador_nome);
+            state.absentStaff = Array.from(new Set([...(state.absentStaff || []), ...ausenciasRows.map(a => a.operador_nome)]));
           }
         } catch (e) {}
 
-        // Buscar dados sincronizados do plantão nas tabelas plantaonoturno_* se existirem
+        // 5. Buscar dados sincronizados do plantão nas tabelas plantaonoturno_* se existirem
         try {
           const { data: turnoRow } = await supabaseClient
             .from('plantaonoturno_turnos')
@@ -5068,15 +5094,51 @@
         } catch (e) {}
 
         lastCloudSyncTime = new Date();
+
+        // 6. Aplicar os dados consolidados da nuvem
         if (diariaData) {
           applyRemoteData(diariaData, false);
-          updateCloudSyncUI('connected', `Dados de ${dateStr} sincronizados da nuvem.`);
-        } else {
-          updateCloudSyncUI('connected', `Pronto. Sem registros prévios na nuvem para ${dateStr}.`);
+        }
+
+        // 7. Consolidar tarefas da tabela dedicada (garante que tarefas marcadas por qualquer gestor coexistam)
+        if (tarefasRows.length > 0) {
+          const state = ensureDateState(dateStr);
+          tarefasRows.forEach(row => {
+            if (row.concluida || (row.logs && row.logs.length > 0)) {
+              const existing = state.tasks[row.task_id] || {};
+              state.tasks[row.task_id] = {
+                ...existing,
+                completed: !!row.concluida,
+                user: row.concluida_por || existing.user,
+                checkedTime: row.checked_time || existing.checkedTime,
+                timestamp: row.concluida_em || existing.timestamp,
+                onTime: row.no_horario ?? existing.onTime ?? true,
+                delayMinutes: row.delay_minutes ?? existing.delayMinutes ?? 0,
+                slaStatus: row.sla_status || existing.slaStatus || 'on_time',
+                logs: (row.logs && row.logs.length > 0) ? row.logs : (existing.logs || [])
+              };
+            }
+          });
+        }
+
+        // 8. Consolidar apontamentos de Senso de Dono
+        if (sensoRowsList.length > 0) {
+          dbState.sensoDeDono[dateStr] = mergeSensoRecords(dbState.sensoDeDono[dateStr] || [], sensoRowsList);
+        }
+
+        saveLocalState(dateStr);
+        renderApp();
+
+        if (!silent) {
+          if (diariaData || tarefasRows.length > 0 || sensoRowsList.length > 0) {
+            updateCloudSyncUI('connected', `Dados de ${dateStr} sincronizados da nuvem.`);
+          } else {
+            updateCloudSyncUI('connected', `Pronto. Sem registros prévios na nuvem para ${dateStr}.`);
+          }
         }
       } catch (err) {
         console.error('[Supabase] Exceção em fetchDateFromSupabase:', err);
-        updateCloudSyncUI('offline', err.message);
+        if (!silent) updateCloudSyncUI('offline', err.message);
       }
     }
 
@@ -5131,29 +5193,35 @@
         }
 
         // 2. Salvar tarefas auditáveis individualmente na tabela rotina_operacional_tarefas
+        // Apenas envia as tarefas que foram concluídas ou modificadas para nunca desmarcar tarefas concluídas por outros gestores!
         try {
-          const taskRows = masterSchedule.map(t => {
-            const rec = state.tasks[t.id] || {};
-            return {
-              data: dateStr,
-              task_id: t.id,
-              titulo: t.title,
-              horario: t.time,
-              responsavel: t.resp,
-              categoria: t.category,
-              critica: !!t.critical,
-              concluida: !!rec.completed,
-              concluida_por: rec.user || null,
-              concluida_em: rec.timestamp || null,
-              checked_time: rec.checkedTime || null,
-              no_horario: rec.onTime ?? true,
-              delay_minutes: rec.delayMinutes ?? (rec.onTime === false ? 25 : 0),
-              sla_status: rec.slaStatus || (rec.onTime === false ? 'delayed' : 'on_time'),
-              logs: rec.logs || [],
-              updated_at: new Date().toISOString()
-            };
+          const taskRowsToUpsert = [];
+          masterSchedule.forEach(t => {
+            const rec = state.tasks[t.id];
+            if (rec && (rec.completed || (rec.logs && rec.logs.length > 0))) {
+              taskRowsToUpsert.push({
+                data: dateStr,
+                task_id: t.id,
+                titulo: t.title,
+                horario: t.time,
+                responsavel: t.resp,
+                categoria: t.category,
+                critica: !!t.critical,
+                concluida: !!rec.completed,
+                concluida_por: rec.user || null,
+                concluida_em: rec.timestamp || null,
+                checked_time: rec.checkedTime || null,
+                no_horario: rec.onTime ?? true,
+                delay_minutes: rec.delayMinutes ?? (rec.onTime === false ? 25 : 0),
+                sla_status: rec.slaStatus || (rec.onTime === false ? 'delayed' : 'on_time'),
+                logs: rec.logs || [],
+                updated_at: new Date().toISOString()
+              });
+            }
           });
-          supabaseClient.from('rotina_operacional_tarefas').upsert(taskRows, { onConflict: 'data,task_id' }).then();
+          if (taskRowsToUpsert.length > 0) {
+            supabaseClient.from('rotina_operacional_tarefas').upsert(taskRowsToUpsert, { onConflict: 'data,task_id' }).then();
+          }
         } catch (e) {}
 
         // 3. Salvar apontamentos de Senso de Dono na tabela rotina_operacional_senso_dono
@@ -5235,6 +5303,70 @@
             }
           }
         )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'rotina_operacional_senso_dono',
+            filter: `data=eq.${dateStr}`
+          },
+          (payload) => {
+            console.log('[Supabase Realtime] Evento em senso_dono:', payload);
+            if ((payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') && payload.new) {
+              const s = payload.new;
+              const rec = {
+                id: s.id,
+                timestamp: s.created_at,
+                time: s.horario,
+                user: s.gestor,
+                aconteceu: s.aconteceu,
+                acoes: s.acoes,
+                conhecimento: s.conhecimento,
+                produto: s.produto,
+                cliente: s.cliente,
+                processo: s.processo
+              };
+              dbState.sensoDeDono[selectedDate] = mergeSensoRecords(dbState.sensoDeDono[selectedDate] || [], [rec]);
+              saveLocalState(selectedDate);
+              renderSensoDeDono();
+              playChime(520, 0.08);
+              showToast(`Novo Senso de Dono lançado por ${s.gestor}!`);
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              dbState.sensoDeDono[selectedDate] = (dbState.sensoDeDono[selectedDate] || []).filter(r => String(r.id) !== String(payload.old.id));
+              saveLocalState(selectedDate);
+              renderSensoDeDono();
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'rotina_operacional_tarefas',
+            filter: `data=eq.${dateStr}`
+          },
+          (payload) => {
+            console.log('[Supabase Realtime] Evento em rotina_operacional_tarefas:', payload);
+            if ((payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') && payload.new) {
+              const row = payload.new;
+              const state = ensureDateState(selectedDate);
+              state.tasks[row.task_id] = {
+                completed: !!row.concluida,
+                user: row.concluida_por,
+                checkedTime: row.checked_time,
+                timestamp: row.concluida_em,
+                onTime: row.no_horario,
+                delayMinutes: row.delay_minutes,
+                slaStatus: row.sla_status,
+                logs: row.logs || []
+              };
+              saveLocalState(selectedDate);
+              renderApp();
+            }
+          }
+        )
         .subscribe((status) => {
           console.log('[Supabase Realtime] Status da inscrição:', status);
           if (status === 'SUBSCRIBED') {
@@ -5249,12 +5381,21 @@
       const dateStr = data.data;
       const state = ensureDateState(dateStr);
 
-      if (data.tarefas) {
-        state.tasks = { ...state.tasks, ...data.tarefas };
+      if (data.tarefas && typeof data.tarefas === 'object') {
+        Object.keys(data.tarefas).forEach(taskId => {
+          const remoteTask = data.tarefas[taskId];
+          if (!remoteTask) return;
+          const localTask = state.tasks[taskId] || {};
+          if (remoteTask.completed) {
+            state.tasks[taskId] = { ...localTask, ...remoteTask };
+          } else if (!localTask.completed) {
+            state.tasks[taskId] = { ...localTask, ...remoteTask };
+          }
+        });
       }
 
       if (Array.isArray(data.senso_de_dono)) {
-        dbState.sensoDeDono[dateStr] = data.senso_de_dono;
+        dbState.sensoDeDono[dateStr] = mergeSensoRecords(dbState.sensoDeDono[dateStr] || [], data.senso_de_dono);
       }
 
       if (data.almocos) {
@@ -5267,7 +5408,7 @@
 
       if (data.workdesk) {
         if (typeof data.workdesk.workdeskRounds === 'number') {
-          state.workdeskRounds = data.workdesk.workdeskRounds;
+          state.workdeskRounds = Math.max(state.workdeskRounds || 0, data.workdesk.workdeskRounds);
         }
         if (data.workdesk.lastRoundTime) {
           state.lastRoundTime = data.workdesk.lastRoundTime;
@@ -5275,8 +5416,8 @@
         if (data.workdesk.lastRoundUser) {
           state.lastRoundUser = data.workdesk.lastRoundUser;
         }
-        if (Array.isArray(data.workdesk.absentStaff) && data.workdesk.absentStaff.length > 0) {
-          state.absentStaff = data.workdesk.absentStaff;
+        if (Array.isArray(data.workdesk.absentStaff)) {
+          state.absentStaff = Array.from(new Set([...(state.absentStaff || []), ...data.workdesk.absentStaff]));
         }
       }
 
@@ -5345,7 +5486,7 @@
             if (display) display.textContent = savedOp;
           }
         }
-        activeFilter = activeOperator;
+        activeFilter = 'all';
       } catch (e) {
         console.warn('[LocalStorage] Erro ao carregar cache local:', e);
       }
@@ -6052,6 +6193,20 @@ END \$\$;
 
     // Intervalo contínuo para verificação de tarefas críticas
     setInterval(checkCriticalTaskAlerts, 25000);
+
+    // Polling contínuo em background (15s) para que todos os gestores vejam em tempo real os lançamentos dos colegas
+    setInterval(() => {
+      if (supabaseClient && !isSyncingToCloud && !isApplyingRemoteUpdate && selectedDate) {
+        fetchDateFromSupabase(selectedDate, true);
+      }
+    }, 15000);
+
+    // Sincronizar imediatamente quando o gestor retornar ou alternar para a aba do sistema
+    window.addEventListener('focus', () => {
+      if (supabaseClient && !isSyncingToCloud && selectedDate) {
+        fetchDateFromSupabase(selectedDate, true);
+      }
+    });
 
     // =========================================================================
     // FEATURE 5: RELATÓRIO EXECUTIVO EM PDF & IMPRESSÃO PROFISSIONAL
@@ -11900,9 +12055,7 @@ END \$\$;
 
       // 1. Carrega dados do cache local offline imediatamente (zero delay)
       loadLocalState(selectedDate);
-      if (activeOperator) {
-        setActiveFilter(activeOperator);
-      }
+      setActiveFilter('all');
       updateNotificationButtonUI();
 
       if (isWeekend(getFormattedTodayDate())) {
