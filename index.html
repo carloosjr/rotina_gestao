@@ -1258,6 +1258,12 @@
         <span id="voiceAlertText" class="hidden sm:inline">Voz Ativa</span>
       </button>
 
+      <!-- Realtime Status Indicator Badge -->
+      <div id="realtimeBadge" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#1c1c1c] text-emerald-400 border border-emerald-500/30 transition shadow-xs" title="Sincronização em Tempo Real Ativa (Supabase Broadcast + WebSocket)">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="hidden md:inline">Tempo Real</span>
+      </div>
+
       <!-- Desktop Push Notification Permission Button -->
       <button id="notifPermBtn" onclick="requestBrowserNotificationPermission()" title="Ativar alertas desktop para a ronda de 30m" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#1c1c1c] hover:bg-[#252525] text-slate-300 border border-[#2a2a2a] hover:border-[#fbbf24]/50 transition">
         <i id="notifPermIcon" class="ti ti-bell text-[#fbbf24]"></i>
@@ -5275,13 +5281,33 @@
       }
     }
 
+    function broadcastRealtimeAction(type, data) {
+      if (realtimeChannel && typeof realtimeChannel.send === 'function') {
+        try {
+          realtimeChannel.send({
+            type: 'broadcast',
+            event: 'routine_sync',
+            payload: {
+              type,
+              data,
+              date: selectedDate,
+              sender: activeOperator,
+              timestamp: new Date().toISOString()
+            }
+          }).catch(err => {
+            console.warn('[Realtime Broadcast] Erro:', err);
+          });
+        } catch(e) {}
+      }
+    }
+
     function scheduleCloudSync() {
       saveLocalState(selectedDate);
       if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
       updateCloudSyncUI('syncing');
       syncDebounceTimer = setTimeout(() => {
         saveToSupabase(selectedDate);
-      }, 400);
+      }, 250);
     }
 
     function subscribeToDateRealtime(dateStr) {
@@ -5293,7 +5319,71 @@
       }
 
       realtimeChannel = supabaseClient
-        .channel(`rotina_op_${dateStr}`)
+        .channel(`rotina_op_${dateStr}`, {
+          config: {
+            broadcast: { ack: false, self: false }
+          }
+        })
+        .on('broadcast', { event: 'routine_sync' }, (res) => {
+          const payload = res?.payload;
+          if (!payload || payload.date !== selectedDate) return;
+          if (payload.sender && normalizeName(payload.sender) === normalizeName(activeOperator)) return;
+
+          console.log('[Realtime Broadcast] Atualização instantânea recebida:', payload);
+          const state = ensureDateState(selectedDate);
+
+          if (payload.type === 'task_toggle') {
+            const { taskId, taskRecord } = payload.data;
+            if (taskId && taskRecord) {
+              state.tasks[taskId] = taskRecord;
+              saveLocalState(selectedDate);
+              renderApp();
+              playChime(660, 0.08);
+              const actionLabel = taskRecord.completed ? 'concluiu' : 'reabriu';
+              showToast(`⚡ ${payload.sender} ${actionLabel} "${payload.data.taskTitle || 'uma tarefa'}"`);
+            }
+          } else if (payload.type === 'senso_add') {
+            if (payload.data?.record) {
+              dbState.sensoDeDono[selectedDate] = mergeSensoRecords(dbState.sensoDeDono[selectedDate] || [], [payload.data.record]);
+              saveLocalState(selectedDate);
+              renderSensoDeDono();
+              playChime(780, 0.1);
+              showToast(`⚡ Novo Senso de Dono lançado por ${payload.sender}!`);
+            }
+          } else if (payload.type === 'senso_del') {
+            if (payload.data?.recId) {
+              dbState.sensoDeDono[selectedDate] = (dbState.sensoDeDono[selectedDate] || []).filter(r => String(r.id) !== String(payload.data.recId));
+              saveLocalState(selectedDate);
+              renderSensoDeDono();
+              showToast(`⚡ Senso de Dono removido por ${payload.sender}`);
+            }
+          } else if (payload.type === 'workdesk_round') {
+            if (payload.data) {
+              state.workdeskRounds = payload.data.workdeskRounds;
+              state.lastRoundTime = payload.data.lastRoundTime;
+              state.lastRoundUser = payload.data.lastRoundUser;
+              workdeskSecondsLeft = 30 * 60;
+              saveLocalState(selectedDate);
+              renderApp();
+              playChime(880, 0.1);
+              showToast(`⚡ ${payload.sender} registrou a ronda ${payload.data.workdeskRounds} do WorkDesk!`);
+            }
+          } else if (payload.type === 'absent_toggle') {
+            if (payload.data?.absentStaff) {
+              state.absentStaff = payload.data.absentStaff;
+              saveLocalState(selectedDate);
+              renderTimeline();
+              showToast(`⚡ ${payload.sender} atualizou as ausências/atestados`);
+            }
+          } else if (payload.type === 'lunch_toggle') {
+            if (payload.data?.lunchDeviations) {
+              state.lunchDeviations = payload.data.lunchDeviations;
+              saveLocalState(selectedDate);
+              renderLunchRuler();
+              showToast(`⚡ ${payload.sender} atualizou a tolerância de almoço (+15m)`);
+            }
+          }
+        })
         .on(
           'postgres_changes',
           {
@@ -5339,7 +5429,6 @@
               saveLocalState(selectedDate);
               renderSensoDeDono();
               playChime(520, 0.08);
-              showToast(`Novo Senso de Dono lançado por ${s.gestor}!`);
             } else if (payload.eventType === 'DELETE' && payload.old) {
               dbState.sensoDeDono[selectedDate] = (dbState.sensoDeDono[selectedDate] || []).filter(r => String(r.id) !== String(payload.old.id));
               saveLocalState(selectedDate);
@@ -5366,8 +5455,8 @@
                 checkedTime: row.checked_time,
                 timestamp: row.concluida_em,
                 onTime: row.no_horario,
-                delayMinutes: row.delay_minutes,
-                slaStatus: row.sla_status,
+                delayMinutes: row.delay_minutes || 0,
+                slaStatus: row.sla_status || 'on_time',
                 logs: row.logs || []
               };
               saveLocalState(selectedDate);
@@ -5379,6 +5468,11 @@
           console.log('[Supabase Realtime] Status da inscrição:', status);
           if (status === 'SUBSCRIBED') {
             updateCloudSyncUI('connected', 'Sincronização em tempo real ativa.');
+            const badge = document.getElementById('realtimeBadge');
+            if (badge) {
+              badge.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#1c1c1c] text-emerald-400 border border-emerald-500/30 transition shadow-xs';
+              badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="hidden md:inline">Tempo Real Ativo</span>';
+            }
           }
         });
     }
@@ -5892,6 +5986,8 @@ END \$\$;
         showToast('Retorno no horário normal restabelecido.');
       }
       renderLunchRuler();
+      broadcastRealtimeAction('lunch_toggle', { lunchDeviations: state.lunchDeviations });
+      scheduleCloudSync();
     }
 
     // Feature 4: Toggle operator absence
@@ -5907,6 +6003,7 @@ END \$\$;
         showToast(`Presença normalizada: ${name}`);
       }
       renderTimeline();
+      broadcastRealtimeAction('absent_toggle', { absentStaff: state.absentStaff });
       scheduleCloudSync();
     }
 
@@ -5922,6 +6019,7 @@ END \$\$;
       }
       input.value = '';
       renderTimeline();
+      broadcastRealtimeAction('absent_toggle', { absentStaff: state.absentStaff });
       scheduleCloudSync();
     }
 
@@ -8430,6 +8528,7 @@ END \$\$;
       }
 
       renderApp();
+      broadcastRealtimeAction('task_toggle', { taskId, taskRecord: state.tasks[taskId], taskTitle: taskDef?.title });
       scheduleCloudSync();
     }
 
@@ -8462,6 +8561,7 @@ END \$\$;
 
       showToast(`Ronda do WorkDesk registrada por ${activeOperator}! Total: ${state.workdeskRounds}`);
       renderApp();
+      broadcastRealtimeAction('workdesk_round', { workdeskRounds: state.workdeskRounds, lastRoundTime: timeStr, lastRoundUser: activeOperator });
       scheduleCloudSync();
     }
 
@@ -8888,6 +8988,7 @@ END \$\$;
       playChime(780, 0.15);
       showToast(`Registro de Senso de Dono salvo por ${activeOperator}!`);
       renderSensoDeDono();
+      broadcastRealtimeAction('senso_add', { record });
       scheduleCloudSync();
     }
 
@@ -8998,6 +9099,7 @@ END \$\$;
 
       showToast('Registro de Senso de Dono excluído com sucesso.');
       renderSensoDeDono();
+      broadcastRealtimeAction('senso_del', { recId });
       scheduleCloudSync();
     }
 
@@ -12117,6 +12219,25 @@ END \$\$;
 
       // 8. Inicializa e carrega casos do Gerador e Dashboard Smart
       initSmartModule();
+
+      // 9. Sincronização em tempo real periódica (4s) e revalidação ao focar a aba
+      setInterval(() => {
+        if (supabaseClient && !isSyncingToCloud) {
+          fetchDateFromSupabase(selectedDate, true);
+        }
+      }, 4000);
+
+      window.addEventListener('focus', () => {
+        if (supabaseClient && !isSyncingToCloud) {
+          fetchDateFromSupabase(selectedDate, true);
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && supabaseClient && !isSyncingToCloud) {
+          fetchDateFromSupabase(selectedDate, true);
+        }
+      });
     };
   </script>
 </body>
