@@ -3886,10 +3886,14 @@
   <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL)     -->
   <!-- ============================================================== -->
   <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-[#1c1c1c] border border-red-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative">
-      <div class="flex items-start gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center text-xl shrink-0 border border-red-500/30">
-          <i class="ti ti-trash"></i>
+    <div id="deleteConfirmCard" class="bg-[#1c1c1c] border border-red-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative">
+      <button onclick="closeDeleteConfirmModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#252525] transition" title="Fechar (Esc)">
+        <i class="ti ti-x text-lg"></i>
+      </button>
+
+      <div class="flex items-start gap-3.5 pr-6">
+        <div id="deleteConfirmIconBox" class="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center text-xl shrink-0 border border-red-500/30">
+          <i id="deleteConfirmIcon" class="ti ti-trash"></i>
         </div>
         <div class="space-y-1">
           <h3 id="deleteConfirmTitle" class="text-base font-bold text-white">Confirmar Exclusão</h3>
@@ -8818,6 +8822,88 @@ END \$\$;
     }
 
     // ==============================================================
+    // CONTROLLER DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL)
+    // ==============================================================
+    let pendingDeleteCallback = null;
+
+    function requestDeleteConfirmation({
+      title = 'Confirmar Exclusão',
+      message = 'Tem certeza que deseja prosseguir com a exclusão?',
+      detailsHtml = null,
+      confirmBtnText = 'Confirmar e Excluir',
+      iconClass = 'ti ti-trash',
+      danger = true,
+      onConfirm
+    }) {
+      const modal = document.getElementById('deleteConfirmModal');
+      const titleEl = document.getElementById('deleteConfirmTitle');
+      const msgEl = document.getElementById('deleteConfirmMessage');
+      const detailsEl = document.getElementById('deleteConfirmDetails');
+      const actionBtn = document.getElementById('deleteConfirmActionBtn');
+      const iconEl = document.getElementById('deleteConfirmIcon');
+      const iconBox = document.getElementById('deleteConfirmIconBox');
+      const card = document.getElementById('deleteConfirmCard');
+
+      if (titleEl) titleEl.textContent = title;
+      if (msgEl) msgEl.textContent = message;
+
+      if (iconEl) iconEl.className = iconClass;
+      if (iconBox) {
+        if (danger) {
+          iconBox.className = "w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center text-xl shrink-0 border border-red-500/30";
+        } else {
+          iconBox.className = "w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-xl shrink-0 border border-amber-500/30";
+        }
+      }
+
+      if (card) {
+        if (danger) {
+          card.className = "bg-[#1c1c1c] border border-red-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative";
+        } else {
+          card.className = "bg-[#1c1c1c] border border-amber-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative";
+        }
+      }
+
+      if (detailsEl) {
+        if (detailsHtml) {
+          detailsEl.innerHTML = detailsHtml;
+          detailsEl.classList.remove('hidden');
+        } else {
+          detailsEl.classList.add('hidden');
+        }
+      }
+
+      if (actionBtn) {
+        actionBtn.innerHTML = `<i class="${iconClass}"></i><span>${confirmBtnText}</span>`;
+        if (danger) {
+          actionBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-1.5 active:scale-95 shadow-sm";
+        } else {
+          actionBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition flex items-center gap-1.5 active:scale-95 shadow-sm";
+        }
+      }
+
+      pendingDeleteCallback = onConfirm;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDeleteConfirmModal() {
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.add('hidden');
+      pendingDeleteCallback = null;
+    }
+
+    function confirmDeleteAction() {
+      if (typeof pendingDeleteCallback === 'function') {
+        const action = pendingDeleteCallback;
+        pendingDeleteCallback = null;
+        closeDeleteConfirmModal();
+        action();
+      } else {
+        closeDeleteConfirmModal();
+      }
+    }
+
+    // ==============================================================
     // GESTÃO DE TAREFAS: ADICIONAR, EDITAR, EXCLUIR E RESTAURAR
     // ==============================================================
 
@@ -8933,10 +9019,30 @@ END \$\$;
       const task = masterSchedule.find(t => t.id === taskId);
       if (!task) return;
 
-      const confirmMsg = `Tem certeza que deseja excluir esta tarefa?\n\n"${task.title}" (${task.time})\nResponsável: ${task.resp}\n\nEsta alteração será sincronizada em tempo real para toda a equipe.`;
-      if (confirm(confirmMsg)) {
-        deleteTask(taskId);
-      }
+      const detailsHtml = `
+        <div class="space-y-1.5 text-left">
+          <div class="flex items-center justify-between font-bold text-white">
+            <span class="flex items-center gap-1.5"><i class="ti ti-checklist text-[#fbbf24]"></i> ${task.title}</span>
+            <span class="px-2 py-0.5 rounded bg-[#252525] text-slate-300 font-mono text-[11px]">${task.time}${task.timeEnd ? ' - ' + task.timeEnd : ''}</span>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Responsável: <strong class="text-slate-200">${task.resp}</strong> | Categoria: <strong class="text-slate-200">${task.category || 'Geral'}</strong>
+          </div>
+          ${task.desc ? `<p class="text-[11px] text-slate-400 italic line-clamp-2 mt-1">"${task.desc}"</p>` : ''}
+        </div>
+      `;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Tarefa Operacional',
+        message: 'Deseja realmente excluir esta tarefa do catálogo da rotina? A alteração será sincronizada em tempo real para toda a equipe.',
+        detailsHtml,
+        confirmBtnText: 'Excluir Tarefa',
+        iconClass: 'ti ti-trash',
+        danger: true,
+        onConfirm: () => {
+          deleteTask(taskId);
+        }
+      });
     }
 
     function deleteTask(taskId) {
@@ -8958,14 +9064,28 @@ END \$\$;
     }
 
     function resetMasterScheduleToDefault() {
-      const confirmMsg = 'Deseja restaurar as 28 tarefas operacionais originais do sistema?\n\nQualquer tarefa personalizada criada ou alterada será substituída pelo catálogo padrão oficial.';
-      if (!confirm(confirmMsg)) return;
+      const detailsHtml = `
+        <div class="space-y-1 text-left text-[11px] text-slate-300">
+          <p>⚠️ O catálogo voltará para as <strong class="text-white">28 tarefas oficiais</strong>.</p>
+          <p>Todas as tarefas customizadas criadas ou alteradas nesta rotina serão substituídas.</p>
+        </div>
+      `;
 
-      masterSchedule = defaultMasterSchedule.map(t => ({ ...t }));
-      saveMasterSchedule(masterSchedule);
-      closeTaskModal();
-      renderApp();
-      showToast('✓ Catálogo oficial de 28 tarefas restaurado!');
+      requestDeleteConfirmation({
+        title: 'Restaurar Catálogo Padrão',
+        message: 'Deseja realmente restaurar as 28 tarefas operacionais originais do sistema?',
+        detailsHtml,
+        confirmBtnText: 'Restaurar Catálogo',
+        iconClass: 'ti ti-refresh',
+        danger: false,
+        onConfirm: () => {
+          masterSchedule = defaultMasterSchedule.map(t => ({ ...t }));
+          saveMasterSchedule(masterSchedule);
+          closeTaskModal();
+          renderApp();
+          showToast('✓ Catálogo oficial de 28 tarefas restaurado!');
+        }
+      });
     }
 
     function completeHudCurrentTask() {
@@ -9433,48 +9553,6 @@ END \$\$;
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
-    }
-
-    // --- CONTROLLER DE CONFIRMAÇÃO DE EXCLUSÃO (GENÉRICO & REUTILIZÁVEL) ---
-    let pendingDeleteCallback = null;
-
-    function requestDeleteConfirmation({ title, message, detailsHtml, onConfirm }) {
-      const modal = document.getElementById('deleteConfirmModal');
-      const titleEl = document.getElementById('deleteConfirmTitle');
-      const msgEl = document.getElementById('deleteConfirmMessage');
-      const detailsEl = document.getElementById('deleteConfirmDetails');
-
-      if (titleEl) titleEl.textContent = title || 'Confirmar Exclusão';
-      if (msgEl) msgEl.textContent = message || 'Tem certeza que deseja prosseguir com a exclusão?';
-
-      if (detailsEl) {
-        if (detailsHtml) {
-          detailsEl.innerHTML = detailsHtml;
-          detailsEl.classList.remove('hidden');
-        } else {
-          detailsEl.classList.add('hidden');
-        }
-      }
-
-      pendingDeleteCallback = onConfirm;
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeDeleteConfirmModal() {
-      const modal = document.getElementById('deleteConfirmModal');
-      if (modal) modal.classList.add('hidden');
-      pendingDeleteCallback = null;
-    }
-
-    function confirmDeleteAction() {
-      if (typeof pendingDeleteCallback === 'function') {
-        const action = pendingDeleteCallback;
-        pendingDeleteCallback = null;
-        closeDeleteConfirmModal();
-        action();
-      } else {
-        closeDeleteConfirmModal();
-      }
     }
 
     function deleteSensoRecord(recId) {
@@ -10323,10 +10401,32 @@ END \$\$;
 
     function excluirAtendimentoGrupo(id) {
       const state = ensureDateState(selectedDate);
-      state.acompanhamentoPlantao.groupLogs = state.acompanhamentoPlantao.groupLogs.filter(g => g.id !== id);
-      scheduleCloudSync();
-      renderPlantaoGrupos(state);
-      showToast('Lançamento de grupo removido.');
+      const log = (state.acompanhamentoPlantao.groupLogs || []).find(g => g.id === id);
+      const detailsHtml = log ? `
+        <div class="space-y-1 text-left">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="ti ti-brand-whatsapp text-[#25D366]"></i>
+            <span>${log.nome}</span>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Horário: <strong class="text-slate-200">${log.inicio}${log.fim ? ' às ' + log.fim : ' (Em andamento)'}</strong>
+            ${log.atendente ? ` | Atendente: <strong class="text-slate-200">${log.atendente}</strong>` : ''}
+          </div>
+        </div>
+      ` : null;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Atendimento em Grupo',
+        message: 'Tem certeza que deseja excluir este atendimento de cliente no grupo?',
+        detailsHtml,
+        confirmBtnText: 'Excluir Atendimento',
+        onConfirm: () => {
+          state.acompanhamentoPlantao.groupLogs = state.acompanhamentoPlantao.groupLogs.filter(g => g.id !== id);
+          scheduleCloudSync();
+          renderPlantaoGrupos(state);
+          showToast('Lançamento de grupo removido.');
+        }
+      });
     }
 
     // 3. FILAS DE ATENDIMENTO
@@ -10462,10 +10562,31 @@ END \$\$;
 
     function excluirFilaPlantao(id) {
       const state = ensureDateState(selectedDate);
-      state.acompanhamentoPlantao.queueLogs = state.acompanhamentoPlantao.queueLogs.filter(q => q.id !== id);
-      scheduleCloudSync();
-      renderPlantaoFilas(state);
-      showToast('Registro de fila removido.');
+      const log = (state.acompanhamentoPlantao.queueLogs || []).find(q => q.id === id);
+      const detailsHtml = log ? `
+        <div class="space-y-1 text-left">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="ti ti-users text-[#fbbf24]"></i>
+            <span>Fila: ${log.quantidade || 0} ticket(s)</span>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Início: <strong class="text-slate-200">${log.inicio || '--:--'}</strong>${log.fim ? ` • Zerou: <strong class="text-slate-200">${log.fim}</strong>` : ' (Em fila)'}
+          </div>
+        </div>
+      ` : null;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Registro de Fila',
+        message: 'Tem certeza que deseja excluir este apontamento de fila do plantão?',
+        detailsHtml,
+        confirmBtnText: 'Excluir Fila',
+        onConfirm: () => {
+          state.acompanhamentoPlantao.queueLogs = state.acompanhamentoPlantao.queueLogs.filter(q => q.id !== id);
+          scheduleCloudSync();
+          renderPlantaoFilas(state);
+          showToast('Registro de fila removido.');
+        }
+      });
     }
 
     // 4. LIGAÇÕES NA CENTRAL
@@ -10549,10 +10670,31 @@ END \$\$;
 
     function excluirLigacaoPlantao(id) {
       const state = ensureDateState(selectedDate);
-      state.acompanhamentoPlantao.ligacoes = state.acompanhamentoPlantao.ligacoes.filter(l => l.id !== id);
-      scheduleCloudSync();
-      renderPlantaoLigacoes(state);
-      showToast('Registro de ligação removido.');
+      const log = (state.acompanhamentoPlantao.ligacoes || []).find(l => l.id === id);
+      const detailsHtml = log ? `
+        <div class="space-y-1 text-left">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="ti ti-phone-call text-[#fbbf24]"></i>
+            <span>${log.quantidade} ligação(ões) na central</span>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Registrado às <strong class="text-slate-200">${log.horario || '--:--'}</strong>
+          </div>
+        </div>
+      ` : null;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Registro de Ligação',
+        message: 'Deseja realmente excluir este lançamento de ligações da central?',
+        detailsHtml,
+        confirmBtnText: 'Excluir Registro',
+        onConfirm: () => {
+          state.acompanhamentoPlantao.ligacoes = state.acompanhamentoPlantao.ligacoes.filter(l => l.id !== id);
+          scheduleCloudSync();
+          renderPlantaoLigacoes(state);
+          showToast('Registro de ligação removido.');
+        }
+      });
     }
 
     // =========================================================================
@@ -10698,10 +10840,32 @@ END \$\$;
 
     function excluirAgendaIndevida(id) {
       const state = ensureDateState(selectedDate);
-      state.acompanhamentoPlantao.agendaLogs = state.acompanhamentoPlantao.agendaLogs.filter(a => a.id !== id);
-      scheduleCloudSync();
-      renderValidacaoAgenda();
-      showToast('Registro de OC indevida removido.');
+      const log = (state.acompanhamentoPlantao.agendaLogs || []).find(a => a.id === id);
+      const detailsHtml = log ? `
+        <div class="space-y-1 text-left">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="ti ti-calendar-event text-rose-400"></i>
+            <span>OC #${log.oc || '---'} • ${log.responsavel || 'Técnico'}</span>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Motivo: <strong class="text-slate-200">${log.motivo || 'Indevida'}</strong>
+            ${log.registro ? ` | Cliente #${log.registro}` : ''}
+          </div>
+        </div>
+      ` : null;
+
+      requestDeleteConfirmation({
+        title: 'Excluir Apontamento de OC Indevida',
+        message: 'Deseja realmente excluir este registro de OC indevida da agenda?',
+        detailsHtml,
+        confirmBtnText: 'Excluir Apontamento',
+        onConfirm: () => {
+          state.acompanhamentoPlantao.agendaLogs = state.acompanhamentoPlantao.agendaLogs.filter(a => a.id !== id);
+          scheduleCloudSync();
+          renderValidacaoAgenda();
+          showToast('Registro de OC indevida removido.');
+        }
+      });
     }
 
     // --- CÓPIA E COMPILADOS PARA WHATSAPP ---
@@ -11620,33 +11784,49 @@ END \$\$;
     }
 
     // Persistência: Excluir Caso
-    async function excluirCasoSmart(id, registro) {
-      if (!confirm(`Deseja realmente excluir o caso do cliente #${registro}?`)) {
-        return;
-      }
+    function excluirCasoSmart(id, registro) {
+      const caso = smartCasosList.find(c => c.id === id);
+      const detailsHtml = `
+        <div class="space-y-1 text-left">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="ti ti-file-text text-[#fbbf24]"></i>
+            <span>Caso #${registro}</span>
+          </div>
+          ${caso?.nome ? `<div class="text-[11px] text-slate-400">Cliente: <strong class="text-slate-200">${caso.nome}</strong></div>` : ''}
+          ${caso?.resumo ? `<p class="text-[11px] text-slate-400 italic line-clamp-2">"${caso.resumo}"</p>` : ''}
+        </div>
+      `;
 
-      smartCasosList = smartCasosList.filter(c => c.id !== id);
-      try {
-        localStorage.setItem(CACHE_KEY_SMART_CASOS, JSON.stringify(smartCasosList));
-      } catch (e) {}
+      requestDeleteConfirmation({
+        title: 'Excluir Caso do Plantão',
+        message: `Deseja realmente excluir o caso do cliente #${registro}? O registro será removido permanentemente.`,
+        detailsHtml,
+        confirmBtnText: 'Excluir Caso',
+        onConfirm: async () => {
+          smartCasosList = smartCasosList.filter(c => c.id !== id);
+          try {
+            localStorage.setItem(CACHE_KEY_SMART_CASOS, JSON.stringify(smartCasosList));
+          } catch (e) {}
 
-      if (supabaseClient) {
-        try {
-          await supabaseClient.from('plantaonoturno_casos_smart').delete().eq('id', id);
-        } catch (e) {
-          console.warn('[Smart] Erro ao deletar no Supabase:', e);
+          if (supabaseClient) {
+            try {
+              await supabaseClient.from('plantaonoturno_casos_smart').delete().eq('id', id);
+            } catch (e) {
+              console.warn('[Smart] Erro ao deletar no Supabase:', e);
+            }
+          }
+
+          const badgeNav = document.getElementById('moduleBadgeSmartCasos');
+          if (badgeNav) {
+            badgeNav.textContent = String(smartCasosList.length);
+            badgeNav.classList.toggle('hidden', smartCasosList.length === 0);
+          }
+
+          renderSmartDashboard();
+          renderSmartSavedHistoryCards();
+          showToast(`Caso #${registro} excluído.`);
         }
-      }
-
-      const badgeNav = document.getElementById('moduleBadgeSmartCasos');
-      if (badgeNav) {
-        badgeNav.textContent = String(smartCasosList.length);
-        badgeNav.classList.toggle('hidden', smartCasosList.length === 0);
-      }
-
-      renderSmartDashboard();
-      renderSmartSavedHistoryCards();
-      showToast(`Caso #${registro} excluído.`);
+      });
     }
 
     // Carregar Caso no Formulário do Gerador
