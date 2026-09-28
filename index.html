@@ -1549,7 +1549,10 @@
         <div class="bg-[#252525] border border-[#2a2a2a] rounded-xl p-4 sm:p-5 flex flex-col justify-between shrink-0 lg:w-96 shadow-xl space-y-3.5">
           <div class="flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Tempo Restante do Ciclo</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <i class="ti ti-users text-[#fbbf24] text-xs"></i>
+                <span>Ciclo Unificado da Equipe</span>
+              </span>
               <div class="flex items-baseline gap-2 mt-0.5">
                 <span id="rondaBigCountdown" class="font-mono text-3xl font-black text-[#fbbf24] tracking-tight">30:00</span>
                 <span class="text-[11px] text-slate-400 font-semibold">/ 30 min</span>
@@ -1558,7 +1561,7 @@
 
             <!-- Total rounds today badge -->
             <div class="text-right">
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Total Hoje</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Total Equipe</span>
               <div class="flex items-center justify-end gap-1.5 mt-0.5">
                 <span id="rondaBigCount" class="text-2xl font-black text-[#22c55e]">0</span>
                 <span class="text-xs text-slate-400 font-medium">rondas</span>
@@ -1579,14 +1582,14 @@
 
           <!-- Last round audit info -->
           <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5 border-t border-[#2a2a2a]">
-            <span>Última ronda:</span>
+            <span>Última ronda da equipe:</span>
             <span id="rondaLastCheckedLabel" class="font-semibold text-slate-300">Nenhuma ainda hoje</span>
           </div>
 
           <!-- Primary Click Button -->
           <button onclick="triggerQuickWorkDeskRound()" class="w-full py-3 px-4 rounded-lg btn-accent text-xs sm:text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98]">
             <i class="ti ti-rotate-clockwise text-base"></i>
-            <span>VALIDAR RONDA DO WORKDESK AGORA</span>
+            <span>VALIDAR RONDA DO WORKDESK (EQUIPE)</span>
             <kbd class="text-[10px] bg-black/25 px-1.5 py-0.5 rounded text-slate-900 font-mono ml-1 font-bold">R</kbd>
           </button>
         </div>
@@ -4767,6 +4770,62 @@
       return day === 0 || day === 6; // 0 = Domingo, 6 = Sábado
     }
 
+    function getTimestampFromTimeStr(timeStr, dateStr = selectedDate) {
+      if (!timeStr) return null;
+      const parts = timeStr.split(':').map(Number);
+      if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+      const [y, m, d] = (dateStr || getFormattedTodayDate()).split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d, parts[0], parts[1], 0, 0);
+      return dateObj.toISOString();
+    }
+
+    // Cálculo universal de tempo restante da ronda de 30 minutos (unificado para toda a equipe)
+    function calculateWorkdeskSecondsLeft() {
+      const todayStr = getFormattedTodayDate();
+      const targetDate = selectedDate || todayStr;
+
+      if (isWeekend(targetDate)) {
+        return 30 * 60;
+      }
+
+      // Se estiver visualizando uma data passada, o ciclo diário já encerrou
+      if (targetDate < todayStr) {
+        return 0;
+      }
+
+      const state = ensureDateState(targetDate);
+
+      let lastTs = state.lastRoundTimestamp;
+      if (!lastTs && state.lastRoundTime) {
+        lastTs = getTimestampFromTimeStr(state.lastRoundTime, targetDate);
+        state.lastRoundTimestamp = lastTs;
+      }
+
+      if (lastTs) {
+        const lastTimeMs = new Date(lastTs).getTime();
+        if (!isNaN(lastTimeMs)) {
+          const elapsedSecs = Math.floor((Date.now() - lastTimeMs) / 1000);
+          if (elapsedSecs >= 0) {
+            return Math.max(0, 30 * 60 - elapsedSecs);
+          }
+        }
+      }
+
+      // Se nenhuma ronda foi registrada ainda hoje:
+      // A operação inicia às 08:00. O primeiro ciclo vence às 08:30.
+      const now = new Date();
+      const startOfOp = new Date();
+      startOfOp.setHours(8, 0, 0, 0);
+
+      const diffFromStart = Math.floor((now.getTime() - startOfOp.getTime()) / 1000);
+      if (diffFromStart > 0) {
+        const cycleOffset = diffFromStart % (30 * 60);
+        return Math.max(0, 30 * 60 - cycleOffset);
+      }
+
+      return 30 * 60;
+    }
+
     function getLastWorkingDay(baseDateStr) {
       const parts = (baseDateStr || getFormattedTodayDate()).split('-').map(Number);
       const cur = new Date(parts[0], parts[1] - 1, parts[2]);
@@ -4912,6 +4971,7 @@
           workdeskRounds: 0,
           lastRoundTime: null,
           lastRoundUser: null,
+          lastRoundTimestamp: null,
           absentStaff: [],
           lunchDeviations: {},
           productivityChecklists: {},
@@ -5295,6 +5355,28 @@
           }
         } catch (e) {}
 
+        // 5.5. Buscar a última ronda da equipe registrada na tabela rotina_operacional_workdesk
+        try {
+          const { data: wRows, error: wErr } = await supabaseClient
+            .from('rotina_operacional_workdesk')
+            .select('*')
+            .eq('data', dateStr)
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          if (!wErr && Array.isArray(wRows) && wRows.length > 0) {
+            const latestW = wRows[0];
+            const state = ensureDateState(dateStr);
+            if (typeof latestW.ronda_numero === 'number' && latestW.ronda_numero > (state.workdeskRounds || 0)) {
+              state.workdeskRounds = latestW.ronda_numero;
+            }
+            if (latestW.horario) state.lastRoundTime = latestW.horario;
+            if (latestW.gestor) state.lastRoundUser = latestW.gestor;
+            if (latestW.created_at) state.lastRoundTimestamp = latestW.created_at;
+            workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
+          }
+        } catch (e) {}
+
         lastCloudSyncTime = new Date();
 
         // 6. Aplicar os dados consolidados da nuvem
@@ -5376,6 +5458,7 @@
           workdeskRounds: state.workdeskRounds || 0,
           lastRoundTime: state.lastRoundTime || null,
           lastRoundUser: state.lastRoundUser || null,
+          lastRoundTimestamp: state.lastRoundTimestamp || null,
           absentStaff: state.absentStaff || []
         },
         passagem_plantao: state.passagemPlantao || {},
@@ -5560,7 +5643,9 @@
               state.workdeskRounds = payload.data.workdeskRounds;
               state.lastRoundTime = payload.data.lastRoundTime;
               state.lastRoundUser = payload.data.lastRoundUser;
-              workdeskSecondsLeft = 30 * 60;
+              state.lastRoundTimestamp = payload.data.lastRoundTimestamp || new Date().toISOString();
+              workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
+              hasNotifiedThreeMinAlert = false;
               saveLocalState(selectedDate);
               renderApp();
               playChime(880, 0.1);
@@ -5725,9 +5810,13 @@
         if (data.workdesk.lastRoundUser) {
           state.lastRoundUser = data.workdesk.lastRoundUser;
         }
+        if (data.workdesk.lastRoundTimestamp) {
+          state.lastRoundTimestamp = data.workdesk.lastRoundTimestamp;
+        }
         if (Array.isArray(data.workdesk.absentStaff)) {
           state.absentStaff = Array.from(new Set([...(state.absentStaff || []), ...data.workdesk.absentStaff]));
         }
+        workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
       }
 
       if (data.passagem_plantao) {
@@ -5802,6 +5891,7 @@
           }
         }
         activeFilter = 'all';
+        workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
       } catch (e) {
         console.warn('[LocalStorage] Erro ao carregar cache local:', e);
       }
@@ -8315,6 +8405,8 @@ END \$\$;
         return;
       }
 
+      workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
+
       const mins = Math.floor(workdeskSecondsLeft / 60);
       const secs = workdeskSecondsLeft % 60;
       const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
@@ -8329,9 +8421,9 @@ END \$\$;
 
       if (lastCheckedLabel) {
         if (state.lastRoundTime) {
-          lastCheckedLabel.innerHTML = `<strong class="text-white">${state.lastRoundTime}</strong> por <span class="text-[#fbbf24] font-bold">${state.lastRoundUser || 'Gestor'}</span>`;
+          lastCheckedLabel.innerHTML = `<strong class="text-white">${state.lastRoundTime}</strong> por <span class="text-[#fbbf24] font-bold">${state.lastRoundUser || 'Gestor'}</span> <span class="text-[10px] text-slate-400 font-medium">(Equipe)</span>`;
         } else {
-          lastCheckedLabel.textContent = 'Nenhuma ainda hoje';
+          lastCheckedLabel.textContent = 'Nenhuma ainda hoje (Ciclo Unificado)';
         }
       }
 
@@ -9101,11 +9193,16 @@ END \$\$;
       state.workdeskRounds++;
       const now = new Date();
       const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
+      const nowIso = now.toISOString();
       state.lastRoundTime = timeStr;
       state.lastRoundUser = activeOperator;
+      state.lastRoundTimestamp = nowIso;
       workdeskSecondsLeft = 30 * 60; // reset 30m countdown
       hasNotifiedThreeMinAlert = false;
       playChime(880, 0.15);
+
+      // Salva imediatamente no armazenamento local para persistir se atualizar a página
+      saveLocalState(selectedDate);
       
       // Registrar log histórico na tabela rotina_operacional_workdesk
       if (supabaseClient) {
@@ -9113,13 +9210,19 @@ END \$\$;
           data: selectedDate,
           ronda_numero: state.workdeskRounds,
           horario: timeStr,
-          gestor: activeOperator
+          gestor: activeOperator,
+          created_at: nowIso
         }).then();
       }
 
-      showToast(`Ronda do WorkDesk registrada por ${activeOperator}! Total: ${state.workdeskRounds}`);
+      showToast(`✓ Ronda ${state.workdeskRounds} do WorkDesk registrada por ${activeOperator}!`);
       renderApp();
-      broadcastRealtimeAction('workdesk_round', { workdeskRounds: state.workdeskRounds, lastRoundTime: timeStr, lastRoundUser: activeOperator });
+      broadcastRealtimeAction('workdesk_round', {
+        workdeskRounds: state.workdeskRounds,
+        lastRoundTime: timeStr,
+        lastRoundUser: activeOperator,
+        lastRoundTimestamp: nowIso
+      });
       scheduleCloudSync();
     }
 
@@ -9176,43 +9279,41 @@ END \$\$;
     setInterval(() => {
       if (isWeekend(getFormattedTodayDate())) return;
 
-      if (workdeskSecondsLeft > 0) {
-        workdeskSecondsLeft--;
+      const prevSecs = workdeskSecondsLeft;
+      workdeskSecondsLeft = calculateWorkdeskSecondsLeft();
 
-        // Trigger 5-minute warning notification
-        if (workdeskSecondsLeft === 5 * 60 && !hasNotifiedThreeMinAlert) {
-          hasNotifiedThreeMinAlert = true;
-          playChime(520, 0.25);
-          sendDesktopNotification(
-            "⏰ Ronda WorkDesk Vencendo em 5 Minutos!",
-            "Verificar painel WorkDesk, filas acumuladas e tickets com TMA excedido agora."
-          );
-        }
-      } else {
-        workdeskSecondsLeft = 0;
+      // Trigger 5-minute warning notification
+      if (prevSecs > 5 * 60 && workdeskSecondsLeft <= 5 * 60 && workdeskSecondsLeft > 0 && !hasNotifiedThreeMinAlert) {
+        hasNotifiedThreeMinAlert = true;
+        playChime(520, 0.25);
+        sendDesktopNotification(
+          "⏰ Ronda WorkDesk Vencendo em 5 Minutos!",
+          "Verificar painel WorkDesk, filas acumuladas e tickets com TMA excedido agora."
+        );
+      } else if (prevSecs > 0 && workdeskSecondsLeft === 0 && !hasNotifiedThreeMinAlert) {
+        hasNotifiedThreeMinAlert = true;
         playChime(440, 0.3);
-        if (!hasNotifiedThreeMinAlert) {
-          hasNotifiedThreeMinAlert = true;
-          sendDesktopNotification(
-            "🚨 RONDA WORKDESK VENCIDA!",
-            "A ronda periódica de 30 minutos atingiu o tempo limite. Realize a auditoria imediatamente."
-          );
+        sendDesktopNotification(
+          "🚨 RONDA WORKDESK VENCIDA!",
+          "A ronda periódica de 30 minutos atingiu o tempo limite. Realize a auditoria imediatamente."
+        );
 
-          // Disparo de alerta no Discord para a ronda vencida
-          if (discordConfig.autoAlertWorkdeskOverdue && discordConfig.webhookUrl) {
-            try {
-              fetch(discordConfig.webhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  username: 'Service Desk Chat | Alertas WorkDesk',
-                  avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                  content: `🚨 **ALERTA DE RONDA WORKDESK VENCIDA (30 min)**: A auditoria periódica atingiu o tempo limite. Gestores de turno, favor verificar filas e tickets agora!`
-                })
-              }).catch(() => {});
-            } catch(e) {}
-          }
+        // Disparo de alerta no Discord para a ronda vencida
+        if (discordConfig.autoAlertWorkdeskOverdue && discordConfig.webhookUrl) {
+          try {
+            fetch(discordConfig.webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: 'Service Desk Chat | Alertas WorkDesk',
+                avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                content: `🚨 **ALERTA DE RONDA WORKDESK VENCIDA (30 min)**: A auditoria periódica atingiu o tempo limite. Gestores de turno, favor verificar filas e tickets agora!`
+              })
+            }).catch(() => {});
+          } catch(e) {}
         }
+      } else if (workdeskSecondsLeft > 5 * 60) {
+        hasNotifiedThreeMinAlert = false;
       }
 
       const mins = Math.floor(workdeskSecondsLeft / 60);
